@@ -1,8 +1,8 @@
 import type { Logger as TsLogger } from "tslog";
 import { Chalk } from "chalk";
+import type { RuntimeEnv } from "../runtime.js";
 import { CHAT_CHANNEL_ORDER } from "../channels/registry.js";
 import { isVerbose } from "../globals.js";
-import { defaultRuntime, type RuntimeEnv } from "../runtime.js";
 import { clearActiveProgressLine } from "../terminal/progress-line.js";
 import { getConsoleSettings, shouldLogSubsystemToConsole } from "./console.js";
 import { type LogLevel, levelToMinLevel } from "./levels.js";
@@ -316,20 +316,15 @@ export function createSubsystemLogger(subsystem: string): SubsystemLogger {
   return logger;
 }
 
-export function runtimeForLogger(
-  logger: SubsystemLogger,
-  exit: RuntimeEnv["exit"] = defaultRuntime.exit,
-): RuntimeEnv {
+export function runtimeForLogger(logger: SubsystemLogger, exit?: RuntimeEnv["exit"]): RuntimeEnv {
+  const resolvedExit = exit ?? ((code: number) => process.exit(code));
   return {
     log: (message: string) => logger.info(message),
     error: (message: string) => logger.error(message),
-    exit,
+    exit: resolvedExit,
   };
 }
 
-export function createSubsystemRuntime(
-  subsystem: string,
-  exit: RuntimeEnv["exit"] = defaultRuntime.exit,
-): RuntimeEnv {
+export function createSubsystemRuntime(subsystem: string, exit?: RuntimeEnv["exit"]): RuntimeEnv {
   return runtimeForLogger(createSubsystemLogger(subsystem), exit);
 }

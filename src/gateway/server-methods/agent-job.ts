@@ -131,5 +131,3 @@ export async function waitForAgentJob(params: {
     const timer = setTimeout(() => finish(null), timerDelayMs);
   });
 }
-
-ensureAgentRunListener();

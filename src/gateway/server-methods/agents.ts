@@ -43,19 +43,36 @@ import {
 } from "../protocol/index.js";
 import { listAgentsForGateway } from "../session-utils.js";
 
-const BOOTSTRAP_FILE_NAMES = [
-  DEFAULT_AGENTS_FILENAME,
-  DEFAULT_SOUL_FILENAME,
-  DEFAULT_TOOLS_FILENAME,
-  DEFAULT_IDENTITY_FILENAME,
-  DEFAULT_USER_FILENAME,
-  DEFAULT_HEARTBEAT_FILENAME,
-  DEFAULT_BOOTSTRAP_FILENAME,
-] as const;
+let cachedBootstrapFileNames: ReadonlyArray<string> | null = null;
+let cachedAllowedFileNames: ReadonlySet<string> | null = null;
 
-const MEMORY_FILE_NAMES = [DEFAULT_MEMORY_FILENAME, DEFAULT_MEMORY_ALT_FILENAME] as const;
+function bootstrapFileNames(): ReadonlyArray<string> {
+  if (cachedBootstrapFileNames) {
+    return cachedBootstrapFileNames;
+  }
+  cachedBootstrapFileNames = [
+    DEFAULT_AGENTS_FILENAME,
+    DEFAULT_SOUL_FILENAME,
+    DEFAULT_TOOLS_FILENAME,
+    DEFAULT_IDENTITY_FILENAME,
+    DEFAULT_USER_FILENAME,
+    DEFAULT_HEARTBEAT_FILENAME,
+    DEFAULT_BOOTSTRAP_FILENAME,
+  ];
+  return cachedBootstrapFileNames;
+}
 
-const ALLOWED_FILE_NAMES = new Set<string>([...BOOTSTRAP_FILE_NAMES, ...MEMORY_FILE_NAMES]);
+function allowedFileNames(): ReadonlySet<string> {
+  if (cachedAllowedFileNames) {
+    return cachedAllowedFileNames;
+  }
+  cachedAllowedFileNames = new Set<string>([
+    ...bootstrapFileNames(),
+    DEFAULT_MEMORY_FILENAME,
+    DEFAULT_MEMORY_ALT_FILENAME,
+  ]);
+  return cachedAllowedFileNames;
+}
 
 function resolveAgentWorkspaceFileOrRespondError(
   params: Record<string, unknown>,
@@ -80,7 +97,7 @@ function resolveAgentWorkspaceFileOrRespondError(
   const name = (
     typeof rawName === "string" || typeof rawName === "number" ? String(rawName) : ""
   ).trim();
-  if (!ALLOWED_FILE_NAMES.has(name)) {
+  if (!allowedFileNames().has(name)) {
     respond(false, undefined, errorShape(ErrorCodes.INVALID_REQUEST, `unsupported file "${name}"`));
     return null;
   }
@@ -117,7 +134,7 @@ async function listAgentFiles(workspaceDir: string) {
     updatedAtMs?: number;
   }> = [];
 
-  for (const name of BOOTSTRAP_FILE_NAMES) {
+  for (const name of bootstrapFileNames()) {
     const filePath = path.join(workspaceDir, name);
     const meta = await statFile(filePath);
     if (meta) {

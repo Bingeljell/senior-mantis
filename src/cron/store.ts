@@ -3,9 +3,9 @@ import fs from "node:fs";
 import path from "node:path";
 import type { CronStoreFile } from "./types.js";
 import { expandHomePrefix } from "../infra/home-dir.js";
-import { CONFIG_DIR } from "../utils.js";
+import { resolveConfigDir } from "../utils.js";
 
-export const DEFAULT_CRON_DIR = path.join(CONFIG_DIR, "cron");
+export const DEFAULT_CRON_DIR = path.join(resolveConfigDir(), "cron");
 export const DEFAULT_CRON_STORE_PATH = path.join(DEFAULT_CRON_DIR, "jobs.json");
 
 export function resolveCronStorePath(storePath?: string) {
