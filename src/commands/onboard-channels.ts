@@ -133,13 +133,15 @@ async function collectChannelStatus(params: {
     (entry) => !installedIds.has(entry.id) && shouldIncludeOnboardingChannel(entry.id),
   );
   const statusEntries = await Promise.all(
-    listChannelOnboardingAdapters().map((adapter) =>
-      adapter.getStatus({
-        cfg: params.cfg,
-        options: params.options,
-        accountOverrides: params.accountOverrides,
-      }),
-    ),
+    listChannelOnboardingAdapters()
+      .filter((adapter) => shouldIncludeOnboardingChannel(adapter.channel))
+      .map((adapter) =>
+        adapter.getStatus({
+          cfg: params.cfg,
+          options: params.options,
+          accountOverrides: params.accountOverrides,
+        }),
+      ),
   );
   const filteredStatuses = statusEntries.filter((entry) =>
     shouldIncludeOnboardingChannel(entry.channel),
@@ -323,7 +325,11 @@ export async function setupChannels(
   options?: SetupChannelsOptions,
 ): Promise<OpenClawConfig> {
   let next = cfg;
-  const forceAllowFromChannels = new Set(options?.forceAllowFromChannels ?? []);
+  const forceAllowFromChannels = new Set(
+    (options?.forceAllowFromChannels ?? []).filter((channel) =>
+      shouldIncludeOnboardingChannel(channel),
+    ),
+  );
   const accountOverrides: Partial<Record<ChannelChoice, string>> = {
     ...options?.accountIds,
   };
@@ -374,8 +380,7 @@ export async function setupChannels(
   ];
   await noteChannelPrimer(prompter, primerChannels);
 
-  const quickstartDefault =
-    options?.initialSelection?.[0] ?? resolveQuickstartDefault(statusByChannel);
+  const quickstartStatusDefault = resolveQuickstartDefault(statusByChannel);
 
   const shouldPromptAccountIds = options?.promptAccountIds === true;
   const accountIdsByChannel = new Map<ChannelChoice, string>();
@@ -468,6 +473,26 @@ export async function setupChannels(
       catalog,
       catalogById: new Map(catalog.map((entry) => [entry.id as ChannelChoice, entry])),
     };
+  };
+
+  const resolveInitialChannelSelection = (
+    entries: Array<{
+      id: ChannelChoice;
+      meta: { id: string; label: string; selectionLabel?: string };
+    }>,
+  ): ChannelChoice | undefined => {
+    const explicit = options?.initialSelection?.find((channel) =>
+      entries.some((entry) => entry.id === channel),
+    );
+    if (explicit) {
+      return explicit;
+    }
+    if (!quickstartStatusDefault) {
+      return undefined;
+    }
+    return entries.some((entry) => entry.id === quickstartStatusDefault)
+      ? quickstartStatusDefault
+      : undefined;
   };
 
   const refreshStatus = async (channel: ChannelChoice) => {
@@ -604,7 +629,15 @@ export async function setupChannels(
   };
 
   const handleChannelChoice = async (channel: ChannelChoice) => {
-    const { catalogById } = getChannelEntries();
+    if (!shouldIncludeOnboardingChannel(channel)) {
+      await prompter.note(`Skipping ${channel}: not available in this runtime profile.`, "Channels");
+      return;
+    }
+    const { entries, catalogById } = getChannelEntries();
+    if (!entries.some((entry) => entry.id === channel)) {
+      await prompter.note(`Skipping ${channel}: channel is unavailable.`, "Channels");
+      return;
+    }
     const catalogEntry = catalogById.get(channel);
     if (catalogEntry) {
       const workspaceDir = resolveAgentWorkspaceDir(next, resolveDefaultAgentId(next));
@@ -645,6 +678,7 @@ export async function setupChannels(
 
   if (options?.quickstartDefaults) {
     const { entries } = getChannelEntries();
+    const quickstartDefault = resolveInitialChannelSelection(entries);
     const addLaterHint = isSeniorMantisCli()
       ? `You can run \`${formatCliCommand("openclaw onboard")}\` again later.`
       : `You can add channels later via \`${formatCliCommand("openclaw channels add")}\``;
@@ -665,7 +699,8 @@ export async function setupChannels(
     }
   } else {
     const doneValue = "__done__" as const;
-    const initialValue = options?.initialSelection?.[0] ?? quickstartDefault;
+    const { entries } = getChannelEntries();
+    const initialValue = resolveInitialChannelSelection(entries);
     while (true) {
       const { entries } = getChannelEntries();
       const choice = (await prompter.select({

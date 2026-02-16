@@ -247,4 +247,99 @@ describe("setupChannels", () => {
     expect(select).toHaveBeenCalledWith(expect.objectContaining({ message: "Select a channel" }));
     expect(multiselect).not.toHaveBeenCalled();
   });
+
+  it("limits QuickStart channel choices to WhatsApp in Senior Mantis mode", async () => {
+    vi.stubEnv("OPENCLAW_CLI_NAME_OVERRIDE", "seniormantis");
+    const select = vi.fn(async ({ message, options }: { message: string; options: unknown[] }) => {
+      if (message === "Select channel (QuickStart)") {
+        const opts = options as Array<{ value: string }>;
+        const values = opts.map((opt) => opt.value);
+        expect(values).toContain("whatsapp");
+        expect(values).not.toContain("telegram");
+        expect(values).not.toContain("discord");
+        return "__skip__";
+      }
+      throw new Error(`unexpected select prompt: ${message}`);
+    });
+    const multiselect = vi.fn(async () => {
+      throw new Error("unexpected multiselect");
+    });
+    const text = vi.fn(async ({ message }: { message: string }) => {
+      throw new Error(`unexpected text prompt: ${message}`);
+    });
+
+    const prompter: WizardPrompter = {
+      intro: vi.fn(async () => {}),
+      outro: vi.fn(async () => {}),
+      note: vi.fn(async () => {}),
+      select,
+      multiselect,
+      text: text as unknown as WizardPrompter["text"],
+      confirm: vi.fn(async () => false),
+      progress: vi.fn(() => ({ update: vi.fn(), stop: vi.fn() })),
+    };
+
+    const runtime: RuntimeEnv = {
+      log: vi.fn(),
+      error: vi.fn(),
+      exit: vi.fn((code: number) => {
+        throw new Error(`exit:${code}`);
+      }),
+    };
+
+    await setupChannels({} as OpenClawConfig, runtime, prompter, {
+      skipConfirm: true,
+      quickstartDefaults: true,
+      initialSelection: ["telegram"],
+      forceAllowFromChannels: ["telegram", "whatsapp"],
+    });
+
+    const quickstartCall = select.mock.calls.find(
+      ([args]) => (args as { message?: string }).message === "Select channel (QuickStart)",
+    );
+    expect(quickstartCall).toBeTruthy();
+    const quickstartInitialValue = (quickstartCall?.[0] as { initialValue?: string }).initialValue;
+    expect(quickstartInitialValue).not.toBe("telegram");
+    expect(multiselect).not.toHaveBeenCalled();
+  });
+
+  it("uses Senior Mantis primer text without non-v1 CLI commands", async () => {
+    vi.stubEnv("OPENCLAW_CLI_NAME_OVERRIDE", "seniormantis");
+    const note = vi.fn(async () => {});
+    const select = vi.fn(async () => "__done__");
+    const multiselect = vi.fn(async () => {
+      throw new Error("unexpected multiselect");
+    });
+
+    const prompter: WizardPrompter = {
+      intro: vi.fn(async () => {}),
+      outro: vi.fn(async () => {}),
+      note,
+      select,
+      multiselect,
+      text: vi.fn(async () => ""),
+      confirm: vi.fn(async () => false),
+      progress: vi.fn(() => ({ update: vi.fn(), stop: vi.fn() })),
+    };
+
+    const runtime: RuntimeEnv = {
+      log: vi.fn(),
+      error: vi.fn(),
+      exit: vi.fn((code: number) => {
+        throw new Error(`exit:${code}`);
+      }),
+    };
+
+    await setupChannels({} as OpenClawConfig, runtime, prompter, {
+      skipConfirm: true,
+    });
+
+    const primerNote = note.mock.calls.find(([, title]) => title === "How channels work");
+    expect(primerNote).toBeTruthy();
+    const primerBody = String(primerNote?.[0] ?? "");
+    expect(primerBody).toContain("Approve pairing requests from the local dashboard/onboarding flow.");
+    expect(primerBody).not.toContain("pairing approve");
+    expect(primerBody).not.toContain('config set session.dmScope "per-channel-peer"');
+    expect(multiselect).not.toHaveBeenCalled();
+  });
 });
