@@ -37,3 +37,7 @@ Reason: reduce risk by keeping code available while constraining behavior to des
 ### D-009: Staged prune policy
 Decision: prune non-v1 channel/plugin/deployment surfaces in stages, starting with runtime/channel enforcement and removal of Fly deployment artifacts.
 Reason: keep the migration safe while converging to desktop-first local v1 scope.
+
+### D-010: Senior Mantis onboarding channel scope
+Decision: restrict onboarding channel setup to WhatsApp only in Senior Mantis mode.
+Reason: align onboarding UX with v1 scope and avoid exposing non-v1 channel setup paths.

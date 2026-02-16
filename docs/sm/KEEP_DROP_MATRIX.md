@@ -17,6 +17,7 @@ Legend:
 | UI package | `ui/**` | Keep | Control UI and chat surfaces |
 | Core config/infra | `src/config/**`, `src/infra/**` | Keep | runtime plumbing |
 | Multi-channel CLI | `src/cli/channels-cli.ts` and non-v1 sub-CLIs | Defer | remove after Senior Mantis onboarding is stable |
+| Onboarding channel chooser | `src/commands/onboard-channels.ts`, `src/wizard/onboarding.ts` | Keep | Senior Mantis runtime now filters onboarding to WhatsApp-only |
 | Plugin channels | `extensions/**` | Drop | not needed in v1 (staged: non-v1 channel plugins runtime-disabled in Senior Mantis guardrails) |
 | Mobile apps | `apps/ios/**`, `apps/android/**` | Drop | out of scope v1 |
 | macOS native app | `apps/macos/**` | Drop | replaced by Electron |

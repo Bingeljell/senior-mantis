@@ -27,6 +27,9 @@ Last updated: 2026-02-16
 - Added Senior Mantis-specific status/health/sessions registration text to remove non-v1 channel wording:
   - `src/sm/cli/program/register-status-health-sessions.ts`
   - `src/sm/cli/program/build-program.ts`
+- Locked onboarding channel selection to v1 scope in Senior Mantis mode:
+  - `src/commands/onboard-channels.ts` (filter selectable channels to WhatsApp)
+  - `src/wizard/onboarding.ts` (Senior Mantis onboarding flags + DM policy prompt skip)
 - Expanded runtime guardrails to explicitly disable non-v1 channel plugins:
   - `src/sm/runtime-guardrails.ts`
   - `src/sm/runtime-guardrails.test.ts`
