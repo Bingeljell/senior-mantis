@@ -11,6 +11,7 @@ onlyBuiltDependencies:
   - "@napi-rs/canvas"
   - "@whiskeysockets/baileys"
   - authenticate-pam
+  - electron
   - esbuild
   - node-llama-cpp
   - protobufjs
