@@ -7,6 +7,7 @@ import { withProgress } from "../cli/progress.js";
 import { loadConfig } from "../config/config.js";
 import { callGateway, randomIdempotencyKey } from "../gateway/call.js";
 import { normalizeAgentId } from "../routing/session-key.js";
+import { assertSeniorMantisAllowedGatewayChannel } from "../sm/channel-policy.js";
 import {
   GATEWAY_CLIENT_MODES,
   GATEWAY_CLIENT_NAMES,
@@ -119,6 +120,11 @@ export async function agentViaGatewayCommand(opts: AgentCliOpts, runtime: Runtim
   }).sessionKey;
 
   const channel = normalizeMessageChannel(opts.channel) ?? DEFAULT_CHAT_CHANNEL;
+  assertSeniorMantisAllowedGatewayChannel(channel, "--channel");
+  const replyChannelRaw = normalizeMessageChannel(opts.replyChannel) ?? opts.replyChannel?.trim();
+  if (replyChannelRaw) {
+    assertSeniorMantisAllowedGatewayChannel(replyChannelRaw, "--reply-channel");
+  }
   const idempotencyKey = opts.runId?.trim() || randomIdempotencyKey();
 
   const response = await withProgress(
@@ -140,7 +146,7 @@ export async function agentViaGatewayCommand(opts: AgentCliOpts, runtime: Runtim
           thinking: opts.thinking,
           deliver: Boolean(opts.deliver),
           channel,
-          replyChannel: opts.replyChannel,
+          replyChannel: replyChannelRaw,
           replyAccountId: opts.replyAccount,
           timeout: timeoutSeconds,
           lane: opts.lane,

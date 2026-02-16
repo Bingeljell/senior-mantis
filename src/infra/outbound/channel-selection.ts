@@ -1,5 +1,10 @@
 import type { ChannelPlugin } from "../../channels/plugins/types.js";
 import type { OpenClawConfig } from "../../config/config.js";
+import {
+  assertSeniorMantisAllowedDeliverableChannel,
+  isSeniorMantisAllowedDeliverableChannel,
+  isSeniorMantisCli,
+} from "../../sm/channel-policy.js";
 import { listChannelPlugins } from "../../channels/plugins/index.js";
 import {
   listDeliverableMessageChannels,
@@ -61,7 +66,10 @@ export async function listConfiguredMessageChannels(
       channels.push(plugin.id);
     }
   }
-  return channels;
+  if (!isSeniorMantisCli()) {
+    return channels;
+  }
+  return channels.filter((channel) => isSeniorMantisAllowedDeliverableChannel(channel));
 }
 
 export async function resolveMessageChannelSelection(params: {
@@ -73,6 +81,7 @@ export async function resolveMessageChannelSelection(params: {
     if (!isKnownChannel(normalized)) {
       throw new Error(`Unknown channel: ${String(normalized)}`);
     }
+    assertSeniorMantisAllowedDeliverableChannel(normalized, "--channel");
     return {
       channel: normalized as MessageChannelId,
       configured: await listConfiguredMessageChannels(params.cfg),

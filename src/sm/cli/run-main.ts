@@ -8,6 +8,7 @@ import { installUnhandledRejectionHandler } from "../../infra/unhandled-rejectio
 import { enableConsoleCapture } from "../../logging.js";
 import { normalizeWindowsArgv } from "../../cli/windows-argv.js";
 import { applySeniorMantisDefaults } from "../env.js";
+import { applySeniorMantisRuntimeGuardrails } from "../runtime-guardrails.js";
 import { buildSeniorMantisProgram } from "./program/build-program.js";
 
 function rewriteUpdateFlagArgv(argv: string[]): string[] {
@@ -27,6 +28,7 @@ export async function runSeniorMantisCli(argv: string[] = process.argv): Promise
   loadDotEnv({ quiet: true });
   normalizeEnv();
   applySeniorMantisDefaults();
+  applySeniorMantisRuntimeGuardrails();
   ensureOpenClawCliOnPath();
 
   // Enforce minimum runtime before doing any work.
