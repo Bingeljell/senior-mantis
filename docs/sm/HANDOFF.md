@@ -33,6 +33,7 @@ Ship a senior-friendly assistant app based on OpenClaw with a narrow v1:
   - gateway channel policy: `whatsapp|webchat` only
   - deliverable channel policy: `whatsapp` only
   - enforcement wired into agent/message runtime path
+- Added Senior Mantis-specific `status`/`health`/`sessions` registration (`src/sm/cli/program/register-status-health-sessions.ts`) to avoid non-v1 channel phrasing in help text.
 - Updated plugin auto-enable behavior to respect `channels.<id>.enabled=false` so disabled channels are not re-enabled from env/config detection.
 - Added tests:
   - `src/sm/env.test.ts`

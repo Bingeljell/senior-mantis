@@ -6,7 +6,6 @@ import { registerAgentCommands } from "../../../cli/program/register.agent.js";
 import { registerOnboardCommand } from "../../../cli/program/register.onboard.js";
 import { registerPreActionHooks } from "../../../cli/program/preaction.js";
 import { registerSetupCommand } from "../../../cli/program/register.setup.js";
-import { registerStatusHealthSessionsCommands } from "../../../cli/program/register.status-health-sessions.js";
 import { createMessageCliHelpers } from "../../../cli/program/message/helpers.js";
 import { registerMessageSendCommand } from "../../../cli/program/message/register.send.js";
 import { dashboardCommand } from "../../../commands/dashboard.js";
@@ -15,6 +14,7 @@ import { defaultRuntime } from "../../../runtime.js";
 import { formatDocsLink } from "../../../terminal/links.js";
 import { theme } from "../../../terminal/theme.js";
 import { VERSION } from "../../../version.js";
+import { registerSeniorMantisStatusHealthSessionsCommands } from "./register-status-health-sessions.js";
 
 const SM_CHANNELS = ["whatsapp", "webchat"] as const;
 
@@ -127,7 +127,7 @@ export function buildSeniorMantisProgram(): Command {
   registerSeniorMantisMaintenanceCommands(program);
   registerSeniorMantisMessageCommands(program, ctx);
   registerAgentCommands(program, { agentChannelOptions: ctx.agentChannelOptions });
-  registerStatusHealthSessionsCommands(program);
+  registerSeniorMantisStatusHealthSessionsCommands(program);
   registerGatewayCli(program);
 
   return program;
