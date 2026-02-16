@@ -1,0 +1,11 @@
+const { contextBridge, ipcRenderer } = require("electron");
+
+contextBridge.exposeInMainWorld("smDesktop", {
+  getConfig: () => ipcRenderer.invoke("sm:get-config"),
+  runReadonly: (action) => ipcRenderer.invoke("sm:run-readonly", action),
+  getGatewayStatus: () => ipcRenderer.invoke("sm:gateway-status"),
+  startGateway: () => ipcRenderer.invoke("sm:start-gateway"),
+  stopGateway: () => ipcRenderer.invoke("sm:stop-gateway"),
+  openDashboard: () => ipcRenderer.invoke("sm:open-dashboard"),
+  runOnboarding: () => ipcRenderer.invoke("sm:run-onboarding"),
+});

@@ -1,0 +1,108 @@
+const els = {
+  startGateway: document.getElementById("startGateway"),
+  stopGateway: document.getElementById("stopGateway"),
+  openOnboarding: document.getElementById("openOnboarding"),
+  openDashboard: document.getElementById("openDashboard"),
+  refreshHealth: document.getElementById("refreshHealth"),
+  refreshSessions: document.getElementById("refreshSessions"),
+  refreshStatus: document.getElementById("refreshStatus"),
+  refreshFrame: document.getElementById("refreshFrame"),
+  gatewayStatus: document.getElementById("gatewayStatus"),
+  healthOutput: document.getElementById("healthOutput"),
+  sessionsOutput: document.getElementById("sessionsOutput"),
+  statusOutput: document.getElementById("statusOutput"),
+  activityLog: document.getElementById("activityLog"),
+  webUiFrame: document.getElementById("webUiFrame"),
+};
+
+function logActivity(message) {
+  const timestamp = new Date().toLocaleTimeString();
+  const current = els.activityLog.textContent?.trim();
+  const nextLine = `[${timestamp}] ${message}`;
+  els.activityLog.textContent = current ? `${nextLine}\n${current}` : nextLine;
+}
+
+function pretty(result) {
+  if (!result) {
+    return "No result.";
+  }
+  if (result.ok && result.stdout) {
+    try {
+      return JSON.stringify(JSON.parse(result.stdout), null, 2);
+    } catch {
+      return result.stdout;
+    }
+  }
+  return JSON.stringify(result, null, 2);
+}
+
+async function refreshGatewayStatus() {
+  const status = await window.smDesktop.getGatewayStatus();
+  const startedAt = status.startedAt ? ` · started: ${status.startedAt}` : "";
+  els.gatewayStatus.textContent = status.running
+    ? `Running (desktop-managed)${startedAt}`
+    : `Not running (desktop-managed) · UI URL ${status.gatewayUrl}`;
+}
+
+async function refreshReadOnlyView(action, target) {
+  const result = await window.smDesktop.runReadonly(action);
+  target.textContent = pretty(result);
+}
+
+async function boot() {
+  const cfg = await window.smDesktop.getConfig();
+  els.webUiFrame.src = cfg.gatewayUrl;
+  logActivity(`Loaded UI frame: ${cfg.gatewayUrl}`);
+  await refreshGatewayStatus();
+  await Promise.all([
+    refreshReadOnlyView("status", els.statusOutput),
+    refreshReadOnlyView("health", els.healthOutput),
+    refreshReadOnlyView("sessions", els.sessionsOutput),
+  ]);
+}
+
+els.startGateway.addEventListener("click", async () => {
+  const result = await window.smDesktop.startGateway();
+  logActivity(result.message ?? "Start gateway completed.");
+  await refreshGatewayStatus();
+});
+
+els.stopGateway.addEventListener("click", async () => {
+  const result = await window.smDesktop.stopGateway();
+  logActivity(result.message ?? "Stop gateway completed.");
+  await refreshGatewayStatus();
+});
+
+els.openOnboarding.addEventListener("click", async () => {
+  const result = await window.smDesktop.runOnboarding();
+  logActivity(result.message ?? "Onboarding action completed.");
+});
+
+els.openDashboard.addEventListener("click", async () => {
+  const result = await window.smDesktop.openDashboard();
+  logActivity(result.message ?? "Opened dashboard.");
+});
+
+els.refreshHealth.addEventListener("click", async () => {
+  await refreshReadOnlyView("health", els.healthOutput);
+  logActivity("Refreshed health snapshot.");
+});
+
+els.refreshSessions.addEventListener("click", async () => {
+  await refreshReadOnlyView("sessions", els.sessionsOutput);
+  logActivity("Refreshed sessions snapshot.");
+});
+
+els.refreshStatus.addEventListener("click", async () => {
+  await refreshReadOnlyView("status", els.statusOutput);
+  logActivity("Refreshed status snapshot.");
+});
+
+els.refreshFrame.addEventListener("click", () => {
+  els.webUiFrame.contentWindow?.location.reload();
+  logActivity("Reloaded embedded local web UI.");
+});
+
+boot().catch((error) => {
+  logActivity(`Bootstrap failure: ${String(error)}`);
+});

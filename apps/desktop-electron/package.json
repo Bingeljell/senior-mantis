@@ -1,0 +1,15 @@
+{
+  "name": "@seniormantis/desktop-electron",
+  "version": "0.0.1",
+  "private": true,
+  "description": "Senior Mantis desktop shell (Electron)",
+  "main": "main.mjs",
+  "type": "module",
+  "scripts": {
+    "dev": "electron .",
+    "start": "electron ."
+  },
+  "devDependencies": {
+    "electron": "^35.7.5"
+  }
+}
