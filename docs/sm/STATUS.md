@@ -60,7 +60,7 @@ Last updated: 2026-02-16
 - `docs/zh-CN/**` was intentionally not edited in this pass (generated content policy).
 
 ## Validation attempts
-- `pnpm test -- --run src/sm/env.test.ts src/sm/cli/program/build-program.test.ts src/sm/runtime-guardrails.test.ts src/sm/channel-policy.test.ts`
+- `pnpm test -- --run src/commands/onboard-channels.e2e.test.ts src/sm/channel-policy.test.ts`
   - Error: `ERR_PNPM_RECURSIVE_EXEC_FIRST_FAIL Command "vitest" not found`
 - `pnpm install`
   - Error: `ENOTFOUND registry.npmjs.org` while fetching packages
