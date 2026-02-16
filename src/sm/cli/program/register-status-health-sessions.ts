@@ -1,4 +1,7 @@
 import type { Command } from "commander";
+import { runCommandWithRuntime } from "../../../cli/cli-utils.js";
+import { formatHelpExamples } from "../../../cli/help-format.js";
+import { parsePositiveIntOrUndefined } from "../../../cli/program/helpers.js";
 import { healthCommand } from "../../../commands/health.js";
 import { sessionsCommand } from "../../../commands/sessions.js";
 import { statusCommand } from "../../../commands/status.js";
@@ -6,9 +9,6 @@ import { setVerbose } from "../../../globals.js";
 import { defaultRuntime } from "../../../runtime.js";
 import { formatDocsLink } from "../../../terminal/links.js";
 import { theme } from "../../../terminal/theme.js";
-import { runCommandWithRuntime } from "../../../cli/cli-utils.js";
-import { formatHelpExamples } from "../../../cli/help-format.js";
-import { parsePositiveIntOrUndefined } from "../../../cli/program/helpers.js";
 
 function resolveVerbose(opts: { verbose?: boolean; debug?: boolean }): boolean {
   return Boolean(opts.verbose || opts.debug);

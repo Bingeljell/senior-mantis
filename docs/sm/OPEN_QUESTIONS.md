@@ -9,10 +9,12 @@
 ## Safety and policy
 
 1. Which actions require explicit confirmation by default:
+
 - sending email
 - executing shell commands
 - browser form submission
 - file deletion
+
 2. Should confirmations be per-action or session-level temporary approvals?
 
 ## UX

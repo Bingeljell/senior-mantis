@@ -14,14 +14,19 @@
 4. WhatsApp inbound message produces a response in same chat.
 5. Dashboard opens and connects with local auth.
 6. Manual email workflow:
+
 - read/summarize works
 - draft works
 - send requires explicit confirmation
+
 7. Guided web workflow:
+
 - open page
 - summarize page
 - guided navigation instruction response
+
 8. Voice setup:
+
 - mic/speaker test path executes
 - disabled voice path does not block onboarding
 

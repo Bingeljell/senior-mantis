@@ -1,13 +1,13 @@
 import { Command } from "commander";
-import { registerGatewayCli } from "../../../cli/gateway-cli.js";
-import { runCommandWithRuntime } from "../../../cli/cli-utils.js";
 import type { ProgramContext } from "../../../cli/program/context.js";
-import { registerAgentCommands } from "../../../cli/program/register.agent.js";
-import { registerOnboardCommand } from "../../../cli/program/register.onboard.js";
-import { registerPreActionHooks } from "../../../cli/program/preaction.js";
-import { registerSetupCommand } from "../../../cli/program/register.setup.js";
+import { runCommandWithRuntime } from "../../../cli/cli-utils.js";
+import { registerGatewayCli } from "../../../cli/gateway-cli.js";
 import { createMessageCliHelpers } from "../../../cli/program/message/helpers.js";
 import { registerMessageSendCommand } from "../../../cli/program/message/register.send.js";
+import { registerPreActionHooks } from "../../../cli/program/preaction.js";
+import { registerAgentCommands } from "../../../cli/program/register.agent.js";
+import { registerOnboardCommand } from "../../../cli/program/register.onboard.js";
+import { registerSetupCommand } from "../../../cli/program/register.setup.js";
 import { dashboardCommand } from "../../../commands/dashboard.js";
 import { doctorCommand } from "../../../commands/doctor.js";
 import { defaultRuntime } from "../../../runtime.js";
@@ -50,7 +50,10 @@ function configureSeniorMantisHelp(program: Command, ctx: ProgramContext): void 
     outputError: (str, write) => write(theme.error(str)),
   });
 
-  const docsLink = formatDocsLink("/start/getting-started", "docs.openclaw.ai/start/getting-started");
+  const docsLink = formatDocsLink(
+    "/start/getting-started",
+    "docs.openclaw.ai/start/getting-started",
+  );
   program.addHelpText("afterAll", () => {
     return `
 ${theme.heading("Quick Start:")}

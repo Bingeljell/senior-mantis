@@ -34,10 +34,7 @@ export function assertSeniorMantisAllowedGatewayChannel(raw: string, optionName:
   );
 }
 
-export function assertSeniorMantisAllowedDeliverableChannel(
-  raw: string,
-  optionName: string,
-): void {
+export function assertSeniorMantisAllowedDeliverableChannel(raw: string, optionName: string): void {
   if (!isSeniorMantisCli()) {
     return;
   }

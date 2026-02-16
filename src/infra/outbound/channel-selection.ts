@@ -1,11 +1,11 @@
 import type { ChannelPlugin } from "../../channels/plugins/types.js";
 import type { OpenClawConfig } from "../../config/config.js";
+import { listChannelPlugins } from "../../channels/plugins/index.js";
 import {
   assertSeniorMantisAllowedDeliverableChannel,
   isSeniorMantisAllowedDeliverableChannel,
   isSeniorMantisCli,
 } from "../../sm/channel-policy.js";
-import { listChannelPlugins } from "../../channels/plugins/index.js";
 import {
   listDeliverableMessageChannels,
   type DeliverableMessageChannel,

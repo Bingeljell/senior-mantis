@@ -22,10 +22,7 @@ import { formatCliCommand } from "../cli/command-format.js";
 import { isChannelConfigured } from "../config/plugin-auto-enable.js";
 import { enablePluginInConfig } from "../plugins/enable.js";
 import { DEFAULT_ACCOUNT_ID, normalizeAccountId } from "../routing/session-key.js";
-import {
-  isSeniorMantisAllowedOnboardingChannel,
-  isSeniorMantisCli,
-} from "../sm/channel-policy.js";
+import { isSeniorMantisAllowedOnboardingChannel, isSeniorMantisCli } from "../sm/channel-policy.js";
 import { formatDocsLink } from "../terminal/links.js";
 import {
   ensureOnboardingPluginInstalled,
@@ -456,12 +453,11 @@ export async function setupChannels(
     );
     const installedIds = new Set(installed.map((plugin) => plugin.id));
     const workspaceDir = resolveAgentWorkspaceDir(next, resolveDefaultAgentId(next));
-    const catalog: ReturnType<typeof listChannelPluginCatalogEntries> =
-      shouldUseOnboardingCatalog()
-        ? listChannelPluginCatalogEntries({ workspaceDir }).filter(
-            (entry) => !installedIds.has(entry.id) && shouldIncludeOnboardingChannel(entry.id),
-          )
-        : [];
+    const catalog: ReturnType<typeof listChannelPluginCatalogEntries> = shouldUseOnboardingCatalog()
+      ? listChannelPluginCatalogEntries({ workspaceDir }).filter(
+          (entry) => !installedIds.has(entry.id) && shouldIncludeOnboardingChannel(entry.id),
+        )
+      : [];
     const metaById = new Map<string, ChannelMeta>();
     for (const meta of core) {
       metaById.set(meta.id, meta);
@@ -640,7 +636,10 @@ export async function setupChannels(
 
   const handleChannelChoice = async (channel: ChannelChoice) => {
     if (!shouldIncludeOnboardingChannel(channel)) {
-      await prompter.note(`Skipping ${channel}: not available in this runtime profile.`, "Channels");
+      await prompter.note(
+        `Skipping ${channel}: not available in this runtime profile.`,
+        "Channels",
+      );
       return;
     }
     const { entries, catalogById } = getChannelEntries();

@@ -1,4 +1,5 @@
 import process from "node:process";
+import { normalizeWindowsArgv } from "../../cli/windows-argv.js";
 import { loadDotEnv } from "../../infra/dotenv.js";
 import { normalizeEnv } from "../../infra/env.js";
 import { formatUncaughtError } from "../../infra/errors.js";
@@ -6,7 +7,6 @@ import { ensureOpenClawCliOnPath } from "../../infra/path-env.js";
 import { assertSupportedRuntime } from "../../infra/runtime-guard.js";
 import { installUnhandledRejectionHandler } from "../../infra/unhandled-rejections.js";
 import { enableConsoleCapture } from "../../logging.js";
-import { normalizeWindowsArgv } from "../../cli/windows-argv.js";
 import { applySeniorMantisDefaults } from "../env.js";
 import { applySeniorMantisRuntimeGuardrails } from "../runtime-guardrails.js";
 import { buildSeniorMantisProgram } from "./program/build-program.js";

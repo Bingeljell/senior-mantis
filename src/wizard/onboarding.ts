@@ -40,10 +40,7 @@ import {
 } from "../config/config.js";
 import { logConfigUpdated } from "../config/logging.js";
 import { defaultRuntime } from "../runtime.js";
-import {
-  isSeniorMantisAllowedOnboardingChannel,
-  isSeniorMantisCli,
-} from "../sm/channel-policy.js";
+import { isSeniorMantisAllowedOnboardingChannel, isSeniorMantisCli } from "../sm/channel-policy.js";
 import { resolveUserPath } from "../utils.js";
 import { finalizeOnboardingWizard } from "./onboarding.finalize.js";
 import { configureGatewayForOnboarding } from "./onboarding.gateway-config.js";
