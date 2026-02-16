@@ -52,6 +52,10 @@ function shouldIncludeOnboardingChannel(channel: string): boolean {
   return isSeniorMantisAllowedOnboardingChannel(channel);
 }
 
+function shouldUseOnboardingCatalog(): boolean {
+  return !isSeniorMantisCli();
+}
+
 function formatAccountLabel(accountId: string): string {
   return accountId === DEFAULT_ACCOUNT_ID ? "default (primary)" : accountId;
 }
@@ -129,9 +133,12 @@ async function collectChannelStatus(params: {
   );
   const installedIds = new Set(installedPlugins.map((plugin) => plugin.id));
   const workspaceDir = resolveAgentWorkspaceDir(params.cfg, resolveDefaultAgentId(params.cfg));
-  const catalogEntries = listChannelPluginCatalogEntries({ workspaceDir }).filter(
-    (entry) => !installedIds.has(entry.id) && shouldIncludeOnboardingChannel(entry.id),
-  );
+  const catalogEntries: ReturnType<typeof listChannelPluginCatalogEntries> =
+    shouldUseOnboardingCatalog()
+      ? listChannelPluginCatalogEntries({ workspaceDir }).filter(
+          (entry) => !installedIds.has(entry.id) && shouldIncludeOnboardingChannel(entry.id),
+        )
+      : [];
   const statusEntries = await Promise.all(
     listChannelOnboardingAdapters()
       .filter((adapter) => shouldIncludeOnboardingChannel(adapter.channel))
@@ -449,9 +456,12 @@ export async function setupChannels(
     );
     const installedIds = new Set(installed.map((plugin) => plugin.id));
     const workspaceDir = resolveAgentWorkspaceDir(next, resolveDefaultAgentId(next));
-    const catalog = listChannelPluginCatalogEntries({ workspaceDir }).filter(
-      (entry) => !installedIds.has(entry.id) && shouldIncludeOnboardingChannel(entry.id),
-    );
+    const catalog: ReturnType<typeof listChannelPluginCatalogEntries> =
+      shouldUseOnboardingCatalog()
+        ? listChannelPluginCatalogEntries({ workspaceDir }).filter(
+            (entry) => !installedIds.has(entry.id) && shouldIncludeOnboardingChannel(entry.id),
+          )
+        : [];
     const metaById = new Map<string, ChannelMeta>();
     for (const meta of core) {
       metaById.set(meta.id, meta);
@@ -640,6 +650,13 @@ export async function setupChannels(
     }
     const catalogEntry = catalogById.get(channel);
     if (catalogEntry) {
+      if (!shouldUseOnboardingCatalog()) {
+        await prompter.note(
+          `Skipping ${channel}: plugin installs are disabled in this mode.`,
+          "Channels",
+        );
+        return;
+      }
       const workspaceDir = resolveAgentWorkspaceDir(next, resolveDefaultAgentId(next));
       const result = await ensureOnboardingPluginInstalled({
         cfg: next,

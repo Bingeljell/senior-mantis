@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { OpenClawConfig } from "../config/config.js";
 import type { RuntimeEnv } from "../runtime.js";
 import type { WizardPrompter } from "../wizard/prompts.js";
+import * as channelCatalog from "../channels/plugins/catalog.js";
 import { discordPlugin } from "../../extensions/discord/src/channel.js";
 import { imessagePlugin } from "../../extensions/imessage/src/channel.js";
 import { signalPlugin } from "../../extensions/signal/src/channel.js";
@@ -250,6 +251,7 @@ describe("setupChannels", () => {
 
   it("limits QuickStart channel choices to WhatsApp in Senior Mantis mode", async () => {
     vi.stubEnv("OPENCLAW_CLI_NAME_OVERRIDE", "seniormantis");
+    const catalogSpy = vi.spyOn(channelCatalog, "listChannelPluginCatalogEntries");
     const select = vi.fn(async ({ message, options }: { message: string; options: unknown[] }) => {
       if (message === "Select channel (QuickStart)") {
         const opts = options as Array<{ value: string }>;
@@ -287,12 +289,16 @@ describe("setupChannels", () => {
       }),
     };
 
-    await setupChannels({} as OpenClawConfig, runtime, prompter, {
-      skipConfirm: true,
-      quickstartDefaults: true,
-      initialSelection: ["telegram"],
-      forceAllowFromChannels: ["telegram", "whatsapp"],
-    });
+    try {
+      await setupChannels({} as OpenClawConfig, runtime, prompter, {
+        skipConfirm: true,
+        quickstartDefaults: true,
+        initialSelection: ["telegram"],
+        forceAllowFromChannels: ["telegram", "whatsapp"],
+      });
+    } finally {
+      catalogSpy.mockRestore();
+    }
 
     const quickstartCall = select.mock.calls.find(
       ([args]) => (args as { message?: string }).message === "Select channel (QuickStart)",
@@ -300,6 +306,7 @@ describe("setupChannels", () => {
     expect(quickstartCall).toBeTruthy();
     const quickstartInitialValue = (quickstartCall?.[0] as { initialValue?: string }).initialValue;
     expect(quickstartInitialValue).not.toBe("telegram");
+    expect(catalogSpy).not.toHaveBeenCalled();
     expect(multiselect).not.toHaveBeenCalled();
   });
 
