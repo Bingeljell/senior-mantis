@@ -78,6 +78,10 @@ Last updated: 2026-02-16
   - repo CLI mode now requires both runtime deps and `dist/entry-seniormantis.*`
   - gateway start now reports explicit launch errors (for example missing binary)
   - UI activity log now shows resolved CLI mode and command
+- Added Electron install-script allowlisting for workspace installs:
+  - `.npmrc` (`allow-build-scripts` includes `electron`)
+  - `pnpm-workspace.yaml` (`onlyBuiltDependencies` includes `electron`)
+  - `package.json` (`pnpm.onlyBuiltDependencies` includes `electron`)
 
 ### Exact file removals
 
@@ -119,5 +123,7 @@ Last updated: 2026-02-16
   - Result: pass
 - `pnpm --dir apps/desktop-electron install`
   - Current blocker: `ENOTFOUND registry.npmjs.org` (example failed tarball request: `@opentelemetry/api/-/api-1.9.0.tgz`)
+- `node node_modules/.pnpm/electron@35.7.5/node_modules/electron/install.js`
+  - Current blocker: `getaddrinfo ENOTFOUND github.com` (Electron binary download source)
 - `git diff --check`
   - Result: pass
