@@ -55,6 +55,23 @@ openclaw onboard --install-daemon
 
 The wizard installs the Gateway daemon (launchd/systemd user service) so it stays running.
 
+## Senior Mantis fork track (local testing)
+
+This workspace also contains a **Senior Mantis** fork path (`seniormantis` CLI) focused on desktop-first + WhatsApp + local web UI.
+
+```bash
+# Senior Mantis onboarding
+node seniormantis.mjs onboard
+
+# Senior Mantis health/status
+node seniormantis.mjs status --all
+
+# Desktop MVP shell (Electron)
+pnpm desktop:dev
+```
+
+Source of truth for that track: `docs/sm/HANDOFF.md`, `docs/sm/STATUS.md`, `docs/sm/DECISIONS.md`.
+
 ## Quick start (TL;DR)
 
 Runtime: **Node ≥22**.

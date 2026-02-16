@@ -61,3 +61,13 @@ Reason: defense in depth; ensure non-v1 channels cannot be selected through pres
 
 Decision: treat product rebrand as an explicit staged workstream, with user-facing rename first and internal identifier rename after runtime parity.
 Reason: keep v1 delivery moving while avoiding risky broad renames across runtime/config/protocol internals too early.
+
+### D-013: Desktop MVP implementation shape
+
+Decision: ship a minimal Electron shell first (`apps/desktop-electron`) that wraps existing CLI/gateway paths, with explicit confirmation before side-effecting actions.
+Reason: validate desktop-first UX quickly without blocking on packaging/build-system complexity.
+
+### D-014: Channel prune at plugin loader boundary
+
+Decision: enforce Senior Mantis channel policy inside plugin loading, so disallowed channel plugins never load in SM mode even when explicitly enabled in config.
+Reason: defense in depth; remove non-v1 channel load paths instead of relying only on later runtime checks.

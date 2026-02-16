@@ -39,6 +39,12 @@ Last updated: 2026-02-16
   - `src/commands/onboard-channels.ts` (skip catalog enumeration and plugin install paths in SM runtime)
 - Added onboarding e2e coverage for Senior Mantis channel scope and primer wording:
   - `src/commands/onboard-channels.e2e.test.ts` (includes assertion that catalog enumeration is not used in SM mode)
+- Added plugin loader boundary pruning in Senior Mantis mode:
+  - `src/plugins/loader.ts` blocks disallowed channel plugins before module load/registration
+  - `src/plugins/loader.test.ts` verifies disallowed/allowed channel plugin behavior under SM mode
+- Added channel catalog filtering in Senior Mantis mode:
+  - `src/channels/plugins/catalog.ts`
+  - `src/channels/plugins/catalog.test.ts`
 - Expanded runtime guardrails to explicitly disable non-v1 channel plugins:
   - `src/sm/runtime-guardrails.ts`
   - `src/sm/runtime-guardrails.test.ts`
@@ -52,6 +58,20 @@ Last updated: 2026-02-16
   - `docs/sm/DECISIONS.md` (D-012)
   - `docs/sm/HANDOFF.md` (stages A/B/C)
   - `docs/sm/KEEP_DROP_MATRIX.md` (keep/defer matrix entries for naming surfaces)
+- Applied Stage A user-facing rename updates in SM onboarding/help paths:
+  - `src/wizard/onboarding.ts` (product naming + command rendering in security prompt)
+  - `src/sm/cli/program/build-program.ts` (profile option wording)
+
+### Desktop MVP
+
+- Added desktop Electron shell scaffolding:
+  - `apps/desktop-electron/main.mjs`
+  - `apps/desktop-electron/preload.cjs`
+  - `apps/desktop-electron/renderer/*`
+  - `apps/desktop-electron/README.md`
+- Added root scripts for local desktop run:
+  - `package.json` (`desktop:dev`, `desktop:start`)
+  - desktop app currently runs as a standalone package (`pnpm --dir apps/desktop-electron ...`); workspace inclusion can be added in packaging phase
 
 ### Exact file removals
 
@@ -80,6 +100,8 @@ Last updated: 2026-02-16
   - Result: pass for `src/sm/channel-policy.test.ts` (repo `test` command path still runs unit-profile selection)
 - `pnpm exec vitest run --config vitest.e2e.config.ts src/commands/onboard-channels.e2e.test.ts`
   - Result: pass (6 tests)
+- `pnpm exec vitest run src/plugins/loader.test.ts src/channels/plugins/catalog.test.ts src/sm/channel-policy.test.ts`
+  - Result: pass (25 tests)
 - `pnpm check`
   - Result: pass (`format:check`, `tsgo`, `lint`)
 - `git diff --check`

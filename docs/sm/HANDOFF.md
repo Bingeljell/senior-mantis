@@ -38,12 +38,21 @@ Ship a senior-friendly assistant app based on OpenClaw with a narrow v1:
   - onboarding channel policy: `whatsapp` only
   - enforcement wired into agent/message runtime path
 - Added Senior Mantis-specific `status`/`health`/`sessions` registration (`src/sm/cli/program/register-status-health-sessions.ts`) to avoid non-v1 channel phrasing in help text.
+- Added minimal desktop shell at `apps/desktop-electron/*`:
+  - local web UI embed (`http://127.0.0.1:18789/ui`)
+  - onboarding launch from desktop flow (opens terminal command)
+  - status/health/sessions snapshots via Senior Mantis CLI commands
+  - explicit confirmations before side effects (start/stop gateway, onboarding launch)
 - Locked onboarding channel selection to WhatsApp-only in Senior Mantis mode (`src/commands/onboard-channels.ts`, `src/wizard/onboarding.ts`).
 - Hardened Senior Mantis onboarding allowlist enforcement in `src/commands/onboard-channels.ts`:
   - adapter status is fetched only for allowed onboarding channels
   - plugin catalog/install paths are disabled in Senior Mantis mode
   - `initialSelection` and `forceAllowFromChannels` are sanitized to the allowed set
   - disallowed or unavailable channels are explicitly rejected in channel choice handling
+- Added loader-level channel prune in Senior Mantis mode:
+  - `src/plugins/loader.ts` blocks disallowed channel plugins before plugin module load/registration
+  - `src/plugins/loader.test.ts` covers disallowed/allowed SM channel cases
+  - `src/channels/plugins/catalog.ts` filters SM plugin catalog to v1 onboarding channel policy
 - Updated plugin auto-enable behavior to respect `channels.<id>.enabled=false` so disabled channels are not re-enabled from env/config detection.
 - Added tests:
   - `src/sm/env.test.ts`
@@ -51,6 +60,8 @@ Ship a senior-friendly assistant app based on OpenClaw with a narrow v1:
   - `src/sm/runtime-guardrails.test.ts`
   - `src/sm/channel-policy.test.ts`
   - `src/commands/onboard-channels.e2e.test.ts` (Senior Mantis onboarding scope and primer wording)
+  - `src/plugins/loader.test.ts` (SM loader channel prune)
+  - `src/channels/plugins/catalog.test.ts` (SM catalog filter)
 - Added bundler entry in `tsdown.config.ts` for `src/entry-seniormantis.ts`.
 - Removed non-v1 Fly deployment artifacts:
   - deleted `docs/install/fly.md`
@@ -72,14 +83,13 @@ Ship a senior-friendly assistant app based on OpenClaw with a narrow v1:
 ## Intentional non-goals in this baseline
 
 - No destructive deletions of OpenClaw modules yet.
-- No Electron app implementation yet.
 - No schema rewrite yet (still reusing OpenClaw internals with different defaults).
 
 ## Immediate next tasks
 
-1. Build Electron shell under `apps/desktop-electron`.
+1. Add desktop packaging/distribution flow for `apps/desktop-electron` (dev -> signed release pipeline later).
 2. Replace generic onboarding with senior-focused question flow.
-3. Continue staged prune of non-v1 channels/extensions in runtime and docs.
+3. Continue staged prune of non-v1 channels/extensions/modules in runtime and docs.
 4. Add Senior Mantis config schema adapter (`src/sm/config/*`).
 5. Add feature modules for email/manual workflows and guided browser workflows.
 

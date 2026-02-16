@@ -32,18 +32,23 @@ WhatsApp channel      Pi runtime + tools
 - `src/sm/cli/run-main.ts`
 - `src/sm/cli/program/build-program.ts`
 
-4. Core gateway and sessions (reused)
+4. Desktop shell
+
+- `apps/desktop-electron/*`
+- wraps local gateway/web UI and onboarding/status/health/sessions actions
+
+5. Core gateway and sessions (reused)
 
 - `src/gateway/*`
 - `src/routing/*`
 - `src/sessions/*`
 
-5. Channel surface for v1
+6. Channel surface for v1
 
 - WhatsApp path: `src/web/auto-reply/*`, `src/whatsapp/*`
 - Internal webchat channel for UI operations.
 
-6. Agent runtime
+7. Agent runtime
 
 - `src/agents/*`
 - Tool orchestration and model provider execution.
