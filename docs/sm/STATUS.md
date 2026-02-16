@@ -103,6 +103,10 @@ Last updated: 2026-02-16
 - `pnpm exec vitest run src/plugins/loader.test.ts src/channels/plugins/catalog.test.ts src/sm/channel-policy.test.ts`
   - Result: pass (25 tests)
 - `pnpm check`
-  - Result: pass (`format:check`, `tsgo`, `lint`)
+  - Current blocker after dependency reinstall attempt: `sh: oxfmt: command not found`
+- `pnpm exec vitest run src/plugins/loader.test.ts src/channels/plugins/catalog.test.ts src/sm/channel-policy.test.ts src/commands/onboard-channels.e2e.test.ts`
+  - Current blocker after dependency reinstall attempt: `ERR_PNPM_RECURSIVE_EXEC_FIRST_FAIL Command "vitest" not found`
+- `pnpm install`
+  - Current blocker: `ENOTFOUND registry.npmjs.org` (example failed tarball request: `@opentelemetry/api/-/api-1.9.0.tgz`)
 - `git diff --check`
   - Result: pass
