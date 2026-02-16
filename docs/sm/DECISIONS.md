@@ -71,3 +71,8 @@ Reason: validate desktop-first UX quickly without blocking on packaging/build-sy
 
 Decision: enforce Senior Mantis channel policy inside plugin loading, so disallowed channel plugins never load in SM mode even when explicitly enabled in config.
 Reason: defense in depth; remove non-v1 channel load paths instead of relying only on later runtime checks.
+
+### D-015: Desktop CLI invocation fallback for local mac testing
+
+Decision: desktop Electron shell should resolve CLI invocation dynamically (repo CLI first, global `seniormantis` fallback), and report explicit process-launch errors.
+Reason: keep local developer testing unblocked when repo dependencies are temporarily missing, while preserving a deterministic default path.

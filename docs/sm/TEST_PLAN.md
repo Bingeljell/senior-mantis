@@ -19,6 +19,8 @@
 - explicit confirmation appears before gateway start/stop and onboarding launch
 - status/health/sessions snapshots render
 - local web UI embeds and reloads
+- activity log shows resolved CLI mode/command
+- gateway start returns actionable error if CLI binary is missing
 
 7. Manual email workflow:
 

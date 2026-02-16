@@ -57,20 +57,28 @@ The wizard installs the Gateway daemon (launchd/systemd user service) so it stay
 
 ## Senior Mantis fork track (local testing)
 
-This workspace also contains a **Senior Mantis** fork path (`seniormantis` CLI) focused on desktop-first + WhatsApp + local web UI.
+This workspace also contains a **Senior Mantis** fork path (`seniormantis` CLI) focused on:
+
+- desktop-first workflow
+- WhatsApp as the v1 messaging channel
+- local web control UI
+- safe local defaults (`gateway.mode=local`, loopback bind, explicit confirmations for side effects)
 
 ```bash
-# Senior Mantis onboarding
-node seniormantis.mjs onboard
+# Install dependencies
+pnpm install
+pnpm build
+pnpm --dir apps/desktop-electron install
 
-# Senior Mantis health/status
-node seniormantis.mjs status --all
-
-# Desktop MVP shell (Electron)
+# Run Desktop MVP shell (Electron)
 pnpm desktop:dev
+
+# Optional CLI checks
+node seniormantis.mjs onboard
+node seniormantis.mjs status --all
 ```
 
-Source of truth for that track: `docs/sm/HANDOFF.md`, `docs/sm/STATUS.md`, `docs/sm/DECISIONS.md`.
+Source of truth for that track: `docs/sm/VISION.md`, `docs/sm/HANDOFF.md`, `docs/sm/STATUS.md`, `docs/sm/DECISIONS.md`.
 
 ## Quick start (TL;DR)
 

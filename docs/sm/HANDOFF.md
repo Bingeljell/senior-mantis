@@ -4,6 +4,8 @@ Status: active implementation baseline
 Owner: Senior Mantis product fork
 Last updated: 2026-02-16
 
+Primary vision doc: `docs/sm/VISION.md`
+
 ## Goal
 
 Ship a senior-friendly assistant app based on OpenClaw with a narrow v1:
@@ -43,6 +45,10 @@ Ship a senior-friendly assistant app based on OpenClaw with a narrow v1:
   - onboarding launch from desktop flow (opens terminal command)
   - status/health/sessions snapshots via Senior Mantis CLI commands
   - explicit confirmations before side effects (start/stop gateway, onboarding launch)
+  - CLI invocation mode selection:
+    - prefer repo CLI when local dependencies and `dist/entry-seniormantis.*` are present
+    - fallback to global `seniormantis` command when repo runtime modules are missing
+    - return explicit startup errors if gateway command cannot be launched
 - Locked onboarding channel selection to WhatsApp-only in Senior Mantis mode (`src/commands/onboard-channels.ts`, `src/wizard/onboarding.ts`).
 - Hardened Senior Mantis onboarding allowlist enforcement in `src/commands/onboard-channels.ts`:
   - adapter status is fetched only for allowed onboarding channels
@@ -87,9 +93,9 @@ Ship a senior-friendly assistant app based on OpenClaw with a narrow v1:
 
 ## Immediate next tasks
 
-1. Add desktop packaging/distribution flow for `apps/desktop-electron` (dev -> signed release pipeline later).
-2. Replace generic onboarding with senior-focused question flow.
-3. Continue staged prune of non-v1 channels/extensions/modules in runtime and docs.
+1. Complete phase-2 hard prune of non-v1 channel wiring beyond guardrails (runtime loaders, command surfaces, docs).
+2. Replace generic onboarding with senior-focused question flow and caregiver-safe defaults.
+3. Add desktop packaging/distribution flow for `apps/desktop-electron` (dev -> signed release pipeline later).
 4. Add Senior Mantis config schema adapter (`src/sm/config/*`).
 5. Add feature modules for email/manual workflows and guided browser workflows.
 
@@ -127,3 +133,12 @@ This is now an explicit implementation track, not an implicit cleanup.
 2. Copy `src/sm/*`, `src/entry-seniormantis.ts`, `seniormantis.mjs`, and retained runtime folders.
 3. Run smoke checks from `docs/sm/BOOTSTRAP_NEW_REPO.md`.
 4. Treat this handoff file as source of truth for continuation.
+
+## Local macOS desktop test path
+
+```bash
+pnpm install
+pnpm build
+pnpm --dir apps/desktop-electron install
+pnpm desktop:dev
+```

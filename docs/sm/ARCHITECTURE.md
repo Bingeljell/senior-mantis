@@ -36,6 +36,9 @@ WhatsApp channel      Pi runtime + tools
 
 - `apps/desktop-electron/*`
 - wraps local gateway/web UI and onboarding/status/health/sessions actions
+- CLI invocation strategy in desktop shell:
+  - prefer repo CLI runtime (`node seniormantis.mjs ...`) when deps + dist entry are present
+  - fallback to global `seniormantis` binary when repo runtime modules are unavailable
 
 5. Core gateway and sessions (reused)
 

@@ -5,6 +5,7 @@ Last updated: 2026-02-16
 
 ## Source of truth
 
+- `docs/sm/VISION.md`
 - `docs/sm/HANDOFF.md`
 - `docs/sm/DECISIONS.md`
 - `docs/sm/KEEP_DROP_MATRIX.md`
@@ -15,7 +16,7 @@ Last updated: 2026-02-16
 - `src/sm/runtime-guardrails.ts`: present and wired guardrails for local-first defaults + channel/plugin pruning.
 - `src/sm/runtime-guardrails.test.ts`: present.
 - `src/sm/cli/run-main.ts`: calls `applySeniorMantisRuntimeGuardrails()` before CLI parse.
-- `docs/sm/` updates: present (`HANDOFF.md`, `DECISIONS.md`, `KEEP_DROP_MATRIX.md`).
+- `docs/sm/` updates: present (`VISION.md`, `HANDOFF.md`, `DECISIONS.md`, `KEEP_DROP_MATRIX.md`).
 
 ## Cleanup phase (this pass)
 
@@ -72,6 +73,11 @@ Last updated: 2026-02-16
 - Added root scripts for local desktop run:
   - `package.json` (`desktop:dev`, `desktop:start`)
   - desktop app currently runs as a standalone package (`pnpm --dir apps/desktop-electron ...`); workspace inclusion can be added in packaging phase
+- Improved desktop CLI invocation behavior for local testing:
+  - onboarding terminal launch now resolves through Senior Mantis CLI mode selection (repo/global)
+  - repo CLI mode now requires both runtime deps and `dist/entry-seniormantis.*`
+  - gateway start now reports explicit launch errors (for example missing binary)
+  - UI activity log now shows resolved CLI mode and command
 
 ### Exact file removals
 
@@ -93,6 +99,7 @@ Last updated: 2026-02-16
 ## Notes
 
 - `docs/zh-CN/**` was intentionally not edited in this pass (generated content policy).
+- README now includes an expanded Senior Mantis fork section with desktop-first v1 vision and local macOS test commands.
 
 ## Validation attempts
 
@@ -103,10 +110,14 @@ Last updated: 2026-02-16
 - `pnpm exec vitest run src/plugins/loader.test.ts src/channels/plugins/catalog.test.ts src/sm/channel-policy.test.ts`
   - Result: pass (25 tests)
 - `pnpm check`
-  - Current blocker after dependency reinstall attempt: `sh: oxfmt: command not found`
+  - Current blocker: `sh: oxfmt: command not found`
 - `pnpm exec vitest run src/plugins/loader.test.ts src/channels/plugins/catalog.test.ts src/sm/channel-policy.test.ts src/commands/onboard-channels.e2e.test.ts`
-  - Current blocker after dependency reinstall attempt: `ERR_PNPM_RECURSIVE_EXEC_FIRST_FAIL Command "vitest" not found`
+  - Current blocker: `ERR_PNPM_RECURSIVE_EXEC_FIRST_FAIL Command "vitest" not found`
 - `pnpm install`
+  - Current blocker: `ENOTFOUND registry.npmjs.org` (example failed tarball request: `@opentelemetry/api/-/api-1.9.0.tgz`)
+- `node --check apps/desktop-electron/main.mjs && node --check apps/desktop-electron/renderer/renderer.js`
+  - Result: pass
+- `pnpm --dir apps/desktop-electron install`
   - Current blocker: `ENOTFOUND registry.npmjs.org` (example failed tarball request: `@opentelemetry/api/-/api-1.9.0.tgz`)
 - `git diff --check`
   - Result: pass

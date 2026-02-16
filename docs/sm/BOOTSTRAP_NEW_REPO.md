@@ -24,6 +24,7 @@ Copy at minimum:
 - `apps/desktop-electron/**` (desktop MVP shell)
 - runtime dependencies needed by that path (gateway/agents/config/infra/web/whatsapp/ui)
 - `docs/sm/**`
+- `README.md` Senior Mantis fork section (or equivalent root runbook)
 
 If you want top-level `pnpm` workspace commands for desktop app development, add `apps/desktop-electron` to `pnpm-workspace.yaml`.
 
