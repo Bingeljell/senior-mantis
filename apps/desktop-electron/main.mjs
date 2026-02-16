@@ -13,7 +13,6 @@ const defaultGatewayHost = process.env.SM_GATEWAY_HOST ?? "127.0.0.1";
 const defaultGatewayPort = process.env.SM_GATEWAY_PORT ?? "18789";
 const defaultGatewayUrl = `http://${defaultGatewayHost}:${defaultGatewayPort}/ui`;
 
-let mainWindow = null;
 let gatewayProcess = null;
 let gatewayStartTime = null;
 let lastGatewayLaunchMode = "repo";
@@ -68,6 +67,19 @@ function shouldRetryWithGlobalCli(result) {
     merged.includes("MODULE_NOT_FOUND") ||
     merged.includes("missing dist/entry-seniormantis")
   );
+}
+
+function formatGatewayStartFailure(invocation, code, stderr, stdout) {
+  const merged = `${stderr}\n${stdout}`.trim();
+  const firstLine = merged
+    .split("\n")
+    .map((line) => line.trim())
+    .find((line) => line.length > 0);
+  if (merged.includes("Missing config.")) {
+    return "Gateway is not configured yet. Run `seniormantis setup` first, then try again.";
+  }
+  const reason = firstLine ? `: ${firstLine}` : "";
+  return `Gateway exited early (code ${code ?? -1}) while launching with ${invocation.mode} CLI${reason}`;
 }
 
 function createSideEffectPrompt(actionLabel) {
@@ -184,12 +196,31 @@ async function startGateway() {
       stdio: ["ignore", "pipe", "pipe"],
     });
     let settled = false;
-    child.once("error", (error) => {
+    let stderr = "";
+    let stdout = "";
+    let startupTimer = null;
+
+    child.stdout?.on("data", (chunk) => {
+      stdout += chunk.toString();
+    });
+    child.stderr?.on("data", (chunk) => {
+      stderr += chunk.toString();
+    });
+
+    const finish = (result) => {
       if (settled) {
         return;
       }
       settled = true;
-      resolve({
+      if (startupTimer) {
+        clearTimeout(startupTimer);
+        startupTimer = null;
+      }
+      resolve(result);
+    };
+
+    child.once("error", (error) => {
+      finish({
         ok: false,
         message: `Failed to start gateway with ${invocation.mode} CLI (${invocation.command}): ${String(error)}`,
       });
@@ -201,13 +232,22 @@ async function startGateway() {
       child.on("close", () => {
         gatewayProcess = null;
       });
-      if (settled) {
-        return;
+
+      startupTimer = setTimeout(() => {
+        finish({
+          ok: true,
+          message: `Gateway launch requested on loopback:${defaultGatewayPort} (${invocation.mode} CLI).`,
+        });
+      }, 1200);
+    });
+
+    child.once("close", (code) => {
+      if (gatewayProcess === child) {
+        gatewayProcess = null;
       }
-      settled = true;
-      resolve({
-        ok: true,
-        message: `Gateway launch requested on loopback:${defaultGatewayPort} (${invocation.mode} CLI).`,
+      finish({
+        ok: false,
+        message: formatGatewayStartFailure(invocation, code, stderr, stdout),
       });
     });
   });
@@ -241,7 +281,7 @@ function createMainWindow() {
       preload: path.join(__dirname, "preload.cjs"),
     },
   });
-  window.loadFile(path.join(__dirname, "renderer", "index.html"));
+  void window.loadFile(path.join(__dirname, "renderer", "index.html"));
   return window;
 }
 
@@ -320,14 +360,20 @@ ipcMain.handle("sm:run-onboarding", async () => {
   }
 });
 
-app.whenReady().then(() => {
-  mainWindow = createMainWindow();
-  app.on("activate", () => {
-    if (BrowserWindow.getAllWindows().length === 0) {
-      mainWindow = createMainWindow();
-    }
+void app
+  .whenReady()
+  .then(() => {
+    createMainWindow();
+    app.on("activate", () => {
+      if (BrowserWindow.getAllWindows().length === 0) {
+        createMainWindow();
+      }
+    });
+  })
+  .catch((error) => {
+    console.error("Failed to start Senior Mantis desktop app:", error);
+    app.quit();
   });
-});
 
 app.on("window-all-closed", () => {
   if (process.platform !== "darwin") {
