@@ -4,12 +4,14 @@ Status: active staged-prune implementation
 Last updated: 2026-02-16
 
 ## Source of truth
+
 - `docs/sm/HANDOFF.md`
 - `docs/sm/DECISIONS.md`
 - `docs/sm/KEEP_DROP_MATRIX.md`
 - `docs/sm/BOOTSTRAP_NEW_REPO.md`
 
 ## Reality check (implemented)
+
 - `src/sm/runtime-guardrails.ts`: present and wired guardrails for local-first defaults + channel/plugin pruning.
 - `src/sm/runtime-guardrails.test.ts`: present.
 - `src/sm/cli/run-main.ts`: calls `applySeniorMantisRuntimeGuardrails()` before CLI parse.
@@ -18,6 +20,7 @@ Last updated: 2026-02-16
 ## Cleanup phase (this pass)
 
 ### Runtime/channel prune
+
 - Added Senior Mantis channel policy enforcement:
   - `src/sm/channel-policy.ts`
   - `src/sm/channel-policy.test.ts`
@@ -43,7 +46,15 @@ Last updated: 2026-02-16
   - `src/config/plugin-auto-enable.ts`
   - `src/config/plugin-auto-enable.test.ts`
 
+### Brand migration (newly tracked)
+
+- Added explicit staged brand migration policy in Senior Mantis docs:
+  - `docs/sm/DECISIONS.md` (D-012)
+  - `docs/sm/HANDOFF.md` (stages A/B/C)
+  - `docs/sm/KEEP_DROP_MATRIX.md` (keep/defer matrix entries for naming surfaces)
+
 ### Exact file removals
+
 - Removed `docs/install/fly.md`
   - Rationale: Fly deployment is out of scope for desktop-first local v1.
 - Removed `fly.toml`
@@ -52,6 +63,7 @@ Last updated: 2026-02-16
   - Rationale: cloud deployment artifact not needed for local-first v1 path.
 
 ### Docs updates for removals
+
 - Removed English Fly references from:
   - `docs/platforms/index.md`
   - `docs/help/faq.md`
@@ -59,14 +71,16 @@ Last updated: 2026-02-16
   - `docs/docs.json` (install navigation + redirect target)
 
 ## Notes
+
 - `docs/zh-CN/**` was intentionally not edited in this pass (generated content policy).
 
 ## Validation attempts
+
 - `pnpm test -- --run src/commands/onboard-channels.e2e.test.ts src/sm/channel-policy.test.ts`
-  - Error: `ERR_PNPM_RECURSIVE_EXEC_FIRST_FAIL Command "vitest" not found`
-- `pnpm install`
-  - Error: `ENOTFOUND registry.npmjs.org` while fetching packages
+  - Result: pass for `src/sm/channel-policy.test.ts` (repo `test` command path still runs unit-profile selection)
+- `pnpm exec vitest run --config vitest.e2e.config.ts src/commands/onboard-channels.e2e.test.ts`
+  - Result: pass (6 tests)
 - `pnpm check`
-  - Error: `oxfmt: command not found`
+  - Result: pass (`format:check`, `tsgo`, `lint`)
 - `git diff --check`
   - Result: pass

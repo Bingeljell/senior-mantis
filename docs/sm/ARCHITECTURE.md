@@ -18,27 +18,33 @@ WhatsApp channel      Pi runtime + tools
 ## Components
 
 1. Entry/bootstrap
+
 - `src/entry-seniormantis.ts`
 - `seniormantis.mjs`
 
 2. Product defaults
+
 - `src/sm/env.ts`
 - Sets isolated state/config defaults under `~/.seniormantis`.
 
 3. CLI runner
+
 - `src/sm/cli/run-main.ts`
 - `src/sm/cli/program/build-program.ts`
 
 4. Core gateway and sessions (reused)
+
 - `src/gateway/*`
 - `src/routing/*`
 - `src/sessions/*`
 
 5. Channel surface for v1
+
 - WhatsApp path: `src/web/auto-reply/*`, `src/whatsapp/*`
 - Internal webchat channel for UI operations.
 
 6. Agent runtime
+
 - `src/agents/*`
 - Tool orchestration and model provider execution.
 
@@ -66,3 +72,4 @@ WhatsApp channel      Pi runtime + tools
 
 This architecture intentionally wraps existing OpenClaw internals first.
 Deletion/pruning is phase-2 once the Senior Mantis path is stable and test-covered.
+Brand migration follows the same staged approach: user-facing naming first, internal identifier renames after parity.

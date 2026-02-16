@@ -13,6 +13,7 @@ git init
 ## 2. Copy curated files from current workspace
 
 Copy at minimum:
+
 - `package.json`
 - `pnpm-lock.yaml`
 - `tsconfig*.json`
@@ -55,6 +56,16 @@ git push -u origin main
 ## 7. Start next implementation session
 
 In your first prompt, include:
+
 - "Use `docs/sm/HANDOFF.md` as source of truth."
 - current milestone target
 - whether to prioritize Electron shell or onboarding flow first
+
+## 8. Brand-first rename checklist (new repo)
+
+After the first runnable bootstrap, perform staged rename work:
+
+- user-facing first: CLI help text, onboarding text, docs/product copy should say "Senior Mantis"
+- internal second: package/module/env identifiers that still use `openclaw`
+- keep temporary compatibility aliases only where migration requires them
+- run checks after each rename slice to avoid broad breakage

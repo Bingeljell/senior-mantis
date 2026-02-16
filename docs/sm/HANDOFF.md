@@ -5,7 +5,9 @@ Owner: Senior Mantis product fork
 Last updated: 2026-02-16
 
 ## Goal
+
 Ship a senior-friendly assistant app based on OpenClaw with a narrow v1:
+
 - desktop app
 - WhatsApp
 - local web control UI
@@ -13,6 +15,7 @@ Ship a senior-friendly assistant app based on OpenClaw with a narrow v1:
 - safe/manual task workflows
 
 ## Implemented in this baseline
+
 - Added `seniormantis` binary entry (`package.json`, `seniormantis.mjs`).
 - Added dedicated entrypoint `src/entry-seniormantis.ts`.
 - Added Senior Mantis environment defaults in `src/sm/env.ts`:
@@ -56,6 +59,7 @@ Ship a senior-friendly assistant app based on OpenClaw with a narrow v1:
   - removed English docs references in `docs/platforms/index.md`, `docs/help/faq.md`, `docs/vps.md`, `docs/docs.json`
 
 ## Current command surface (Senior Mantis runner)
+
 - `setup`
 - `onboard`
 - `doctor`
@@ -66,24 +70,49 @@ Ship a senior-friendly assistant app based on OpenClaw with a narrow v1:
 - `gateway`
 
 ## Intentional non-goals in this baseline
+
 - No destructive deletions of OpenClaw modules yet.
 - No Electron app implementation yet.
 - No schema rewrite yet (still reusing OpenClaw internals with different defaults).
 
 ## Immediate next tasks
+
 1. Build Electron shell under `apps/desktop-electron`.
 2. Replace generic onboarding with senior-focused question flow.
 3. Continue staged prune of non-v1 channels/extensions in runtime and docs.
 4. Add Senior Mantis config schema adapter (`src/sm/config/*`).
 5. Add feature modules for email/manual workflows and guided browser workflows.
 
+## Brand migration track (OpenClaw -> Senior Mantis)
+
+This is now an explicit implementation track, not an implicit cleanup.
+
+### Stage A (now): user-facing rename first
+
+- Keep `seniormantis` CLI as primary surface and avoid new `openclaw` mentions in Senior Mantis docs/help text.
+- Prefer "Senior Mantis" naming in onboarding/status/help copy for SM runner.
+- Keep safe behavior unchanged (local mode, loopback bind, explicit confirmations).
+
+### Stage B (after v1 parity): internal identifier migration
+
+- Rename package/module/script identifiers that still use `openclaw` where safe.
+- Introduce explicit compatibility shims only where needed (migration scripts, alias entrypoints).
+- Preserve config/session migration path for existing local installs.
+
+### Stage C (new repo cut)
+
+- Publish from a clean non-fork repo with Senior Mantis-first naming throughout.
+- Remove temporary compatibility aliases once migration window closes.
+
 ## Safety defaults to preserve
+
 - loopback bind by default
 - pairing/allowlist style DM controls
 - user-requested email actions only (no auto-send)
 - explicit confirmations for outbound side effects
 
 ## Repo migration checklist (clean non-fork)
+
 1. Copy this `docs/sm/` folder first.
 2. Copy `src/sm/*`, `src/entry-seniormantis.ts`, `seniormantis.mjs`, and retained runtime folders.
 3. Run smoke checks from `docs/sm/BOOTSTRAP_NEW_REPO.md`.
