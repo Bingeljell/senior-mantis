@@ -13,117 +13,83 @@ Last updated: 2026-02-16
 
 ## Reality check (implemented)
 
-- `src/sm/runtime-guardrails.ts`: present and wired guardrails for local-first defaults + channel/plugin pruning.
-- `src/sm/runtime-guardrails.test.ts`: present.
-- `src/sm/cli/run-main.ts`: calls `applySeniorMantisRuntimeGuardrails()` before CLI parse.
-- `docs/sm/` updates: present (`VISION.md`, `HANDOFF.md`, `DECISIONS.md`, `KEEP_DROP_MATRIX.md`).
-
-## Cleanup phase (this pass)
-
-### Runtime/channel prune
-
-- Added Senior Mantis channel policy enforcement:
-  - `src/sm/channel-policy.ts`
-  - `src/sm/channel-policy.test.ts`
-- Restricted agent/message channel usage in Senior Mantis mode:
-  - `src/commands/agent-via-gateway.ts`
-  - `src/infra/outbound/channel-selection.ts`
-- Added Senior Mantis-specific status/health/sessions registration text to remove non-v1 channel wording:
-  - `src/sm/cli/program/register-status-health-sessions.ts`
-  - `src/sm/cli/program/build-program.ts`
-- Locked onboarding channel selection to v1 scope in Senior Mantis mode:
-  - `src/commands/onboard-channels.ts` (filter selectable channels to WhatsApp)
-  - `src/wizard/onboarding.ts` (Senior Mantis onboarding flags + DM policy prompt skip)
-- Hardened onboarding channel allowlist enforcement in Senior Mantis mode:
-  - `src/commands/onboard-channels.ts` (filter adapter status fetches, sanitize `initialSelection`/`forceAllowFromChannels`, reject disallowed channel choices)
-- Disabled onboarding plugin catalog/install surface in Senior Mantis mode:
-  - `src/commands/onboard-channels.ts` (skip catalog enumeration and plugin install paths in SM runtime)
-- Added onboarding e2e coverage for Senior Mantis channel scope and primer wording:
-  - `src/commands/onboard-channels.e2e.test.ts` (includes assertion that catalog enumeration is not used in SM mode)
-- Added plugin loader boundary pruning in Senior Mantis mode:
-  - `src/plugins/loader.ts` blocks disallowed channel plugins before module load/registration
-  - `src/plugins/loader.test.ts` verifies disallowed/allowed channel plugin behavior under SM mode
-- Added channel catalog filtering in Senior Mantis mode:
-  - `src/channels/plugins/catalog.ts`
-  - `src/channels/plugins/catalog.test.ts`
-- Expanded runtime guardrails to explicitly disable non-v1 channel plugins:
+- Runtime guardrails are implemented and wired:
   - `src/sm/runtime-guardrails.ts`
   - `src/sm/runtime-guardrails.test.ts`
-- Prevented plugin auto-enable from re-enabling explicitly disabled channels:
-  - `src/config/plugin-auto-enable.ts`
-  - `src/config/plugin-auto-enable.test.ts`
+  - `src/sm/cli/run-main.ts` calls guardrails before CLI parse.
+- Senior Mantis channel policy + onboarding restrictions are implemented:
+  - `src/sm/channel-policy.ts`
+  - `src/commands/onboard-channels.ts`
+  - `src/wizard/onboarding.ts`
+  - `src/plugins/loader.ts`
+  - `src/channels/plugins/catalog.ts`
+- Desktop shell exists and is runnable for local testing:
+  - `apps/desktop-electron/*`
+  - root scripts `desktop:dev` and `desktop:start`.
 
-### Brand migration (newly tracked)
+## Current pass: startup hardening + desktop launch diagnostics
 
-- Added explicit staged brand migration policy in Senior Mantis docs:
-  - `docs/sm/DECISIONS.md` (D-012)
-  - `docs/sm/HANDOFF.md` (stages A/B/C)
-  - `docs/sm/KEEP_DROP_MATRIX.md` (keep/defer matrix entries for naming surfaces)
-- Applied Stage A user-facing rename updates in SM onboarding/help paths:
-  - `src/wizard/onboarding.ts` (product naming + command rendering in security prompt)
-  - `src/sm/cli/program/build-program.ts` (profile option wording)
+### Root cause resolved
 
-### Desktop MVP
+- The `ReferenceError: Cannot access 'CONFIG_DIR' before initialization` popup came from bundled CLI startup order (top-level eager initialization in cycle-sensitive paths).
 
-- Added desktop Electron shell scaffolding:
-  - `apps/desktop-electron/main.mjs`
-  - `apps/desktop-electron/preload.cjs`
-  - `apps/desktop-electron/renderer/*`
-  - `apps/desktop-electron/README.md`
-- Added root scripts for local desktop run:
-  - `package.json` (`desktop:dev`, `desktop:start`)
-  - desktop app currently runs as a standalone package (`pnpm --dir apps/desktop-electron ...`); workspace inclusion can be added in packaging phase
-- Improved desktop CLI invocation behavior for local testing:
-  - onboarding terminal launch now resolves through Senior Mantis CLI mode selection (repo/global)
-  - repo CLI mode now requires both runtime deps and `dist/entry-seniormantis.*`
-  - gateway start now reports explicit launch errors (for example missing binary)
-  - UI activity log now shows resolved CLI mode and command
-- Added Electron install-script allowlisting for workspace installs:
-  - `.npmrc` (`allow-build-scripts` includes `electron`)
-  - `pnpm-workspace.yaml` (`onlyBuiltDependencies` includes `electron`)
-  - `package.json` (`pnpm.onlyBuiltDependencies` includes `electron`)
+### Code updates in this pass
 
-### Exact file removals
+- `src/cron/store.ts`
+  - switched from top-level `CONFIG_DIR` constant import to `resolveConfigDir()` call.
+- `src/gateway/server-methods/agent-job.ts`
+  - removed module-level eager `ensureAgentRunListener()` execution.
+- `src/gateway/server-methods/agents.ts`
+  - replaced top-level file-name constant sets with lazy cached helpers.
+- `src/logging/subsystem.ts`
+  - removed runtime dependency on `defaultRuntime` default parameter to avoid cycle-time TDZ.
+- `src/gateway/server.impl.ts`
+  - moved `ensureOpenClawCliOnPath()` from module scope into `startGatewayServer()`.
+- `apps/desktop-electron/main.mjs`
+  - improved gateway start flow to detect early process exit and return actionable failure messages.
+  - explicit missing-config guidance now returns: run `seniormantis setup` first.
 
-- Removed `docs/install/fly.md`
-  - Rationale: Fly deployment is out of scope for desktop-first local v1.
-- Removed `fly.toml`
-  - Rationale: cloud deployment artifact not needed for local-first v1 path.
-- Removed `fly.private.toml`
-  - Rationale: cloud deployment artifact not needed for local-first v1 path.
+### Behavior impact
 
-### Docs updates for removals
+- Senior Mantis CLI `status` and `sessions` no longer crash at startup from the previous TDZ path.
+- Desktop “Start gateway” now reports early launch failures clearly instead of optimistic success on process spawn.
 
-- Removed English Fly references from:
+## Cleanup phase (staged, safe)
+
+- Kept v1-safe defaults:
+  - `gateway.mode=local`
+  - loopback bind
+  - explicit confirmations for desktop side-effect actions.
+- Non-v1 cloud deploy artifacts removed:
+  - `docs/install/fly.md`
+  - `fly.toml`
+  - `fly.private.toml`
+- Non-v1 Fly docs references removed from:
   - `docs/platforms/index.md`
   - `docs/help/faq.md`
   - `docs/vps.md`
-  - `docs/docs.json` (install navigation + redirect target)
+  - `docs/docs.json`
+
+## Validation (this environment)
+
+- `pnpm build`
+  - pass
+- `pnpm check`
+  - pass
+- `pnpm exec vitest run src/cron/store.test.ts src/gateway/server-methods/agent-job.test.ts src/gateway/server-methods/agents-mutate.test.ts src/logging/subsystem.test.ts`
+  - pass (26 tests)
+- `node seniormantis.mjs status --json`
+  - pass
+- `node seniormantis.mjs sessions --json`
+  - pass
+- `node dist/entry-seniormantis.js status --json`
+  - pass
+- `node seniormantis.mjs health --json`
+  - non-zero when gateway is not running (`gateway closed`), expected in this state.
+- `node seniormantis.mjs gateway run --bind loopback --port 18789 --force`
+  - exits with missing-config guidance when setup is incomplete, expected on fresh local state.
 
 ## Notes
 
-- `docs/zh-CN/**` was intentionally not edited in this pass (generated content policy).
-- README now includes an expanded Senior Mantis fork section with desktop-first v1 vision and local macOS test commands.
-
-## Validation attempts
-
-- `pnpm test -- --run src/commands/onboard-channels.e2e.test.ts src/sm/channel-policy.test.ts`
-  - Result: pass for `src/sm/channel-policy.test.ts` (repo `test` command path still runs unit-profile selection)
-- `pnpm exec vitest run --config vitest.e2e.config.ts src/commands/onboard-channels.e2e.test.ts`
-  - Result: pass (6 tests)
-- `pnpm exec vitest run src/plugins/loader.test.ts src/channels/plugins/catalog.test.ts src/sm/channel-policy.test.ts`
-  - Result: pass (25 tests)
-- `pnpm check`
-  - Current blocker: `sh: oxfmt: command not found`
-- `pnpm exec vitest run src/plugins/loader.test.ts src/channels/plugins/catalog.test.ts src/sm/channel-policy.test.ts src/commands/onboard-channels.e2e.test.ts`
-  - Current blocker: `ERR_PNPM_RECURSIVE_EXEC_FIRST_FAIL Command "vitest" not found`
-- `pnpm install`
-  - Current blocker: `ENOTFOUND registry.npmjs.org` (example failed tarball request: `@opentelemetry/api/-/api-1.9.0.tgz`)
-- `node --check apps/desktop-electron/main.mjs && node --check apps/desktop-electron/renderer/renderer.js`
-  - Result: pass
-- `pnpm --dir apps/desktop-electron install`
-  - Current blocker: `ENOTFOUND registry.npmjs.org` (example failed tarball request: `@opentelemetry/api/-/api-1.9.0.tgz`)
-- `node node_modules/.pnpm/electron@35.7.5/node_modules/electron/install.js`
-  - Current blocker: `getaddrinfo ENOTFOUND github.com` (Electron binary download source)
-- `git diff --check`
-  - Result: pass
+- `ERR_CONNECTION_REFUSED` for `http://127.0.0.1:18789/ui` is expected until a local gateway is actually running.
+- `docs/zh-CN/**` remains unchanged by policy (generated content).

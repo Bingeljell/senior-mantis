@@ -49,6 +49,16 @@ Ship a senior-friendly assistant app based on OpenClaw with a narrow v1:
     - prefer repo CLI when local dependencies and `dist/entry-seniormantis.*` are present
     - fallback to global `seniormantis` command when repo runtime modules are missing
     - return explicit startup errors if gateway command cannot be launched
+- Hardened startup-cycle paths for bundled Senior Mantis CLI:
+  - removed eager module-scope initialization that caused TDZ startup failures in bundled desktop CLI path
+  - changed files:
+    - `src/cron/store.ts`
+    - `src/gateway/server-methods/agent-job.ts`
+    - `src/gateway/server-methods/agents.ts`
+    - `src/gateway/server.impl.ts`
+    - `src/logging/subsystem.ts`
+- Improved desktop gateway launch diagnostics:
+  - `apps/desktop-electron/main.mjs` now detects early gateway process exit and reports actionable messages (including missing setup/config guidance) instead of reporting success immediately on spawn
 - Locked onboarding channel selection to WhatsApp-only in Senior Mantis mode (`src/commands/onboard-channels.ts`, `src/wizard/onboarding.ts`).
 - Hardened Senior Mantis onboarding allowlist enforcement in `src/commands/onboard-channels.ts`:
   - adapter status is fetched only for allowed onboarding channels
@@ -139,6 +149,7 @@ This is now an explicit implementation track, not an implicit cleanup.
 ```bash
 pnpm install
 pnpm build
+node seniormantis.mjs setup
 pnpm --dir apps/desktop-electron install
 pnpm desktop:dev
 ```
