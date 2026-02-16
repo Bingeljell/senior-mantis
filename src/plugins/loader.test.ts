@@ -23,6 +23,7 @@ function writePlugin(params: {
   body: string;
   dir?: string;
   filename?: string;
+  channels?: string[];
 }): TempPlugin {
   const dir = params.dir ?? makeTempDir();
   const filename = params.filename ?? `${params.id}.js`;
@@ -33,6 +34,7 @@ function writePlugin(params: {
     JSON.stringify(
       {
         id: params.id,
+        ...(params.channels ? { channels: params.channels } : {}),
         configSchema: EMPTY_PLUGIN_SCHEMA,
       },
       null,
@@ -49,6 +51,7 @@ afterEach(() => {
   } else {
     process.env.OPENCLAW_BUNDLED_PLUGINS_DIR = prevBundledDir;
   }
+  delete process.env.OPENCLAW_CLI_NAME_OVERRIDE;
 });
 
 afterAll(() => {
@@ -102,6 +105,7 @@ describe("loadOpenClawPlugins", () => {
     const bundledDir = makeTempDir();
     writePlugin({
       id: "telegram",
+      channels: ["telegram"],
       body: `export default { id: "telegram", register(api) {
   api.registerChannel({
     plugin: {
@@ -142,6 +146,99 @@ describe("loadOpenClawPlugins", () => {
     const telegram = registry.plugins.find((entry) => entry.id === "telegram");
     expect(telegram?.status).toBe("loaded");
     expect(registry.channels.some((entry) => entry.plugin.id === "telegram")).toBe(true);
+  });
+
+  it("skips disallowed channel plugins in Senior Mantis mode", () => {
+    process.env.OPENCLAW_CLI_NAME_OVERRIDE = "seniormantis";
+    process.env.OPENCLAW_BUNDLED_PLUGINS_DIR = "/nonexistent/bundled/plugins";
+    const plugin = writePlugin({
+      id: "telegram",
+      channels: ["telegram"],
+      body: `export default { id: "telegram", register(api) {
+  api.registerChannel({
+    plugin: {
+      id: "telegram",
+      meta: {
+        id: "telegram",
+        label: "Telegram",
+        selectionLabel: "Telegram",
+        docsPath: "/channels/telegram",
+        blurb: "telegram channel"
+      },
+      capabilities: { chatTypes: ["direct"] },
+      config: {
+        listAccountIds: () => [],
+        resolveAccount: () => ({ accountId: "default" })
+      },
+      outbound: { deliveryMode: "direct" }
+    }
+  });
+} };`,
+    });
+
+    const registry = loadOpenClawPlugins({
+      cache: false,
+      config: {
+        plugins: {
+          load: { paths: [plugin.file] },
+          allow: ["telegram"],
+          entries: {
+            telegram: { enabled: true },
+          },
+        },
+      },
+    });
+
+    const telegram = registry.plugins.find((entry) => entry.id === "telegram");
+    expect(telegram?.status).toBe("disabled");
+    expect(telegram?.error).toContain("Senior Mantis channel policy");
+    expect(registry.channels.some((entry) => entry.plugin.id === "telegram")).toBe(false);
+  });
+
+  it("keeps WhatsApp channel plugins loadable in Senior Mantis mode", () => {
+    process.env.OPENCLAW_CLI_NAME_OVERRIDE = "seniormantis";
+    process.env.OPENCLAW_BUNDLED_PLUGINS_DIR = "/nonexistent/bundled/plugins";
+    const plugin = writePlugin({
+      id: "whatsapp",
+      channels: ["whatsapp"],
+      body: `export default { id: "whatsapp", register(api) {
+  api.registerChannel({
+    plugin: {
+      id: "whatsapp",
+      meta: {
+        id: "whatsapp",
+        label: "WhatsApp",
+        selectionLabel: "WhatsApp",
+        docsPath: "/channels/whatsapp",
+        blurb: "whatsapp channel"
+      },
+      capabilities: { chatTypes: ["direct"] },
+      config: {
+        listAccountIds: () => [],
+        resolveAccount: () => ({ accountId: "default" })
+      },
+      outbound: { deliveryMode: "direct" }
+    }
+  });
+} };`,
+    });
+
+    const registry = loadOpenClawPlugins({
+      cache: false,
+      config: {
+        plugins: {
+          load: { paths: [plugin.file] },
+          allow: ["whatsapp"],
+          entries: {
+            whatsapp: { enabled: true },
+          },
+        },
+      },
+    });
+
+    const whatsapp = registry.plugins.find((entry) => entry.id === "whatsapp");
+    expect(whatsapp?.status).toBe("loaded");
+    expect(registry.channels.some((entry) => entry.plugin.id === "whatsapp")).toBe(true);
   });
 
   it("enables bundled memory plugin when selected by slot", () => {

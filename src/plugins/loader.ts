@@ -11,6 +11,7 @@ import type {
   PluginLogger,
 } from "./types.js";
 import { createSubsystemLogger } from "../logging/subsystem.js";
+import { isSeniorMantisAllowedGatewayChannel, isSeniorMantisCli } from "../sm/channel-policy.js";
 import { resolveUserPath } from "../utils.js";
 import { clearPluginCommands } from "./commands.js";
 import {
@@ -90,6 +91,28 @@ function buildCacheKey(params: {
 }): string {
   const workspaceKey = params.workspaceDir ? resolveUserPath(params.workspaceDir) : "";
   return `${workspaceKey}::${JSON.stringify(params.plugins)}`;
+}
+
+function resolveSeniorMantisChannelGate(params: { pluginId: string; channels: string[] }): {
+  allowed: boolean;
+  reason?: string;
+} {
+  if (!isSeniorMantisCli()) {
+    return { allowed: true };
+  }
+  if (params.channels.length === 0) {
+    return { allowed: true };
+  }
+  const disallowed = params.channels.find(
+    (channel) => !isSeniorMantisAllowedGatewayChannel(channel),
+  );
+  if (!disallowed) {
+    return { allowed: true };
+  }
+  return {
+    allowed: false,
+    reason: `blocked by Senior Mantis channel policy (channel="${disallowed}")`,
+  };
 }
 
 function validatePluginConfig(params: {
@@ -287,6 +310,18 @@ export function loadOpenClawPlugins(options: PluginLoadOptions = {}): PluginRegi
     record.kind = manifestRecord.kind;
     record.configUiHints = manifestRecord.configUiHints;
     record.configJsonSchema = manifestRecord.configSchema;
+
+    const seniorMantisChannelGate = resolveSeniorMantisChannelGate({
+      pluginId,
+      channels: manifestRecord.channels,
+    });
+    if (!seniorMantisChannelGate.allowed) {
+      record.status = "disabled";
+      record.error = seniorMantisChannelGate.reason;
+      registry.plugins.push(record);
+      seenIds.set(pluginId, candidate.origin);
+      continue;
+    }
 
     if (!enableState.enabled) {
       record.status = "disabled";
