@@ -1,6 +1,6 @@
 # Senior Mantis Desktop (Electron)
 
-Minimal desktop shell for local Senior Mantis workflows.
+Minimal desktop shell for local Senior Mantis workflows on macOS.
 
 ## What it does
 
@@ -9,24 +9,48 @@ Minimal desktop shell for local Senior Mantis workflows.
 - Shows status/health/sessions snapshots.
 - Embeds local web UI (`http://127.0.0.1:18789/ui`) in-app.
 
-## Run locally
+## Prerequisites
+
+- Node `22.12+`
+- `pnpm` `10.x`
+- Root dependencies installed (`pnpm install`)
+- Senior Mantis dist entry available (`pnpm build` if missing)
+- Electron package dependencies installed (`pnpm --dir apps/desktop-electron install`)
+
+## Run locally on macOS
 
 From repo root:
 
 ```bash
 pnpm install
+pnpm build
+pnpm --dir apps/desktop-electron install
 pnpm desktop:dev
 ```
 
-If you only want this app:
+## Fast local test flow
+
+1. Start the desktop app with `pnpm desktop:dev`.
+2. Click `Start Gateway` and accept confirmation.
+3. Confirm gateway status shows `Running`.
+4. Click `Run Onboarding` and accept confirmation.
+5. Complete onboarding in Terminal and verify WhatsApp connection.
+6. Return to desktop app and click `Refresh` on Status/Health/Sessions.
+
+## CLI resolution behavior
+
+- Preferred mode: repo CLI (`node seniormantis.mjs ...`) when repo runtime deps and dist entry are present.
+- Fallback mode: global `seniormantis` command if repo mode fails with module-resolution errors.
+- Override global command path with `SM_CLI_COMMAND` (binary path).
 
 ```bash
-pnpm --dir apps/desktop-electron install
-pnpm --dir apps/desktop-electron dev
+SM_CLI_COMMAND=/usr/local/bin/seniormantis pnpm desktop:dev
 ```
 
-## Notes
+## Notes and troubleshooting
 
 - This is an MVP shell, not a packaged release.
-- It assumes `seniormantis.mjs` exists at repo root.
-- Onboarding is launched in your system terminal for interactive prompts.
+- Onboarding launches in your system terminal for interactive prompts.
+- If gateway start fails with `ENOENT`, install or point `SM_CLI_COMMAND` to a valid `seniormantis` binary.
+- If status/health commands fail with missing `dist/entry-seniormantis`, run `pnpm build`.
+- If the embedded UI is blank, verify local gateway is running on `127.0.0.1:18789`.

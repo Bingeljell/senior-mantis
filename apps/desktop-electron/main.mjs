@@ -1,3 +1,4 @@
+import fs from "node:fs";
 import { spawn } from "node:child_process";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -7,6 +8,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const repoRoot = path.resolve(__dirname, "..", "..");
 const seniorMantisEntry = path.join(repoRoot, "seniormantis.mjs");
+const globalCliCommand = process.env.SM_CLI_COMMAND?.trim() || "seniormantis";
 const defaultGatewayHost = process.env.SM_GATEWAY_HOST ?? "127.0.0.1";
 const defaultGatewayPort = process.env.SM_GATEWAY_PORT ?? "18789";
 const defaultGatewayUrl = `http://${defaultGatewayHost}:${defaultGatewayPort}/ui`;
@@ -14,9 +16,58 @@ const defaultGatewayUrl = `http://${defaultGatewayHost}:${defaultGatewayPort}/ui
 let mainWindow = null;
 let gatewayProcess = null;
 let gatewayStartTime = null;
+let lastGatewayLaunchMode = "repo";
 
 function quoted(command) {
   return `"${command.replace(/(["\\$`])/g, "\\$1")}"`;
+}
+
+function hasRepoRuntimeDependencies() {
+  return fs.existsSync(path.join(repoRoot, "node_modules", "commander", "package.json"));
+}
+
+function hasRepoCliBuildOutput() {
+  return (
+    fs.existsSync(path.join(repoRoot, "dist", "entry-seniormantis.js")) ||
+    fs.existsSync(path.join(repoRoot, "dist", "entry-seniormantis.mjs"))
+  );
+}
+
+function resolveCliInvocation(args) {
+  if (hasRepoRuntimeDependencies() && hasRepoCliBuildOutput()) {
+    return {
+      mode: "repo",
+      command: process.execPath,
+      args: [seniorMantisEntry, ...args],
+      env: {
+        ...process.env,
+        OPENCLAW_CLI_NAME_OVERRIDE: "seniormantis",
+      },
+    };
+  }
+  return {
+    mode: "global",
+    command: globalCliCommand,
+    args,
+    env: process.env,
+  };
+}
+
+function toShellCommand(invocation) {
+  return [invocation.command, ...invocation.args].map(quoted).join(" ");
+}
+
+function shouldRetryWithGlobalCli(result) {
+  if (result.ok) {
+    return false;
+  }
+  const merged = `${result.stderr}\n${result.stdout}`;
+  return (
+    merged.includes("Cannot find module") ||
+    merged.includes("ERR_MODULE_NOT_FOUND") ||
+    merged.includes("MODULE_NOT_FOUND") ||
+    merged.includes("missing dist/entry-seniormantis")
+  );
 }
 
 function createSideEffectPrompt(actionLabel) {
@@ -37,37 +88,50 @@ async function confirmSideEffect(actionLabel) {
 }
 
 function runSeniorMantis(args, opts = {}) {
-  return new Promise((resolve) => {
-    const child = spawn(process.execPath, [seniorMantisEntry, ...args], {
-      cwd: repoRoot,
-      env: {
-        ...process.env,
-        OPENCLAW_CLI_NAME_OVERRIDE: "seniormantis",
-      },
-      stdio: ["ignore", "pipe", "pipe"],
-      ...opts,
-    });
-    let stdout = "";
-    let stderr = "";
-    child.stdout?.on("data", (chunk) => {
-      stdout += chunk.toString();
-    });
-    child.stderr?.on("data", (chunk) => {
-      stderr += chunk.toString();
-    });
-    child.on("close", (code) => {
-      resolve({
-        ok: code === 0,
-        code: code ?? -1,
-        stdout: stdout.trim(),
-        stderr: stderr.trim(),
+  const runInvocation = (invocation) =>
+    new Promise((resolve) => {
+      const child = spawn(invocation.command, invocation.args, {
+        cwd: repoRoot,
+        env: invocation.env,
+        stdio: ["ignore", "pipe", "pipe"],
+        ...opts,
+      });
+      let stdout = "";
+      let stderr = "";
+      child.stdout?.on("data", (chunk) => {
+        stdout += chunk.toString();
+      });
+      child.stderr?.on("data", (chunk) => {
+        stderr += chunk.toString();
+      });
+      child.on("close", (code) => {
+        resolve({
+          ok: code === 0,
+          code: code ?? -1,
+          stdout: stdout.trim(),
+          stderr: stderr.trim(),
+          mode: invocation.mode,
+          command: invocation.command,
+        });
       });
     });
-  });
+
+  return (async () => {
+    const primary = await runInvocation(resolveCliInvocation(args));
+    if (primary.mode === "repo" && shouldRetryWithGlobalCli(primary)) {
+      return runInvocation({
+        mode: "global",
+        command: globalCliCommand,
+        args,
+        env: process.env,
+      });
+    }
+    return primary;
+  })();
 }
 
 async function openOnboardingInTerminal() {
-  const command = `${quoted(process.execPath)} ${quoted(seniorMantisEntry)} onboard`;
+  const command = toShellCommand(resolveCliInvocation(["onboard"]));
   if (process.platform === "darwin") {
     const escaped = command.replace(/\\/g, "\\\\").replace(/"/g, '\\"');
     const script = [
@@ -104,27 +168,49 @@ async function startGateway() {
       message: "Gateway is already running from this desktop session.",
     };
   }
-  const child = spawn(
-    process.execPath,
-    [seniorMantisEntry, "gateway", "run", "--bind", "loopback", "--port", defaultGatewayPort, "--force"],
-    {
+  const invocation = resolveCliInvocation([
+    "gateway",
+    "run",
+    "--bind",
+    "loopback",
+    "--port",
+    defaultGatewayPort,
+    "--force",
+  ]);
+  return new Promise((resolve) => {
+    const child = spawn(invocation.command, invocation.args, {
       cwd: repoRoot,
-      env: {
-        ...process.env,
-        OPENCLAW_CLI_NAME_OVERRIDE: "seniormantis",
-      },
+      env: invocation.env,
       stdio: ["ignore", "pipe", "pipe"],
-    },
-  );
-  gatewayProcess = child;
-  gatewayStartTime = new Date().toISOString();
-  child.on("close", () => {
-    gatewayProcess = null;
+    });
+    let settled = false;
+    child.once("error", (error) => {
+      if (settled) {
+        return;
+      }
+      settled = true;
+      resolve({
+        ok: false,
+        message: `Failed to start gateway with ${invocation.mode} CLI (${invocation.command}): ${String(error)}`,
+      });
+    });
+    child.once("spawn", () => {
+      gatewayProcess = child;
+      lastGatewayLaunchMode = invocation.mode;
+      gatewayStartTime = new Date().toISOString();
+      child.on("close", () => {
+        gatewayProcess = null;
+      });
+      if (settled) {
+        return;
+      }
+      settled = true;
+      resolve({
+        ok: true,
+        message: `Gateway launch requested on loopback:${defaultGatewayPort} (${invocation.mode} CLI).`,
+      });
+    });
   });
-  return {
-    ok: true,
-    message: `Gateway launch requested on loopback:${defaultGatewayPort}.`,
-  };
 }
 
 async function stopGateway() {
@@ -160,8 +246,12 @@ function createMainWindow() {
 }
 
 ipcMain.handle("sm:get-config", async () => {
+  const invocation = resolveCliInvocation([]);
   return {
     gatewayUrl: defaultGatewayUrl,
+    cliMode: invocation.mode,
+    globalCliCommand,
+    cliCommand: invocation.command,
   };
 });
 
@@ -189,6 +279,7 @@ ipcMain.handle("sm:gateway-status", async () => {
     running,
     startedAt: gatewayStartTime,
     gatewayUrl: defaultGatewayUrl,
+    launchMode: lastGatewayLaunchMode,
   };
 });
 

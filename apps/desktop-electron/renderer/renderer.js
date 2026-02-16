@@ -38,9 +38,10 @@ function pretty(result) {
 
 async function refreshGatewayStatus() {
   const status = await window.smDesktop.getGatewayStatus();
+  const launchMode = status.launchMode ? ` (${status.launchMode} CLI)` : "";
   const startedAt = status.startedAt ? ` · started: ${status.startedAt}` : "";
   els.gatewayStatus.textContent = status.running
-    ? `Running (desktop-managed)${startedAt}`
+    ? `Running (desktop-managed)${launchMode}${startedAt}`
     : `Not running (desktop-managed) · UI URL ${status.gatewayUrl}`;
 }
 
@@ -53,6 +54,7 @@ async function boot() {
   const cfg = await window.smDesktop.getConfig();
   els.webUiFrame.src = cfg.gatewayUrl;
   logActivity(`Loaded UI frame: ${cfg.gatewayUrl}`);
+  logActivity(`CLI mode: ${cfg.cliMode} (${cfg.cliCommand})`);
   await refreshGatewayStatus();
   await Promise.all([
     refreshReadOnlyView("status", els.statusOutput),
