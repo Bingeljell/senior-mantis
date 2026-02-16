@@ -71,6 +71,14 @@ function resolveChannelConfig(
   return isRecord(entry) ? entry : null;
 }
 
+function isChannelExplicitlyDisabled(cfg: OpenClawConfig, channelId: string): boolean {
+  const entry = resolveChannelConfig(cfg, channelId);
+  if (!entry) {
+    return false;
+  }
+  return entry.enabled === false;
+}
+
 function isTelegramConfigured(cfg: OpenClawConfig, env: NodeJS.ProcessEnv): boolean {
   if (hasNonEmptyString(env.TELEGRAM_BOT_TOKEN)) {
     return true;
@@ -199,6 +207,9 @@ export function isChannelConfigured(
   channelId: string,
   env: NodeJS.ProcessEnv = process.env,
 ): boolean {
+  if (isChannelExplicitlyDisabled(cfg, channelId)) {
+    return false;
+  }
   switch (channelId) {
     case "whatsapp":
       return isWhatsAppConfigured(cfg);

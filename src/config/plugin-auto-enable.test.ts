@@ -29,6 +29,20 @@ describe("applyPluginAutoEnable", () => {
     expect(result.changes).toEqual([]);
   });
 
+  it("does not auto-enable plugin when channel is explicitly disabled", () => {
+    const result = applyPluginAutoEnable({
+      config: {
+        channels: { telegram: { enabled: false, botToken: "x" } },
+      },
+      env: {
+        TELEGRAM_BOT_TOKEN: "env-token",
+      },
+    });
+
+    expect(result.config.plugins?.entries?.telegram?.enabled).toBeUndefined();
+    expect(result.changes).toEqual([]);
+  });
+
   it("auto-enables irc when configured via env", () => {
     const result = applyPluginAutoEnable({
       config: {},
