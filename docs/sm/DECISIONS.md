@@ -29,3 +29,11 @@ Reason: accessibility and ease of use for target audience.
 ### D-007: Initial code strategy
 Decision: add Senior Mantis namespace and wrapper first, then prune.
 Reason: lower migration risk and faster first runnable milestone.
+
+### D-008: Runtime guardrails before deletions
+Decision: enforce v1-safe runtime overrides in the Senior Mantis entry path before deleting non-v1 modules.
+Reason: reduce risk by keeping code available while constraining behavior to desktop + WhatsApp + local web UI defaults.
+
+### D-009: Staged prune policy
+Decision: prune non-v1 channel/plugin/deployment surfaces in stages, starting with runtime/channel enforcement and removal of Fly deployment artifacts.
+Reason: keep the migration safe while converging to desktop-first local v1 scope.

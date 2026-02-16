@@ -17,10 +17,11 @@ Legend:
 | UI package | `ui/**` | Keep | Control UI and chat surfaces |
 | Core config/infra | `src/config/**`, `src/infra/**` | Keep | runtime plumbing |
 | Multi-channel CLI | `src/cli/channels-cli.ts` and non-v1 sub-CLIs | Defer | remove after Senior Mantis onboarding is stable |
-| Plugin channels | `extensions/**` | Drop | not needed in v1 |
+| Plugin channels | `extensions/**` | Drop | not needed in v1 (staged: non-v1 channel plugins runtime-disabled in Senior Mantis guardrails) |
 | Mobile apps | `apps/ios/**`, `apps/android/**` | Drop | out of scope v1 |
 | macOS native app | `apps/macos/**` | Drop | replaced by Electron |
-| Channel implementations (non-WhatsApp) | `src/telegram/**`, `src/discord/**`, `src/slack/**`, `src/signal/**`, `src/imessage/**`, etc | Drop | reduce surface area and maintenance |
+| Channel implementations (non-WhatsApp) | `src/telegram/**`, `src/discord/**`, `src/slack/**`, `src/signal/**`, `src/imessage/**`, etc | Drop | reduce surface area and maintenance (runtime-disabled in Senior Mantis guardrails first) |
 | Complex plugin management | `src/plugins/**` | Defer | likely removable after message/gateway flows are re-wired |
 | Non-v1 docs | `docs/channels/**` (except WhatsApp references) | Drop | product docs should be Senior Mantis specific |
 | Packaging scripts (mobile/mac native) | related scripts under `scripts/` | Drop | not needed for Electron path |
+| Fly deployment docs/artifacts | `docs/install/fly.md`, `fly.toml`, `fly.private.toml` | Drop | out of scope for desktop-first local v1 (removed) |

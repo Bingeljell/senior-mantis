@@ -21,10 +21,30 @@ Ship a senior-friendly assistant app based on OpenClaw with a narrow v1:
   - CLI name override defaults to `seniormantis`
 - Added reduced CLI program at `src/sm/cli/program/build-program.ts`.
 - Added dedicated runner at `src/sm/cli/run-main.ts`.
+- Added Senior Mantis runtime guardrails in `src/sm/runtime-guardrails.ts`:
+  - force `gateway.mode=local`
+  - force `gateway.bind=loopback`
+  - force local control UI enabled
+  - force `tools.exec.ask=always` for explicit exec confirmations
+  - keep WhatsApp web provider enabled
+  - disable non-v1 channels at runtime (`telegram`, `discord`, `irc`, `googlechat`, `slack`, `signal`, `imessage`, `msteams`)
+  - disable non-v1 channel plugins in runtime plugin entries (`bluebubbles`, `discord`, `feishu`, `googlechat`, `imessage`, `irc`, `line`, `matrix`, `mattermost`, `msteams`, `nextcloud-talk`, `nostr`, `signal`, `slack`, `telegram`, `tlon`, `twitch`, `voice-call`, `zalo`, `zalouser`)
+- Added Senior Mantis channel policy guard at `src/sm/channel-policy.ts`:
+  - gateway channel policy: `whatsapp|webchat` only
+  - deliverable channel policy: `whatsapp` only
+  - enforcement wired into agent/message runtime path
+- Updated plugin auto-enable behavior to respect `channels.<id>.enabled=false` so disabled channels are not re-enabled from env/config detection.
 - Added tests:
   - `src/sm/env.test.ts`
   - `src/sm/cli/program/build-program.test.ts`
+  - `src/sm/runtime-guardrails.test.ts`
+  - `src/sm/channel-policy.test.ts`
 - Added bundler entry in `tsdown.config.ts` for `src/entry-seniormantis.ts`.
+- Removed non-v1 Fly deployment artifacts:
+  - deleted `docs/install/fly.md`
+  - deleted `fly.toml`
+  - deleted `fly.private.toml`
+  - removed English docs references in `docs/platforms/index.md`, `docs/help/faq.md`, `docs/vps.md`, `docs/docs.json`
 
 ## Current command surface (Senior Mantis runner)
 - `setup`
@@ -44,7 +64,7 @@ Ship a senior-friendly assistant app based on OpenClaw with a narrow v1:
 ## Immediate next tasks
 1. Build Electron shell under `apps/desktop-electron`.
 2. Replace generic onboarding with senior-focused question flow.
-3. Lock message channel behavior to WhatsApp + internal webchat in runtime config checks.
+3. Continue staged prune of non-v1 channels/extensions in runtime and docs.
 4. Add Senior Mantis config schema adapter (`src/sm/config/*`).
 5. Add feature modules for email/manual workflows and guided browser workflows.
 

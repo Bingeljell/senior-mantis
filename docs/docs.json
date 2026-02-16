@@ -761,7 +761,7 @@
     },
     {
       "source": "/platforms/fly",
-      "destination": "/install/fly"
+      "destination": "/vps"
     },
     {
       "source": "/platforms/hetzner",
@@ -855,7 +855,6 @@
               {
                 "group": "Hosting and deployment",
                 "pages": [
-                  "install/fly",
                   "install/hetzner",
                   "install/gcp",
                   "install/macos-vm",
