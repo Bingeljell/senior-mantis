@@ -2,13 +2,13 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { OpenClawConfig } from "../config/config.js";
 import type { RuntimeEnv } from "../runtime.js";
 import type { WizardPrompter } from "../wizard/prompts.js";
-import * as channelCatalog from "../channels/plugins/catalog.js";
 import { discordPlugin } from "../../extensions/discord/src/channel.js";
 import { imessagePlugin } from "../../extensions/imessage/src/channel.js";
 import { signalPlugin } from "../../extensions/signal/src/channel.js";
 import { slackPlugin } from "../../extensions/slack/src/channel.js";
 import { telegramPlugin } from "../../extensions/telegram/src/channel.js";
 import { whatsappPlugin } from "../../extensions/whatsapp/src/channel.js";
+import * as channelCatalog from "../channels/plugins/catalog.js";
 import { setActivePluginRegistry } from "../plugins/runtime.js";
 import { createTestRegistry } from "../test-utils/channel-plugins.js";
 import { setupChannels } from "./onboard-channels.js";
@@ -304,7 +304,10 @@ describe("setupChannels", () => {
       ([args]) => (args as { message?: string }).message === "Select channel (QuickStart)",
     );
     expect(quickstartCall).toBeTruthy();
-    const quickstartInitialValue = (quickstartCall?.[0] as { initialValue?: string }).initialValue;
+    if (!quickstartCall) {
+      return;
+    }
+    const quickstartInitialValue = (quickstartCall[0] as { initialValue?: string }).initialValue;
     expect(quickstartInitialValue).not.toBe("telegram");
     expect(catalogSpy).not.toHaveBeenCalled();
     expect(multiselect).not.toHaveBeenCalled();
@@ -344,7 +347,9 @@ describe("setupChannels", () => {
     const primerNote = note.mock.calls.find(([, title]) => title === "How channels work");
     expect(primerNote).toBeTruthy();
     const primerBody = String(primerNote?.[0] ?? "");
-    expect(primerBody).toContain("Approve pairing requests from the local dashboard/onboarding flow.");
+    expect(primerBody).toContain(
+      "Approve pairing requests from the local dashboard/onboarding flow.",
+    );
     expect(primerBody).not.toContain("pairing approve");
     expect(primerBody).not.toContain('config set session.dmScope "per-channel-peer"');
     expect(multiselect).not.toHaveBeenCalled();
