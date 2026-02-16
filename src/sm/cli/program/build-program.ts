@@ -38,7 +38,7 @@ function configureSeniorMantisHelp(program: Command, ctx: ProgramContext): void 
     .version(ctx.programVersion)
     .option(
       "--profile <name>",
-      "Use a named profile (isolates OPENCLAW_STATE_DIR/OPENCLAW_CONFIG_PATH under ~/.openclaw-<name>)",
+      "Use a named profile (isolates OPENCLAW_STATE_DIR/OPENCLAW_CONFIG_PATH in a profile-scoped state directory)",
     );
 
   program.configureHelp({

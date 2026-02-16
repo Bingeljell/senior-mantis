@@ -5,6 +5,10 @@ import type { PluginOrigin } from "../../plugins/types.js";
 import type { ChannelMeta } from "./types.js";
 import { MANIFEST_KEY } from "../../compat/legacy-names.js";
 import { discoverOpenClawPlugins } from "../../plugins/discovery.js";
+import {
+  isSeniorMantisAllowedOnboardingChannel,
+  isSeniorMantisCli,
+} from "../../sm/channel-policy.js";
 import { CONFIG_DIR, isRecord, resolveUserPath } from "../../utils.js";
 
 export type ChannelUiMetaEntry = {
@@ -283,7 +287,7 @@ export function listChannelPluginCatalogEntries(
     }
   }
 
-  return Array.from(resolved.values())
+  const entries = Array.from(resolved.values())
     .map(({ entry }) => entry)
     .toSorted((a, b) => {
       const orderA = a.meta.order ?? 999;
@@ -293,6 +297,10 @@ export function listChannelPluginCatalogEntries(
       }
       return a.meta.label.localeCompare(b.meta.label);
     });
+  if (!isSeniorMantisCli()) {
+    return entries;
+  }
+  return entries.filter((entry) => isSeniorMantisAllowedOnboardingChannel(entry.id));
 }
 
 export function getChannelPluginCatalogEntry(

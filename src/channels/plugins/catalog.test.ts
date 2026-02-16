@@ -48,4 +48,20 @@ describe("channel plugin catalog", () => {
     );
     expect(ids).toContain("demo-channel");
   });
+
+  it("filters catalog entries to WhatsApp-only channels in Senior Mantis mode", () => {
+    const previousCliName = process.env.OPENCLAW_CLI_NAME_OVERRIDE;
+    process.env.OPENCLAW_CLI_NAME_OVERRIDE = "seniormantis";
+    try {
+      const ids = listChannelPluginCatalogEntries().map((entry) => entry.id);
+      expect(ids).not.toContain("msteams");
+      expect(ids.every((id) => id === "whatsapp")).toBe(true);
+    } finally {
+      if (previousCliName === undefined) {
+        delete process.env.OPENCLAW_CLI_NAME_OVERRIDE;
+      } else {
+        process.env.OPENCLAW_CLI_NAME_OVERRIDE = previousCliName;
+      }
+    }
+  });
 });

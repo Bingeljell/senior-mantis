@@ -54,15 +54,18 @@ async function requireRiskAcknowledgement(params: {
     return;
   }
 
+  const productName = isSeniorMantisCli() ? "Senior Mantis" : "OpenClaw";
+  const auditDeep = formatCliCommand("openclaw security audit --deep");
+  const auditFix = formatCliCommand("openclaw security audit --fix");
   await params.prompter.note(
     [
       "Security warning — please read.",
       "",
-      "OpenClaw is a hobby project and still in beta. Expect sharp edges.",
+      `${productName} is a hobby project and still in beta. Expect sharp edges.`,
       "This bot can read files and run actions if tools are enabled.",
       "A bad prompt can trick it into doing unsafe things.",
       "",
-      "If you’re not comfortable with basic security and access control, don’t run OpenClaw.",
+      `If you’re not comfortable with basic security and access control, don’t run ${productName}.`,
       "Ask someone experienced to help before enabling tools or exposing it to the internet.",
       "",
       "Recommended baseline:",
@@ -72,8 +75,8 @@ async function requireRiskAcknowledgement(params: {
       "- Use the strongest available model for any bot with tools or untrusted inboxes.",
       "",
       "Run regularly:",
-      "openclaw security audit --deep",
-      "openclaw security audit --fix",
+      auditDeep,
+      auditFix,
       "",
       "Must read: https://docs.openclaw.ai/gateway/security",
     ].join("\n"),
@@ -95,7 +98,7 @@ export async function runOnboardingWizard(
   prompter: WizardPrompter,
 ) {
   printWizardHeader(runtime);
-  await prompter.intro("OpenClaw onboarding");
+  await prompter.intro(isSeniorMantisCli() ? "Senior Mantis onboarding" : "OpenClaw onboarding");
   await requireRiskAcknowledgement({ opts, prompter });
 
   const snapshot = await readConfigFileSnapshot();
