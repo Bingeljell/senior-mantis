@@ -38,6 +38,7 @@ Ship a senior-friendly assistant app based on OpenClaw with a narrow v1:
 - Locked onboarding channel selection to WhatsApp-only in Senior Mantis mode (`src/commands/onboard-channels.ts`, `src/wizard/onboarding.ts`).
 - Hardened Senior Mantis onboarding allowlist enforcement in `src/commands/onboard-channels.ts`:
   - adapter status is fetched only for allowed onboarding channels
+  - plugin catalog/install paths are disabled in Senior Mantis mode
   - `initialSelection` and `forceAllowFromChannels` are sanitized to the allowed set
   - disallowed or unavailable channels are explicitly rejected in channel choice handling
 - Updated plugin auto-enable behavior to respect `channels.<id>.enabled=false` so disabled channels are not re-enabled from env/config detection.

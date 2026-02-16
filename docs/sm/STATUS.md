@@ -32,8 +32,10 @@ Last updated: 2026-02-16
   - `src/wizard/onboarding.ts` (Senior Mantis onboarding flags + DM policy prompt skip)
 - Hardened onboarding channel allowlist enforcement in Senior Mantis mode:
   - `src/commands/onboard-channels.ts` (filter adapter status fetches, sanitize `initialSelection`/`forceAllowFromChannels`, reject disallowed channel choices)
+- Disabled onboarding plugin catalog/install surface in Senior Mantis mode:
+  - `src/commands/onboard-channels.ts` (skip catalog enumeration and plugin install paths in SM runtime)
 - Added onboarding e2e coverage for Senior Mantis channel scope and primer wording:
-  - `src/commands/onboard-channels.e2e.test.ts`
+  - `src/commands/onboard-channels.e2e.test.ts` (includes assertion that catalog enumeration is not used in SM mode)
 - Expanded runtime guardrails to explicitly disable non-v1 channel plugins:
   - `src/sm/runtime-guardrails.ts`
   - `src/sm/runtime-guardrails.test.ts`
