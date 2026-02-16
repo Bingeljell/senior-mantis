@@ -36,12 +36,17 @@ Ship a senior-friendly assistant app based on OpenClaw with a narrow v1:
   - enforcement wired into agent/message runtime path
 - Added Senior Mantis-specific `status`/`health`/`sessions` registration (`src/sm/cli/program/register-status-health-sessions.ts`) to avoid non-v1 channel phrasing in help text.
 - Locked onboarding channel selection to WhatsApp-only in Senior Mantis mode (`src/commands/onboard-channels.ts`, `src/wizard/onboarding.ts`).
+- Hardened Senior Mantis onboarding allowlist enforcement in `src/commands/onboard-channels.ts`:
+  - adapter status is fetched only for allowed onboarding channels
+  - `initialSelection` and `forceAllowFromChannels` are sanitized to the allowed set
+  - disallowed or unavailable channels are explicitly rejected in channel choice handling
 - Updated plugin auto-enable behavior to respect `channels.<id>.enabled=false` so disabled channels are not re-enabled from env/config detection.
 - Added tests:
   - `src/sm/env.test.ts`
   - `src/sm/cli/program/build-program.test.ts`
   - `src/sm/runtime-guardrails.test.ts`
   - `src/sm/channel-policy.test.ts`
+  - `src/commands/onboard-channels.e2e.test.ts` (Senior Mantis onboarding scope and primer wording)
 - Added bundler entry in `tsdown.config.ts` for `src/entry-seniormantis.ts`.
 - Removed non-v1 Fly deployment artifacts:
   - deleted `docs/install/fly.md`

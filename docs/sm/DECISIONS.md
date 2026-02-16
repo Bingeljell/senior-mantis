@@ -41,3 +41,7 @@ Reason: keep the migration safe while converging to desktop-first local v1 scope
 ### D-010: Senior Mantis onboarding channel scope
 Decision: restrict onboarding channel setup to WhatsApp only in Senior Mantis mode.
 Reason: align onboarding UX with v1 scope and avoid exposing non-v1 channel setup paths.
+
+### D-011: Senior Mantis onboarding allowlist hardening
+Decision: enforce onboarding allowlist checks at every setup path (status fetch, defaults, overrides, and selection handling).
+Reason: defense in depth; ensure non-v1 channels cannot be selected through preset values or stale adapter/plugin state.

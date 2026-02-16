@@ -30,6 +30,10 @@ Last updated: 2026-02-16
 - Locked onboarding channel selection to v1 scope in Senior Mantis mode:
   - `src/commands/onboard-channels.ts` (filter selectable channels to WhatsApp)
   - `src/wizard/onboarding.ts` (Senior Mantis onboarding flags + DM policy prompt skip)
+- Hardened onboarding channel allowlist enforcement in Senior Mantis mode:
+  - `src/commands/onboard-channels.ts` (filter adapter status fetches, sanitize `initialSelection`/`forceAllowFromChannels`, reject disallowed channel choices)
+- Added onboarding e2e coverage for Senior Mantis channel scope and primer wording:
+  - `src/commands/onboard-channels.e2e.test.ts`
 - Expanded runtime guardrails to explicitly disable non-v1 channel plugins:
   - `src/sm/runtime-guardrails.ts`
   - `src/sm/runtime-guardrails.test.ts`
