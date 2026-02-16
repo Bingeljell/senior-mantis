@@ -2,6 +2,7 @@ import { SENIOR_MANTIS_CLI_NAME } from "./env.js";
 
 export const SENIOR_MANTIS_ALLOWED_GATEWAY_CHANNELS = ["whatsapp", "webchat"] as const;
 export const SENIOR_MANTIS_ALLOWED_DELIVERABLE_CHANNELS = ["whatsapp"] as const;
+export const SENIOR_MANTIS_ALLOWED_ONBOARDING_CHANNELS = ["whatsapp"] as const;
 
 export function isSeniorMantisCli(env: NodeJS.ProcessEnv = process.env): boolean {
   const cliName = env.OPENCLAW_CLI_NAME_OVERRIDE?.trim().toLowerCase();
@@ -14,6 +15,10 @@ export function isSeniorMantisAllowedGatewayChannel(raw: string): boolean {
 
 export function isSeniorMantisAllowedDeliverableChannel(raw: string): boolean {
   return (SENIOR_MANTIS_ALLOWED_DELIVERABLE_CHANNELS as readonly string[]).includes(raw);
+}
+
+export function isSeniorMantisAllowedOnboardingChannel(raw: string): boolean {
+  return (SENIOR_MANTIS_ALLOWED_ONBOARDING_CHANNELS as readonly string[]).includes(raw);
 }
 
 export function assertSeniorMantisAllowedGatewayChannel(raw: string, optionName: string): void {

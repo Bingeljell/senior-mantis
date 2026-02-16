@@ -40,6 +40,10 @@ import {
 } from "../config/config.js";
 import { logConfigUpdated } from "../config/logging.js";
 import { defaultRuntime } from "../runtime.js";
+import {
+  isSeniorMantisAllowedOnboardingChannel,
+  isSeniorMantisCli,
+} from "../sm/channel-policy.js";
 import { resolveUserPath } from "../utils.js";
 import { finalizeOnboardingWizard } from "./onboarding.finalize.js";
 import { configureGatewayForOnboarding } from "./onboarding.gateway-config.js";
@@ -423,16 +427,23 @@ export async function runOnboardingWizard(
   if (opts.skipChannels ?? opts.skipProviders) {
     await prompter.note("Skipping channel setup.", "Channels");
   } else {
+    const seniorMantisMode = isSeniorMantisCli();
     const quickstartAllowFromChannels =
       flow === "quickstart"
         ? listChannelPlugins()
+            .filter((plugin) => {
+              if (!seniorMantisMode) {
+                return true;
+              }
+              return isSeniorMantisAllowedOnboardingChannel(plugin.id);
+            })
             .filter((plugin) => plugin.meta.quickstartAllowFrom)
             .map((plugin) => plugin.id)
         : [];
     nextConfig = await setupChannels(nextConfig, runtime, prompter, {
       allowSignalInstall: true,
       forceAllowFromChannels: quickstartAllowFromChannels,
-      skipDmPolicyPrompt: flow === "quickstart",
+      skipDmPolicyPrompt: flow === "quickstart" || seniorMantisMode,
       skipConfirm: flow === "quickstart",
       quickstartDefaults: flow === "quickstart",
     });

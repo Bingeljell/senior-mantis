@@ -22,6 +22,10 @@ import { formatCliCommand } from "../cli/command-format.js";
 import { isChannelConfigured } from "../config/plugin-auto-enable.js";
 import { enablePluginInConfig } from "../plugins/enable.js";
 import { DEFAULT_ACCOUNT_ID, normalizeAccountId } from "../routing/session-key.js";
+import {
+  isSeniorMantisAllowedOnboardingChannel,
+  isSeniorMantisCli,
+} from "../sm/channel-policy.js";
 import { formatDocsLink } from "../terminal/links.js";
 import {
   ensureOnboardingPluginInstalled,
@@ -40,6 +44,13 @@ type ChannelStatusSummary = {
   statusByChannel: Map<ChannelChoice, ChannelOnboardingStatus>;
   statusLines: string[];
 };
+
+function shouldIncludeOnboardingChannel(channel: string): boolean {
+  if (!isSeniorMantisCli()) {
+    return true;
+  }
+  return isSeniorMantisAllowedOnboardingChannel(channel);
+}
 
 function formatAccountLabel(accountId: string): string {
   return accountId === DEFAULT_ACCOUNT_ID ? "default (primary)" : accountId;
@@ -113,11 +124,13 @@ async function collectChannelStatus(params: {
   options?: SetupChannelsOptions;
   accountOverrides: Partial<Record<ChannelChoice, string>>;
 }): Promise<ChannelStatusSummary> {
-  const installedPlugins = listChannelPlugins();
+  const installedPlugins = listChannelPlugins().filter((plugin) =>
+    shouldIncludeOnboardingChannel(plugin.id),
+  );
   const installedIds = new Set(installedPlugins.map((plugin) => plugin.id));
   const workspaceDir = resolveAgentWorkspaceDir(params.cfg, resolveDefaultAgentId(params.cfg));
   const catalogEntries = listChannelPluginCatalogEntries({ workspaceDir }).filter(
-    (entry) => !installedIds.has(entry.id),
+    (entry) => !installedIds.has(entry.id) && shouldIncludeOnboardingChannel(entry.id),
   );
   const statusEntries = await Promise.all(
     listChannelOnboardingAdapters().map((adapter) =>
@@ -128,9 +141,12 @@ async function collectChannelStatus(params: {
       }),
     ),
   );
-  const statusByChannel = new Map(statusEntries.map((entry) => [entry.channel, entry]));
+  const filteredStatuses = statusEntries.filter((entry) =>
+    shouldIncludeOnboardingChannel(entry.channel),
+  );
+  const statusByChannel = new Map(filteredStatuses.map((entry) => [entry.channel, entry]));
   const fallbackStatuses = listChatChannels()
-    .filter((meta) => !statusByChannel.has(meta.id))
+    .filter((meta) => shouldIncludeOnboardingChannel(meta.id) && !statusByChannel.has(meta.id))
     .map((meta) => {
       const configured = isChannelConfigured(params.cfg, meta.id);
       const statusLabel = configured ? "configured (plugin disabled)" : "not configured";
@@ -149,7 +165,7 @@ async function collectChannelStatus(params: {
     selectionHint: "plugin · install",
     quickstartScore: 0,
   }));
-  const combinedStatuses = [...statusEntries, ...fallbackStatuses, ...catalogStatuses];
+  const combinedStatuses = [...filteredStatuses, ...fallbackStatuses, ...catalogStatuses];
   const mergedStatusByChannel = new Map(combinedStatuses.map((entry) => [entry.channel, entry]));
   const statusLines = combinedStatuses.flatMap((entry) => entry.statusLines);
   return {
@@ -189,14 +205,20 @@ async function noteChannelPrimer(
       blurb: channel.blurb,
     }),
   );
+  const pairingLine = isSeniorMantisCli()
+    ? "Approve pairing requests from the local dashboard/onboarding flow."
+    : `Approve with: ${formatCliCommand("openclaw pairing approve <channel> <code>")}`;
+  const dmScopeLine = isSeniorMantisCli()
+    ? 'Use dmScope "per-channel-peer" (or "per-account-channel-peer" for multi-account channels) to isolate sessions.'
+    : "Multi-user DMs: run: " +
+      formatCliCommand('openclaw config set session.dmScope "per-channel-peer"') +
+      ' (or "per-account-channel-peer" for multi-account channels) to isolate sessions.';
   await prompter.note(
     [
       "DM security: default is pairing; unknown DMs get a pairing code.",
-      `Approve with: ${formatCliCommand("openclaw pairing approve <channel> <code>")}`,
+      pairingLine,
       'Public DMs require dmPolicy="open" + allowFrom=["*"].',
-      "Multi-user DMs: run: " +
-        formatCliCommand('openclaw config set session.dmScope "per-channel-peer"') +
-        ' (or "per-account-channel-peer" for multi-account channels) to isolate sessions.',
+      dmScopeLine,
       `Docs: ${formatDocsLink("/start/pairing", "start/pairing")}`,
       "",
       ...channelLines,
@@ -244,15 +266,21 @@ async function maybeConfigureDmPolicies(params: {
 
   let cfg = params.cfg;
   const selectPolicy = async (policy: ChannelOnboardingDmPolicy) => {
+    const pairingLine = isSeniorMantisCli()
+      ? "Approve pairing requests from the local dashboard/onboarding flow."
+      : `Approve: ${formatCliCommand(`openclaw pairing approve ${policy.channel} <code>`)}`;
+    const dmScopeLine = isSeniorMantisCli()
+      ? 'Use dmScope "per-channel-peer" (or "per-account-channel-peer" for multi-account channels) to isolate sessions.'
+      : "Multi-user DMs: run: " +
+        formatCliCommand('openclaw config set session.dmScope "per-channel-peer"') +
+        ' (or "per-account-channel-peer" for multi-account channels) to isolate sessions.';
     await prompter.note(
       [
         "Default: pairing (unknown DMs get a pairing code).",
-        `Approve: ${formatCliCommand(`openclaw pairing approve ${policy.channel} <code>`)}`,
+        pairingLine,
         `Allowlist DMs: ${policy.policyKey}="allowlist" + ${policy.allowFromKey} entries.`,
         `Public DMs: ${policy.policyKey}="open" + ${policy.allowFromKey} includes "*".`,
-        "Multi-user DMs: run: " +
-          formatCliCommand('openclaw config set session.dmScope "per-channel-peer"') +
-          ' (or "per-account-channel-peer" for multi-account channels) to isolate sessions.',
+        dmScopeLine,
         `Docs: ${formatDocsLink("/start/pairing", "start/pairing")}`,
       ].join("\n"),
       `${policy.label} DM access`,
@@ -319,11 +347,13 @@ export async function setupChannels(
     return cfg;
   }
 
-  const corePrimer = listChatChannels().map((meta) => ({
-    id: meta.id,
-    label: meta.label,
-    blurb: meta.blurb,
-  }));
+  const corePrimer = listChatChannels()
+    .filter((meta) => shouldIncludeOnboardingChannel(meta.id))
+    .map((meta) => ({
+      id: meta.id,
+      label: meta.label,
+      blurb: meta.blurb,
+    }));
   const coreIds = new Set(corePrimer.map((entry) => entry.id));
   const primerChannels = [
     ...corePrimer,
@@ -408,12 +438,14 @@ export async function setupChannels(
     });
 
   const getChannelEntries = () => {
-    const core = listChatChannels();
-    const installed = listChannelPlugins();
+    const core = listChatChannels().filter((meta) => shouldIncludeOnboardingChannel(meta.id));
+    const installed = listChannelPlugins().filter((plugin) =>
+      shouldIncludeOnboardingChannel(plugin.id),
+    );
     const installedIds = new Set(installed.map((plugin) => plugin.id));
     const workspaceDir = resolveAgentWorkspaceDir(next, resolveDefaultAgentId(next));
     const catalog = listChannelPluginCatalogEntries({ workspaceDir }).filter(
-      (entry) => !installedIds.has(entry.id),
+      (entry) => !installedIds.has(entry.id) && shouldIncludeOnboardingChannel(entry.id),
     );
     const metaById = new Map<string, ChannelMeta>();
     for (const meta of core) {
@@ -613,6 +645,9 @@ export async function setupChannels(
 
   if (options?.quickstartDefaults) {
     const { entries } = getChannelEntries();
+    const addLaterHint = isSeniorMantisCli()
+      ? `You can run \`${formatCliCommand("openclaw onboard")}\` again later.`
+      : `You can add channels later via \`${formatCliCommand("openclaw channels add")}\``;
     const choice = (await prompter.select({
       message: "Select channel (QuickStart)",
       options: [
@@ -620,7 +655,7 @@ export async function setupChannels(
         {
           value: "__skip__",
           label: "Skip for now",
-          hint: `You can add channels later via \`${formatCliCommand("openclaw channels add")}\``,
+          hint: addLaterHint,
         },
       ],
       initialValue: quickstartDefault,

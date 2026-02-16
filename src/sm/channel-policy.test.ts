@@ -4,6 +4,7 @@ import {
   assertSeniorMantisAllowedGatewayChannel,
   isSeniorMantisAllowedDeliverableChannel,
   isSeniorMantisAllowedGatewayChannel,
+  isSeniorMantisAllowedOnboardingChannel,
   isSeniorMantisCli,
 } from "./channel-policy.js";
 
@@ -26,6 +27,11 @@ describe("Senior Mantis channel policy", () => {
   it("enforces deliverable channels", () => {
     expect(isSeniorMantisAllowedDeliverableChannel("whatsapp")).toBe(true);
     expect(isSeniorMantisAllowedDeliverableChannel("webchat")).toBe(false);
+  });
+
+  it("enforces onboarding channels", () => {
+    expect(isSeniorMantisAllowedOnboardingChannel("whatsapp")).toBe(true);
+    expect(isSeniorMantisAllowedOnboardingChannel("telegram")).toBe(false);
   });
 
   it("throws for disallowed channels in Senior Mantis mode", () => {
