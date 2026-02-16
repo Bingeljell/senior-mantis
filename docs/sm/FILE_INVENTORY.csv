@@ -1,0 +1,19 @@
+source_path,target_path,action,notes
+package.json,package.json,edit,Add seniormantis bin entry
+tsdown.config.ts,tsdown.config.ts,edit,Bundle entry-seniormantis
+src/cli/cli-name.ts,src/cli/cli-name.ts,edit,Support seniormantis CLI name override
+seniormantis.mjs,seniormantis.mjs,add,New Node bootstrap wrapper
+src/entry-seniormantis.ts,src/entry-seniormantis.ts,add,Senior Mantis entrypoint
+src/sm/env.ts,src/sm/env.ts,add,State/config defaults for Senior Mantis
+src/sm/env.test.ts,src/sm/env.test.ts,add,Unit tests for defaults
+src/sm/cli/run-main.ts,src/sm/cli/run-main.ts,add,Dedicated CLI runner
+src/sm/cli/program/build-program.ts,src/sm/cli/program/build-program.ts,add,Reduced command surface registration
+src/sm/cli/program/build-program.test.ts,src/sm/cli/program/build-program.test.ts,add,CLI surface test
+docs/sm/HANDOFF.md,docs/sm/HANDOFF.md,add,Main continuation guide
+docs/sm/ARCHITECTURE.md,docs/sm/ARCHITECTURE.md,add,Component and boundary map
+docs/sm/KEEP_DROP_MATRIX.md,docs/sm/KEEP_DROP_MATRIX.md,add,Explicit migration decisions
+docs/sm/FILE_INVENTORY.csv,docs/sm/FILE_INVENTORY.csv,add,File-level migration index
+docs/sm/DECISIONS.md,docs/sm/DECISIONS.md,add,Decision log
+docs/sm/OPEN_QUESTIONS.md,docs/sm/OPEN_QUESTIONS.md,add,Deferred product/engineering questions
+docs/sm/TEST_PLAN.md,docs/sm/TEST_PLAN.md,add,Validation and acceptance plan
+docs/sm/BOOTSTRAP_NEW_REPO.md,docs/sm/BOOTSTRAP_NEW_REPO.md,add,Fresh repo bootstrap steps
