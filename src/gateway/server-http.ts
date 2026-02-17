@@ -21,6 +21,7 @@ import {
 import { loadConfig } from "../config/config.js";
 import { safeEqualSecret } from "../security/secret-equal.js";
 import { handleSlackHttpRequest } from "../slack/http/index.js";
+import { isSeniorMantisCli } from "../sm/channel-policy.js";
 import {
   authorizeGatewayConnect,
   isLocalDirectRequest,
@@ -495,7 +496,9 @@ export function createGatewayHttpServer(opts: {
       ) {
         return;
       }
-      if (await handleSlackHttpRequest(req, res)) {
+      // Senior Mantis v1 keeps WhatsApp + local web UI only.
+      // Skip Slack HTTP channel route wiring in Senior Mantis mode.
+      if (!isSeniorMantisCli() && (await handleSlackHttpRequest(req, res))) {
         return;
       }
       if (handlePluginRequest) {

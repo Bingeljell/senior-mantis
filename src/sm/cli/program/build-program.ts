@@ -1,7 +1,6 @@
 import { Command } from "commander";
 import type { ProgramContext } from "../../../cli/program/context.js";
 import { runCommandWithRuntime } from "../../../cli/cli-utils.js";
-import { registerGatewayCli } from "../../../cli/gateway-cli.js";
 import { createMessageCliHelpers } from "../../../cli/program/message/helpers.js";
 import { registerMessageSendCommand } from "../../../cli/program/message/register.send.js";
 import { registerPreActionHooks } from "../../../cli/program/preaction.js";
@@ -14,16 +13,18 @@ import { defaultRuntime } from "../../../runtime.js";
 import { formatDocsLink } from "../../../terminal/links.js";
 import { theme } from "../../../terminal/theme.js";
 import { VERSION } from "../../../version.js";
+import { registerSeniorMantisGatewayCommands } from "./register-gateway.js";
 import { registerSeniorMantisStatusHealthSessionsCommands } from "./register-status-health-sessions.js";
 
-const SM_CHANNELS = ["whatsapp", "webchat"] as const;
+const SM_AGENT_CHANNELS = ["whatsapp", "webchat"] as const;
+const SM_MESSAGE_CHANNELS = ["whatsapp"] as const;
 
 function createSeniorMantisProgramContext(): ProgramContext {
   return {
     programVersion: VERSION,
-    channelOptions: [...SM_CHANNELS],
-    messageChannelOptions: SM_CHANNELS.join("|"),
-    agentChannelOptions: ["last", ...SM_CHANNELS].join("|"),
+    channelOptions: [...SM_AGENT_CHANNELS],
+    messageChannelOptions: SM_MESSAGE_CHANNELS.join("|"),
+    agentChannelOptions: ["last", ...SM_AGENT_CHANNELS].join("|"),
   };
 }
 
@@ -131,7 +132,7 @@ export function buildSeniorMantisProgram(): Command {
   registerSeniorMantisMessageCommands(program, ctx);
   registerAgentCommands(program, { agentChannelOptions: ctx.agentChannelOptions });
   registerSeniorMantisStatusHealthSessionsCommands(program);
-  registerGatewayCli(program);
+  registerSeniorMantisGatewayCommands(program);
 
   return program;
 }
