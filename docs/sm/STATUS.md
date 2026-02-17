@@ -79,6 +79,12 @@ Last updated: 2026-02-17
     - token resolution now also honors `OPENCLAW_GATEWAY_TOKEN` env when present (common legacy local setup)
     - generated dashboard URL always uses a trailing slash for non-root Control UI base paths to avoid redirect edge cases
     - keep activity/status display URL token-free.
+- CLI gateway auth recovery fixes:
+  - `dashboard --no-open` now correctly suppresses browser launch (Commander negated option wiring fixed in `src/cli/program/register.maintenance.ts`).
+  - `doctor --generate-gateway-token` now persists token config even without `--repair/--fix` (config mutation write guard fixed in `src/commands/doctor.ts`).
+  - tests added:
+    - `src/cli/program/register.maintenance.test.ts`
+    - `src/commands/doctor.runs-legacy-state-migrations-yes-mode-without.e2e.test.ts` (token persistence case).
 
 ### Behavior impact
 

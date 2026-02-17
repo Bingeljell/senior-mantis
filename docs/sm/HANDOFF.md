@@ -83,6 +83,12 @@ Ship a senior-friendly assistant app based on OpenClaw with a narrow v1:
   - token resolution also reads `OPENCLAW_GATEWAY_TOKEN` env for legacy local setups
   - dashboard URL uses trailing slash for non-root base paths to avoid auth fragment loss on redirect edge cases
   - file: `apps/desktop-electron/main.mjs`
+- Fixed CLI auth-recovery command behavior:
+  - `seniormantis dashboard --no-open` now honors `--no-open` correctly (`src/cli/program/register.maintenance.ts`)
+  - `seniormantis doctor --generate-gateway-token` now persists generated token config even when not using `--fix` (`src/commands/doctor.ts`)
+  - tests added:
+    - `src/cli/program/register.maintenance.test.ts`
+    - `src/commands/doctor.runs-legacy-state-migrations-yes-mode-without.e2e.test.ts` (token persistence case)
 - Added Senior Mantis banner branding path:
   - `src/cli/banner.ts` switches banner identity/tagline based on active CLI name (`openclaw` vs `seniormantis`).
 - Added runtime HTTP channel wiring prune for Senior Mantis mode:
