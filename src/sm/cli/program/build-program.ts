@@ -100,11 +100,12 @@ function registerSeniorMantisMaintenanceCommands(program: Command): void {
   program
     .command("dashboard")
     .description("Open the local Senior Mantis Control UI")
-    .option("--no-open", "Print URL but do not launch a browser", false)
+    .option("--no-open", "Print URL but do not launch a browser")
     .action(async (opts) => {
       await runCommandWithRuntime(defaultRuntime, async () => {
         await dashboardCommand(defaultRuntime, {
-          noOpen: Boolean(opts.noOpen),
+          // Commander negated options expose the positive key (`open`), not `noOpen`.
+          noOpen: opts.open === false,
         });
       });
     });
