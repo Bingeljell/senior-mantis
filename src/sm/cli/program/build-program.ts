@@ -10,7 +10,6 @@ import { registerSetupCommand } from "../../../cli/program/register.setup.js";
 import { dashboardCommand } from "../../../commands/dashboard.js";
 import { doctorCommand } from "../../../commands/doctor.js";
 import { defaultRuntime } from "../../../runtime.js";
-import { formatDocsLink } from "../../../terminal/links.js";
 import { theme } from "../../../terminal/theme.js";
 import { VERSION } from "../../../version.js";
 import { registerSeniorMantisGatewayCommands } from "./register-gateway.js";
@@ -51,10 +50,6 @@ function configureSeniorMantisHelp(program: Command, ctx: ProgramContext): void 
     outputError: (str, write) => write(theme.error(str)),
   });
 
-  const docsLink = formatDocsLink(
-    "/start/getting-started",
-    "docs.openclaw.ai/start/getting-started",
-  );
   program.addHelpText("afterAll", () => {
     return `
 ${theme.heading("Quick Start:")}
@@ -66,7 +61,7 @@ ${example(
   "Run one agent turn and deliver output.",
 )}
 
-${theme.muted("Docs:")} ${docsLink}
+${theme.muted("Docs:")} docs/sm/HANDOFF.md
 `;
   });
 }

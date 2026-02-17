@@ -7,7 +7,6 @@ import { sessionsCommand } from "../../../commands/sessions.js";
 import { statusCommand } from "../../../commands/status.js";
 import { setVerbose } from "../../../globals.js";
 import { defaultRuntime } from "../../../runtime.js";
-import { formatDocsLink } from "../../../terminal/links.js";
 import { theme } from "../../../terminal/theme.js";
 
 function resolveVerbose(opts: { verbose?: boolean; debug?: boolean }): boolean {
@@ -47,11 +46,7 @@ export function registerSeniorMantisStatusHealthSessionsCommands(program: Comman
           ["seniormantis status --deep --timeout 5000", "Tighten probe timeout."],
         ])}`,
     )
-    .addHelpText(
-      "after",
-      () =>
-        `\n${theme.muted("Docs:")} ${formatDocsLink("/cli/status", "docs.openclaw.ai/cli/status")}\n`,
-    )
+    .addHelpText("after", () => `\n${theme.muted("Docs:")} docs/sm/STATUS.md\n`)
     .action(async (opts) => {
       const verbose = resolveVerbose(opts);
       setVerbose(verbose);
@@ -81,11 +76,7 @@ export function registerSeniorMantisStatusHealthSessionsCommands(program: Comman
     .option("--timeout <ms>", "Connection timeout in milliseconds", "10000")
     .option("--verbose", "Verbose logging", false)
     .option("--debug", "Alias for --verbose", false)
-    .addHelpText(
-      "after",
-      () =>
-        `\n${theme.muted("Docs:")} ${formatDocsLink("/cli/health", "docs.openclaw.ai/cli/health")}\n`,
-    )
+    .addHelpText("after", () => `\n${theme.muted("Docs:")} docs/sm/STATUS.md\n`)
     .action(async (opts) => {
       const verbose = resolveVerbose(opts);
       setVerbose(verbose);
@@ -124,11 +115,7 @@ export function registerSeniorMantisStatusHealthSessionsCommands(program: Comman
           "Shows token usage per session when the agent reports it; set agents.defaults.contextTokens to cap the window and show %.",
         )}`,
     )
-    .addHelpText(
-      "after",
-      () =>
-        `\n${theme.muted("Docs:")} ${formatDocsLink("/cli/sessions", "docs.openclaw.ai/cli/sessions")}\n`,
-    )
+    .addHelpText("after", () => `\n${theme.muted("Docs:")} docs/sm/STATUS.md\n`)
     .action(async (opts) => {
       setVerbose(Boolean(opts.verbose));
       await sessionsCommand(
