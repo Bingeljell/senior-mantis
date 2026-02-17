@@ -142,8 +142,8 @@ function runSeniorMantis(args, opts = {}) {
   })();
 }
 
-async function openOnboardingInTerminal() {
-  const command = toShellCommand(resolveCliInvocation(["onboard"]));
+async function openCommandInTerminal(args) {
+  const command = toShellCommand(resolveCliInvocation(args));
   if (process.platform === "darwin") {
     const escaped = command.replace(/\\/g, "\\\\").replace(/"/g, '\\"');
     const script = [
@@ -158,6 +158,14 @@ async function openOnboardingInTerminal() {
     return;
   }
   await runCommand("x-terminal-emulator", ["-e", "bash", "-lc", command]);
+}
+
+async function openSetupInTerminal() {
+  await openCommandInTerminal(["setup"]);
+}
+
+async function openOnboardingInTerminal() {
+  await openCommandInTerminal(["onboard"]);
 }
 
 function runCommand(command, args) {
@@ -356,6 +364,22 @@ ipcMain.handle("sm:run-onboarding", async () => {
     return {
       ok: false,
       message: `Failed to open onboarding terminal: ${String(error)}`,
+    };
+  }
+});
+
+ipcMain.handle("sm:run-setup", async () => {
+  const confirmed = await confirmSideEffect("Open setup in a terminal window");
+  if (!confirmed) {
+    return { ok: false, message: "Cancelled by user." };
+  }
+  try {
+    await openSetupInTerminal();
+    return { ok: true, message: "Opened setup terminal." };
+  } catch (error) {
+    return {
+      ok: false,
+      message: `Failed to open setup terminal: ${String(error)}`,
     };
   }
 });

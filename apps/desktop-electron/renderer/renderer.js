@@ -1,4 +1,5 @@
 const els = {
+  runSetup: document.getElementById("runSetup"),
   startGateway: document.getElementById("startGateway"),
   stopGateway: document.getElementById("stopGateway"),
   openOnboarding: document.getElementById("openOnboarding"),
@@ -36,6 +37,17 @@ function pretty(result) {
   return JSON.stringify(result, null, 2);
 }
 
+function maybeSetupHint(result) {
+  if (result?.ok) {
+    return null;
+  }
+  const details = `${result?.stderr ?? ""}\n${result?.stdout ?? ""}`.toLowerCase();
+  if (details.includes("missing config") || details.includes("run `seniormantis setup`")) {
+    return "Setup is required before first gateway start. Click 'Run Setup'.";
+  }
+  return null;
+}
+
 async function refreshGatewayStatus() {
   const status = await window.smDesktop.getGatewayStatus();
   const launchMode = status.launchMode ? ` (${status.launchMode} CLI)` : "";
@@ -48,6 +60,10 @@ async function refreshGatewayStatus() {
 async function refreshReadOnlyView(action, target) {
   const result = await window.smDesktop.runReadonly(action);
   target.textContent = pretty(result);
+  const hint = maybeSetupHint(result);
+  if (hint) {
+    logActivity(hint);
+  }
 }
 
 async function boot() {
@@ -67,6 +83,11 @@ els.startGateway.addEventListener("click", async () => {
   const result = await window.smDesktop.startGateway();
   logActivity(result.message ?? "Start gateway completed.");
   await refreshGatewayStatus();
+});
+
+els.runSetup.addEventListener("click", async () => {
+  const result = await window.smDesktop.runSetup();
+  logActivity(result.message ?? "Setup action completed.");
 });
 
 els.stopGateway.addEventListener("click", async () => {

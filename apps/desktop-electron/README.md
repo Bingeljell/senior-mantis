@@ -5,9 +5,11 @@ Minimal desktop shell for local Senior Mantis workflows on macOS.
 ## What it does
 
 - Starts/stops a local gateway process (`bind=loopback`, port `18789`) after explicit confirmation.
+- Opens setup in a terminal window after explicit confirmation.
 - Opens interactive onboarding in a terminal window after explicit confirmation.
 - Shows status/health/sessions snapshots.
 - Embeds local web UI (`http://127.0.0.1:18789/ui`) in-app.
+- Surfaces first-run setup hints when status checks detect missing config.
 
 ## Prerequisites
 
@@ -24,6 +26,7 @@ From repo root:
 ```bash
 pnpm install
 pnpm build
+node seniormantis.mjs setup
 pnpm --dir apps/desktop-electron install
 pnpm desktop:dev
 ```
@@ -31,11 +34,12 @@ pnpm desktop:dev
 ## Fast local test flow
 
 1. Start the desktop app with `pnpm desktop:dev`.
-2. Click `Start Gateway` and accept confirmation.
-3. Confirm gateway status shows `Running`.
-4. Click `Run Onboarding` and accept confirmation.
-5. Complete onboarding in Terminal and verify WhatsApp connection.
-6. Return to desktop app and click `Refresh` on Status/Health/Sessions.
+2. Click `Run Setup` and complete setup in Terminal (first run).
+3. Click `Start Gateway` and accept confirmation.
+4. Confirm gateway status shows `Running`.
+5. Click `Run Onboarding` and accept confirmation.
+6. Complete onboarding in Terminal and verify WhatsApp connection.
+7. Return to desktop app and click `Refresh` on Status/Health/Sessions.
 
 ## CLI resolution behavior
 
@@ -53,4 +57,5 @@ SM_CLI_COMMAND=/usr/local/bin/seniormantis pnpm desktop:dev
 - Onboarding launches in your system terminal for interactive prompts.
 - If gateway start fails with `ENOENT`, install or point `SM_CLI_COMMAND` to a valid `seniormantis` binary.
 - If status/health commands fail with missing `dist/entry-seniormantis`, run `pnpm build`.
+- If status/health or gateway launch reports missing config, run `seniormantis setup` (or click `Run Setup` in the desktop app).
 - If the embedded UI is blank, verify local gateway is running on `127.0.0.1:18789`.

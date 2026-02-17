@@ -27,32 +27,44 @@ Last updated: 2026-02-17
   - `apps/desktop-electron/*`
   - root scripts `desktop:dev` and `desktop:start`.
 
-## Current pass: startup hardening + desktop launch diagnostics
+## Current pass: phase 2 prune + desktop first-run hardening
 
-### Root cause resolved
+### Command/runtime pruning updates
 
-- The `ReferenceError: Cannot access 'CONFIG_DIR' before initialization` popup came from bundled CLI startup order (top-level eager initialization in cycle-sensitive paths).
+- `src/sm/cli/program/build-program.ts`
+  - removed generic gateway CLI registration from Senior Mantis runner.
+  - message channel option now advertises WhatsApp-only for v1 (`message send --channel whatsapp`).
+- `src/sm/cli/program/register-gateway.ts` (new)
+  - added Senior Mantis-only gateway command surface:
+    - `seniormantis gateway run`
+    - `seniormantis gateway status`
+  - excludes non-v1 gateway subcommands (`call`, `discover`, `probe`, `usage-cost`, service install/start/stop/restart/uninstall).
+- `src/gateway/server-http.ts`
+  - in Senior Mantis mode, skip Slack HTTP route handling (`/api/slack/*`) so non-v1 channel wiring is not active in runtime path.
 
-### Code updates in this pass
+### Rename pass + first-run hardening
 
-- `src/cron/store.ts`
-  - switched from top-level `CONFIG_DIR` constant import to `resolveConfigDir()` call.
-- `src/gateway/server-methods/agent-job.ts`
-  - removed module-level eager `ensureAgentRunListener()` execution.
-- `src/gateway/server-methods/agents.ts`
-  - replaced top-level file-name constant sets with lazy cached helpers.
-- `src/logging/subsystem.ts`
-  - removed runtime dependency on `defaultRuntime` default parameter to avoid cycle-time TDZ.
-- `src/gateway/server.impl.ts`
-  - moved `ensureOpenClawCliOnPath()` from module scope into `startGatewayServer()`.
-- `apps/desktop-electron/main.mjs`
-  - improved gateway start flow to detect early process exit and return actionable failure messages.
-  - explicit missing-config guidance now returns: run `seniormantis setup` first.
+- `src/cli/banner.ts`
+  - banner branding now follows active CLI name:
+    - `openclaw` => OpenClaw banner
+    - `seniormantis` => Senior Mantis banner/tagline.
+- Desktop first-run flow updates:
+  - `apps/desktop-electron/main.mjs` adds explicit `Run Setup` terminal action.
+  - `apps/desktop-electron/preload.cjs` exposes setup action to renderer.
+  - `apps/desktop-electron/renderer/index.html` adds `Run Setup` button.
+  - `apps/desktop-electron/renderer/renderer.js` adds setup action wiring and setup-needed activity hints.
+- Docs/readme updates for local testing path:
+  - `apps/desktop-electron/README.md`
+  - `README.md` (Senior Mantis section).
 
 ### Behavior impact
 
-- Senior Mantis CLI `status` and `sessions` no longer crash at startup from the previous TDZ path.
-- Desktop “Start gateway” now reports early launch failures clearly instead of optimistic success on process spawn.
+- Senior Mantis gateway surface is now explicitly local-v1 scoped (`run`, `status`) instead of inheriting full OpenClaw gateway command matrix.
+- Senior Mantis message CLI channel option no longer advertises `webchat` for outbound send.
+- Slack HTTP route handling is skipped in Senior Mantis mode.
+- Desktop first-run path is explicit:
+  - `Run Setup` -> `Start Gateway` -> `Run Onboarding`.
+- Senior Mantis CLI banner/identity now reads as Senior Mantis in TTY banner output.
 
 ## Cleanup phase (staged, safe)
 
@@ -70,16 +82,26 @@ Last updated: 2026-02-17
   - `docs/vps.md`
   - `docs/docs.json`
 
+### Exact file removals in this pass
+
+- none
+
 ## Validation (this environment)
 
 - `pnpm build`
   - pass
 - `pnpm check`
   - pass
+- `pnpm exec vitest run src/sm/cli/program/build-program.test.ts src/gateway/server-http.seniormantis.test.ts`
+  - pass (6 tests)
 - `pnpm exec vitest run src/cron/store.test.ts src/gateway/server-methods/agent-job.test.ts src/gateway/server-methods/agents-mutate.test.ts src/logging/subsystem.test.ts`
   - pass (26 tests)
+- `pnpm exec vitest run src/sm/cli/program/build-program.test.ts src/gateway/server-http.seniormantis.test.ts src/cron/store.test.ts src/gateway/server-methods/agent-job.test.ts src/gateway/server-methods/agents-mutate.test.ts src/logging/subsystem.test.ts`
+  - pass (32 tests)
 - `node seniormantis.mjs status --json`
   - pass
+- `node seniormantis.mjs gateway --help`
+  - pass (shows v1-scoped subcommands: `run`, `status`)
 - `node seniormantis.mjs sessions --json`
   - pass
 - `node dist/entry-seniormantis.js status --json`

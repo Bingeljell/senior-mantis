@@ -63,20 +63,32 @@ This workspace also contains a **Senior Mantis** fork path (`seniormantis` CLI) 
 - WhatsApp as the v1 messaging channel
 - local web control UI
 - safe local defaults (`gateway.mode=local`, loopback bind, explicit confirmations for side effects)
+- staged cleanup of non-v1 channel wiring and plugin surfaces
 
 ```bash
 # Install dependencies
 pnpm install
 pnpm build
+
+# First run (initialize local config/state)
+node seniormantis.mjs setup
+
+# Install desktop shell deps
 pnpm --dir apps/desktop-electron install
 
 # Run Desktop MVP shell (Electron)
 pnpm desktop:dev
 
 # Optional CLI checks
-node seniormantis.mjs onboard
+node seniormantis.mjs gateway status
 node seniormantis.mjs status --all
 ```
+
+Desktop first-run flow:
+
+1. Click `Run Setup` in the desktop shell and complete setup in Terminal.
+2. Click `Start Gateway`.
+3. Click `Run Onboarding` (WhatsApp-only v1 onboarding path).
 
 Source of truth for that track: `docs/sm/VISION.md`, `docs/sm/HANDOFF.md`, `docs/sm/STATUS.md`, `docs/sm/DECISIONS.md`.
 

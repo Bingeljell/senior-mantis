@@ -6,6 +6,7 @@ contextBridge.exposeInMainWorld("smDesktop", {
   getGatewayStatus: () => ipcRenderer.invoke("sm:gateway-status"),
   startGateway: () => ipcRenderer.invoke("sm:start-gateway"),
   stopGateway: () => ipcRenderer.invoke("sm:stop-gateway"),
+  runSetup: () => ipcRenderer.invoke("sm:run-setup"),
   openDashboard: () => ipcRenderer.invoke("sm:open-dashboard"),
   runOnboarding: () => ipcRenderer.invoke("sm:run-onboarding"),
 });

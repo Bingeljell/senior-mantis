@@ -25,6 +25,9 @@ Ship a senior-friendly assistant app based on OpenClaw with a narrow v1:
   - config path defaults to `~/.seniormantis/seniormantis.json`
   - CLI name override defaults to `seniormantis`
 - Added reduced CLI program at `src/sm/cli/program/build-program.ts`.
+- Added Senior Mantis-only gateway CLI registration at `src/sm/cli/program/register-gateway.ts`:
+  - keeps `gateway run` + `gateway status`
+  - excludes non-v1 gateway subcommands (`call`, `discover`, `probe`, `usage-cost`, service lifecycle installers/controls)
 - Added dedicated runner at `src/sm/cli/run-main.ts`.
 - Added Senior Mantis runtime guardrails in `src/sm/runtime-guardrails.ts`:
   - force `gateway.mode=local`
@@ -39,9 +42,12 @@ Ship a senior-friendly assistant app based on OpenClaw with a narrow v1:
   - deliverable channel policy: `whatsapp` only
   - onboarding channel policy: `whatsapp` only
   - enforcement wired into agent/message runtime path
+- Tightened Senior Mantis CLI message channel scope in `src/sm/cli/program/build-program.ts`:
+  - `message send --channel` option now resolves to WhatsApp-only in v1 mode.
 - Added Senior Mantis-specific `status`/`health`/`sessions` registration (`src/sm/cli/program/register-status-health-sessions.ts`) to avoid non-v1 channel phrasing in help text.
 - Added minimal desktop shell at `apps/desktop-electron/*`:
   - local web UI embed (`http://127.0.0.1:18789/ui`)
+  - setup launch from desktop flow (opens terminal command)
   - onboarding launch from desktop flow (opens terminal command)
   - status/health/sessions snapshots via Senior Mantis CLI commands
   - explicit confirmations before side effects (start/stop gateway, onboarding launch)
@@ -59,6 +65,12 @@ Ship a senior-friendly assistant app based on OpenClaw with a narrow v1:
     - `src/logging/subsystem.ts`
 - Improved desktop gateway launch diagnostics:
   - `apps/desktop-electron/main.mjs` now detects early gateway process exit and reports actionable messages (including missing setup/config guidance) instead of reporting success immediately on spawn
+- Added setup-aware desktop first-run hints:
+  - renderer logs explicit guidance to run setup when status/health output indicates missing config.
+- Added Senior Mantis banner branding path:
+  - `src/cli/banner.ts` switches banner identity/tagline based on active CLI name (`openclaw` vs `seniormantis`).
+- Added runtime HTTP channel wiring prune for Senior Mantis mode:
+  - `src/gateway/server-http.ts` skips Slack HTTP route handling when `OPENCLAW_CLI_NAME_OVERRIDE=seniormantis`.
 - Locked onboarding channel selection to WhatsApp-only in Senior Mantis mode (`src/commands/onboard-channels.ts`, `src/wizard/onboarding.ts`).
 - Hardened Senior Mantis onboarding allowlist enforcement in `src/commands/onboard-channels.ts`:
   - adapter status is fetched only for allowed onboarding channels
@@ -95,6 +107,11 @@ Ship a senior-friendly assistant app based on OpenClaw with a narrow v1:
 - `agent` / `agents`
 - `status` / `health` / `sessions`
 - `gateway`
+
+Gateway subcommands intentionally exposed in Senior Mantis runner:
+
+- `gateway run`
+- `gateway status`
 
 ## Intentional non-goals in this baseline
 
@@ -187,3 +204,9 @@ node seniormantis.mjs setup
 pnpm --dir apps/desktop-electron install
 pnpm desktop:dev
 ```
+
+Desktop first-run click path:
+
+1. `Run Setup`
+2. `Start Gateway`
+3. `Run Onboarding`
