@@ -9,6 +9,8 @@ const __dirname = path.dirname(__filename);
 const repoRoot = path.resolve(__dirname, "..", "..");
 const seniorMantisEntry = path.join(repoRoot, "seniormantis.mjs");
 const globalCliCommand = process.env.SM_CLI_COMMAND?.trim() || "seniormantis";
+const repoNodeCommand =
+  process.env.SM_NODE_COMMAND?.trim() || (process.versions?.electron ? "node" : process.execPath);
 const defaultGatewayHost = process.env.SM_GATEWAY_HOST ?? "127.0.0.1";
 const defaultGatewayPort = process.env.SM_GATEWAY_PORT ?? "18789";
 const defaultGatewayUrl = `http://${defaultGatewayHost}:${defaultGatewayPort}/ui`;
@@ -32,14 +34,21 @@ function hasRepoCliBuildOutput() {
   );
 }
 
+function resolveCliEnv(baseEnv = process.env) {
+  const env = { ...baseEnv };
+  // pnpm desktop launches can leak npm_config_prefix and trigger nvm startup warnings in spawned shells.
+  delete env.npm_config_prefix;
+  return env;
+}
+
 function resolveCliInvocation(args) {
   if (hasRepoRuntimeDependencies() && hasRepoCliBuildOutput()) {
     return {
       mode: "repo",
-      command: process.execPath,
+      command: repoNodeCommand,
       args: [seniorMantisEntry, ...args],
       env: {
-        ...process.env,
+        ...resolveCliEnv(),
         OPENCLAW_CLI_NAME_OVERRIDE: "seniormantis",
       },
     };
@@ -48,7 +57,7 @@ function resolveCliInvocation(args) {
     mode: "global",
     command: globalCliCommand,
     args,
-    env: process.env,
+    env: resolveCliEnv(),
   };
 }
 
@@ -102,6 +111,7 @@ async function confirmSideEffect(actionLabel) {
 function runSeniorMantis(args, opts = {}) {
   const runInvocation = (invocation) =>
     new Promise((resolve) => {
+      let settled = false;
       const child = spawn(invocation.command, invocation.args, {
         cwd: repoRoot,
         env: invocation.env,
@@ -116,7 +126,25 @@ function runSeniorMantis(args, opts = {}) {
       child.stderr?.on("data", (chunk) => {
         stderr += chunk.toString();
       });
+      child.on("error", (error) => {
+        if (settled) {
+          return;
+        }
+        settled = true;
+        resolve({
+          ok: false,
+          code: -1,
+          stdout: stdout.trim(),
+          stderr: `${stderr}\n${String(error)}`.trim(),
+          mode: invocation.mode,
+          command: invocation.command,
+        });
+      });
       child.on("close", (code) => {
+        if (settled) {
+          return;
+        }
+        settled = true;
         resolve({
           ok: code === 0,
           code: code ?? -1,
@@ -135,7 +163,7 @@ function runSeniorMantis(args, opts = {}) {
         mode: "global",
         command: globalCliCommand,
         args,
-        env: process.env,
+        env: resolveCliEnv(),
       });
     }
     return primary;
@@ -172,7 +200,7 @@ function runCommand(command, args) {
   return new Promise((resolve, reject) => {
     const child = spawn(command, args, {
       cwd: repoRoot,
-      env: process.env,
+      env: resolveCliEnv(),
       stdio: "ignore",
       detached: false,
     });
