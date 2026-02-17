@@ -1,5 +1,10 @@
 import type { ConfigUiHint, ConfigUiHints } from "./schema.hints.js";
 import { CHANNEL_IDS } from "../channels/registry.js";
+import {
+  isSeniorMantisAllowedGatewayChannel,
+  isSeniorMantisCli,
+  SENIOR_MANTIS_ALLOWED_GATEWAY_CHANNELS,
+} from "../sm/channel-policy.js";
 import { VERSION } from "../version.js";
 import { applySensitiveHints, buildBaseHints, mapSensitivePaths } from "./schema.hints.js";
 import { OpenClawSchema } from "./zod-schema.js";
@@ -87,6 +92,15 @@ export type ChannelUiMetadata = {
   configSchema?: JsonSchemaNode;
   configUiHints?: Record<string, ConfigUiHint>;
 };
+
+function filterChannelsForActiveMode(channels: ChannelUiMetadata[]): ChannelUiMetadata[] {
+  if (!isSeniorMantisCli()) {
+    return channels;
+  }
+  return channels.filter((channel) =>
+    isSeniorMantisAllowedGatewayChannel(channel.id.trim().toLowerCase()),
+  );
+}
 
 function collectExtensionHintKeys(
   hints: ConfigUiHints,
@@ -189,7 +203,8 @@ function applyChannelHints(hints: ConfigUiHints, channels: ChannelUiMetadata[]):
 function listHeartbeatTargetChannels(channels: ChannelUiMetadata[]): string[] {
   const seen = new Set<string>();
   const ordered: string[] = [];
-  for (const id of CHANNEL_IDS) {
+  const channelIds = isSeniorMantisCli() ? SENIOR_MANTIS_ALLOWED_GATEWAY_CHANNELS : CHANNEL_IDS;
+  for (const id of channelIds) {
     const normalized = id.trim().toLowerCase();
     if (!normalized || seen.has(normalized)) {
       continue;
@@ -344,7 +359,7 @@ export function buildConfigSchema(params?: {
 }): ConfigSchemaResponse {
   const base = buildBaseConfigSchema();
   const plugins = params?.plugins ?? [];
-  const channels = params?.channels ?? [];
+  const channels = filterChannelsForActiveMode(params?.channels ?? []);
   if (plugins.length === 0 && channels.length === 0) {
     return base;
   }

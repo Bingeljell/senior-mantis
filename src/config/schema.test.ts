@@ -1,7 +1,11 @@
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it } from "vitest";
 import { buildConfigSchema } from "./schema.js";
 
 describe("config schema", () => {
+  afterEach(() => {
+    delete process.env.OPENCLAW_CLI_NAME_OVERRIDE;
+  });
+
   it("exports schema + hints", () => {
     const res = buildConfigSchema();
     const schema = res.schema as { properties?: Record<string, unknown> };
@@ -116,5 +120,42 @@ describe("config schema", () => {
     expect(defaultsHint?.help).toContain("bluebubbles");
     expect(defaultsHint?.help).toContain("last");
     expect(listHint?.help).toContain("bluebubbles");
+  });
+
+  it("limits channel schema + heartbeat hints to v1 channels in Senior Mantis mode", () => {
+    process.env.OPENCLAW_CLI_NAME_OVERRIDE = "seniormantis";
+    const res = buildConfigSchema({
+      channels: [
+        {
+          id: "whatsapp",
+          label: "WhatsApp",
+          configSchema: { type: "object", properties: { enabled: { type: "boolean" } } },
+        },
+        {
+          id: "webchat",
+          label: "Web UI",
+          configSchema: { type: "object", properties: { enabled: { type: "boolean" } } },
+        },
+        {
+          id: "telegram",
+          label: "Telegram",
+          configSchema: { type: "object", properties: { enabled: { type: "boolean" } } },
+        },
+      ],
+    });
+
+    const defaultsHint = res.uiHints["agents.defaults.heartbeat.target"];
+    expect(defaultsHint?.help).toContain("whatsapp");
+    expect(defaultsHint?.help).toContain("webchat");
+    expect(defaultsHint?.help).not.toContain("telegram");
+
+    const schema = res.schema as {
+      properties?: Record<string, unknown>;
+    };
+    const channelsNode = schema.properties?.channels as Record<string, unknown> | undefined;
+    const channelsProps = channelsNode?.properties as Record<string, unknown> | undefined;
+    expect(channelsProps?.whatsapp).toBeTruthy();
+    expect(channelsProps?.webchat).toBeTruthy();
+    expect(channelsProps?.telegram).toBeUndefined();
   });
 });
