@@ -75,6 +75,7 @@ Last updated: 2026-02-17
   - fix in `apps/desktop-electron/main.mjs` + `apps/desktop-electron/renderer/renderer.js`:
     - force desktop CLI env defaults to Senior Mantis paths (`OPENCLAW_STATE_DIR=~/.seniormantis`, `OPENCLAW_CONFIG_PATH=~/.seniormantis/seniormantis.json`) unless explicitly overridden with `SM_STATE_DIR`/`SM_CONFIG_PATH`
     - resolve `gateway.auth.token` from Senior Mantis config and append `#token=...` for embedded/opened dashboard URL
+    - re-resolve dashboard URL/token dynamically after gateway start so first-run auto-token generation does not require desktop app restart
     - keep activity/status display URL token-free.
 
 ### Behavior impact

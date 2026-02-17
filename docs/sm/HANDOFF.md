@@ -79,6 +79,7 @@ Ship a senior-friendly assistant app based on OpenClaw with a narrow v1:
 - Fixed desktop auth/config drift with legacy OpenClaw installs:
   - desktop launcher now forces CLI state/config env to Senior Mantis paths by default (`~/.seniormantis`)
   - embedded dashboard/open-in-browser URLs include `#token=...` when `gateway.auth.token` exists in Senior Mantis config (or via `SM_GATEWAY_TOKEN`)
+  - dashboard URL/token are resolved dynamically after gateway start to pick up first-run auto-generated tokens without restarting desktop
   - file: `apps/desktop-electron/main.mjs`
 - Added Senior Mantis banner branding path:
   - `src/cli/banner.ts` switches banner identity/tagline based on active CLI name (`openclaw` vs `seniormantis`).
