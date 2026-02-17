@@ -68,6 +68,7 @@ export async function doctorCommand(
   options: DoctorOptions = {},
 ) {
   const prompter = createDoctorPrompter({ runtime, options });
+  let configMutated = false;
   printWizardHeader(runtime);
   intro("OpenClaw doctor");
 
@@ -155,6 +156,7 @@ export async function doctorCommand(
             },
           },
         };
+        configMutated = true;
         note("Gateway token configured.", "Gateway auth");
       }
     }
@@ -281,7 +283,8 @@ export async function doctorCommand(
     healthOk,
   });
 
-  const shouldWriteConfig = prompter.shouldRepair || configResult.shouldWriteConfig;
+  const shouldWriteConfig =
+    prompter.shouldRepair || configResult.shouldWriteConfig || configMutated;
   if (shouldWriteConfig) {
     cfg = applyWizardMetadata(cfg, { command: "doctor", mode: resolveMode(cfg) });
     await writeConfigFile(cfg);

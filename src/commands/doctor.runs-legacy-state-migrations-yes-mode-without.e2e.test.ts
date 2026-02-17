@@ -92,4 +92,39 @@ describe("doctor command", () => {
     expect(profiles["anthropic:me@example.com"]).toBeTruthy();
     expect(profiles["anthropic:default"]).toBeUndefined();
   }, 30_000);
+
+  it("persists generated gateway token when --generate-gateway-token is set", async () => {
+    readConfigFileSnapshot.mockResolvedValue({
+      path: "/tmp/openclaw.json",
+      exists: true,
+      raw: "{}",
+      parsed: {},
+      valid: true,
+      config: {
+        gateway: {
+          mode: "local",
+        },
+      },
+      issues: [],
+      legacyIssues: [],
+    });
+
+    const { doctorCommand } = await import("./doctor.js");
+    const runtime = {
+      log: vi.fn(),
+      error: vi.fn(),
+      exit: vi.fn(),
+    };
+
+    await doctorCommand(runtime, {
+      nonInteractive: true,
+      generateGatewayToken: true,
+    });
+
+    const written = writeConfigFile.mock.calls.at(-1)?.[0] as Record<string, unknown>;
+    const gateway = written.gateway as { auth?: { mode?: string; token?: string } };
+    expect(gateway.auth?.mode).toBe("token");
+    expect(gateway.auth?.token).toBe("test-gateway-token");
+    expect(confirm).not.toHaveBeenCalled();
+  });
 });
