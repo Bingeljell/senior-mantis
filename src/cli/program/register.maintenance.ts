@@ -47,11 +47,12 @@ export function registerMaintenanceCommands(program: Command) {
       () =>
         `\n${theme.muted("Docs:")} ${formatDocsLink("/cli/dashboard", "docs.openclaw.ai/cli/dashboard")}\n`,
     )
-    .option("--no-open", "Print URL but do not launch a browser", false)
+    .option("--no-open", "Print URL but do not launch a browser")
     .action(async (opts) => {
       await runCommandWithRuntime(defaultRuntime, async () => {
         await dashboardCommand(defaultRuntime, {
-          noOpen: Boolean(opts.noOpen),
+          // Commander negated options expose the positive key (`open`), not `noOpen`.
+          noOpen: opts.open === false,
         });
       });
     });
