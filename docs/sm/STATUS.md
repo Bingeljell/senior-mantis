@@ -45,6 +45,9 @@ Last updated: 2026-02-17
 - `src/channels/plugins/index.ts`
   - in Senior Mantis mode, runtime channel plugin listing is filtered to v1 channels only (`whatsapp`, `webchat`) as a defense-in-depth prune layer for gateway/command channel surfaces.
   - gateway `channels.status` now returns only v1 channel snapshots in Senior Mantis mode (covered via gateway e2e test).
+- `src/config/schema.ts`
+  - in Senior Mantis mode, config schema channel metadata is filtered to v1 channels only (`whatsapp`, `webchat`) before hint/schema merge.
+  - heartbeat target help text in `config.schema` now avoids advertising non-v1 channels.
 
 ### Rename pass + first-run hardening
 
@@ -132,6 +135,8 @@ Last updated: 2026-02-17
 - `pnpm exec vitest run src/sm/cli/program/build-program.test.ts src/gateway/server-http.seniormantis.test.ts src/cron/store.test.ts src/gateway/server-methods/agent-job.test.ts src/gateway/server-methods/agents-mutate.test.ts src/logging/subsystem.test.ts`
   - pass (32 tests)
 - `pnpm exec vitest run src/channels/plugins/index.test.ts src/sm/cli/program/build-program.test.ts src/sm/cli/program/build-program.dashboard.test.ts`
+  - pass (8 tests)
+- `pnpm exec vitest run src/config/schema.test.ts src/channels/plugins/index.test.ts`
   - pass (8 tests)
 - `pnpm exec vitest -c vitest.e2e.config.ts run src/gateway/server.channels.e2e.test.ts`
   - pass (4 tests)

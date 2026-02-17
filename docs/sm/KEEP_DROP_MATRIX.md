@@ -42,6 +42,8 @@ Legend:
   - rationale: enforce Senior Mantis config/state paths in desktop launcher and inject config token into dashboard URL to avoid legacy OpenClaw auth drift (`1008 unauthorized`) during local v1 flows.
 - 2026-02-17: `src/channels/plugins/index.ts`
   - rationale: filter runtime channel plugin listing to Senior Mantis v1 channel set (`whatsapp`, `webchat`) so gateway channel/status/logout surfaces cannot expose non-v1 channel plugins.
+- 2026-02-17: `src/config/schema.ts`
+  - rationale: filter Senior Mantis config schema channel metadata to v1 channels so Control UI hint/help payloads do not advertise non-v1 channel targets.
 
 ## Deletion log (completed)
 

@@ -96,6 +96,9 @@ Ship a senior-friendly assistant app based on OpenClaw with a narrow v1:
 - Added runtime channel-plugin listing prune for Senior Mantis mode:
   - `src/channels/plugins/index.ts` filters runtime channel list to `whatsapp|webchat` when `OPENCLAW_CLI_NAME_OVERRIDE=seniormantis` (defense in depth beyond loader/config guardrails).
   - gateway channel status/logout behavior now inherits this filter (non-v1 channels are not surfaced in `channels.status`; non-v1 logout attempts are rejected).
+- Added config schema channel metadata prune for Senior Mantis mode:
+  - `src/config/schema.ts` filters channel metadata to v1 channel policy before building merged schema/ui hints.
+  - `config.schema` heartbeat target hint text now lists only v1 channels in Senior Mantis mode.
 - Locked onboarding channel selection to WhatsApp-only in Senior Mantis mode (`src/commands/onboard-channels.ts`, `src/wizard/onboarding.ts`).
 - Hardened Senior Mantis onboarding allowlist enforcement in `src/commands/onboard-channels.ts`:
   - adapter status is fetched only for allowed onboarding channels
