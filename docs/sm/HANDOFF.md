@@ -95,6 +95,7 @@ Ship a senior-friendly assistant app based on OpenClaw with a narrow v1:
   - `src/gateway/server-http.ts` skips Slack HTTP route handling when `OPENCLAW_CLI_NAME_OVERRIDE=seniormantis`.
 - Added runtime channel-plugin listing prune for Senior Mantis mode:
   - `src/channels/plugins/index.ts` filters runtime channel list to `whatsapp|webchat` when `OPENCLAW_CLI_NAME_OVERRIDE=seniormantis` (defense in depth beyond loader/config guardrails).
+  - gateway channel status/logout behavior now inherits this filter (non-v1 channels are not surfaced in `channels.status`; non-v1 logout attempts are rejected).
 - Locked onboarding channel selection to WhatsApp-only in Senior Mantis mode (`src/commands/onboard-channels.ts`, `src/wizard/onboarding.ts`).
 - Hardened Senior Mantis onboarding allowlist enforcement in `src/commands/onboard-channels.ts`:
   - adapter status is fetched only for allowed onboarding channels
@@ -116,6 +117,7 @@ Ship a senior-friendly assistant app based on OpenClaw with a narrow v1:
   - `src/channels/plugins/catalog.test.ts` (SM catalog filter)
   - `src/channels/plugins/index.test.ts` (SM runtime channel listing filter)
   - `src/sm/cli/program/build-program.dashboard.test.ts` (`seniormantis dashboard --no-open` wiring)
+  - `src/gateway/server.channels.e2e.test.ts` (SM mode channel status/logout prune behavior)
 - Added bundler entry in `tsdown.config.ts` for `src/entry-seniormantis.ts`.
 - Removed non-v1 Fly deployment artifacts:
   - deleted `docs/install/fly.md`

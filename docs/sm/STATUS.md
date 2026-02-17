@@ -44,6 +44,7 @@ Last updated: 2026-02-17
   - in Senior Mantis mode, skip Slack HTTP route handling (`/api/slack/*`) so non-v1 channel wiring is not active in runtime path.
 - `src/channels/plugins/index.ts`
   - in Senior Mantis mode, runtime channel plugin listing is filtered to v1 channels only (`whatsapp`, `webchat`) as a defense-in-depth prune layer for gateway/command channel surfaces.
+  - gateway `channels.status` now returns only v1 channel snapshots in Senior Mantis mode (covered via gateway e2e test).
 
 ### Rename pass + first-run hardening
 
@@ -132,6 +133,8 @@ Last updated: 2026-02-17
   - pass (32 tests)
 - `pnpm exec vitest run src/channels/plugins/index.test.ts src/sm/cli/program/build-program.test.ts src/sm/cli/program/build-program.dashboard.test.ts`
   - pass (8 tests)
+- `pnpm exec vitest -c vitest.e2e.config.ts run src/gateway/server.channels.e2e.test.ts`
+  - pass (4 tests)
 - `node seniormantis.mjs status --json`
   - pass
 - `node seniormantis.mjs gateway --help`
