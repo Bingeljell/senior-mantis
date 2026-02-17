@@ -63,6 +63,12 @@ Last updated: 2026-02-17
     - use `node` (or `SM_NODE_COMMAND`) for repo CLI invocation when running inside Electron
     - sanitize `npm_config_prefix` from spawned env to avoid zsh/nvm initialization warnings
     - harden spawn error handling in read-only command path.
+- Desktop Control UI URL resolution fix:
+  - root cause: desktop shell hardcoded `/ui`, but gateway default `gateway.controlUi.basePath` is empty (`/` root).
+  - symptom: embedded Web UI frame loaded a 404 page (`Not Found`) even when gateway was running.
+  - fix in `apps/desktop-electron/main.mjs`:
+    - resolve UI path from `SM_GATEWAY_UI_PATH` or local config `gateway.controlUi.basePath`
+    - default to root path when unset.
 
 ### Behavior impact
 

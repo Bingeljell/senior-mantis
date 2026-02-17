@@ -72,6 +72,10 @@ Ship a senior-friendly assistant app based on OpenClaw with a narrow v1:
   - desktop launcher now uses Node command resolution for repo mode (`SM_NODE_COMMAND` override supported)
   - launcher sanitizes `npm_config_prefix` to avoid zsh/nvm initialization warnings in setup/onboarding terminal launches
   - file: `apps/desktop-electron/main.mjs`
+- Fixed desktop Control UI URL default:
+  - `/ui` is not the universal default route; when `gateway.controlUi.basePath` is unset, Control UI serves from root (`/`)
+  - desktop shell now resolves UI path from config (or `SM_GATEWAY_UI_PATH`) before loading iframe URL
+  - file: `apps/desktop-electron/main.mjs`
 - Added Senior Mantis banner branding path:
   - `src/cli/banner.ts` switches banner identity/tagline based on active CLI name (`openclaw` vs `seniormantis`).
 - Added runtime HTTP channel wiring prune for Senior Mantis mode:

@@ -8,7 +8,7 @@ Minimal desktop shell for local Senior Mantis workflows on macOS.
 - Opens setup in a terminal window after explicit confirmation.
 - Opens interactive onboarding in a terminal window after explicit confirmation.
 - Shows status/health/sessions snapshots.
-- Embeds local web UI (`http://127.0.0.1:18789/ui`) in-app.
+- Embeds local web UI in-app (`http://127.0.0.1:18789` by default, or configured `gateway.controlUi.basePath`).
 - Surfaces first-run setup hints when status checks detect missing config.
 
 ## Prerequisites
@@ -47,11 +47,13 @@ pnpm desktop:dev
 - Fallback mode: global `seniormantis` command if repo mode fails with module-resolution errors.
 - Override global command path with `SM_CLI_COMMAND` (binary path).
 - Override repo Node runtime command with `SM_NODE_COMMAND` (default auto-detects `node` under Electron).
+- Override UI path with `SM_GATEWAY_UI_PATH` (defaults to config `gateway.controlUi.basePath`, else `/`).
 
 ```bash
 SM_CLI_COMMAND=/usr/local/bin/seniormantis pnpm desktop:dev
 # optional:
 SM_NODE_COMMAND=/opt/homebrew/bin/node pnpm desktop:dev
+SM_GATEWAY_UI_PATH=/ui pnpm desktop:dev
 ```
 
 ## Notes and troubleshooting
@@ -62,4 +64,4 @@ SM_NODE_COMMAND=/opt/homebrew/bin/node pnpm desktop:dev
 - If setup/onboarding opens a terminal and reports an unexpected runtime command, set `SM_NODE_COMMAND` to your Node binary path.
 - If status/health commands fail with missing `dist/entry-seniormantis`, run `pnpm build`.
 - If status/health or gateway launch reports missing config, run `seniormantis setup` (or click `Run Setup` in the desktop app).
-- If the embedded UI is blank, verify local gateway is running on `127.0.0.1:18789`.
+- If the embedded UI is blank or 404s, verify local gateway is running and check `gateway.controlUi.basePath` (or set `SM_GATEWAY_UI_PATH`).
