@@ -68,7 +68,7 @@ async function refreshReadOnlyView(action, target) {
 
 async function boot() {
   const cfg = await window.smDesktop.getConfig();
-  els.webUiFrame.src = cfg.gatewayUrl;
+  els.webUiFrame.src = cfg.gatewayUrlWithAuth || cfg.gatewayUrl;
   logActivity(`Loaded UI frame: ${cfg.gatewayUrl}`);
   logActivity(`CLI mode: ${cfg.cliMode} (${cfg.cliCommand})`);
   await refreshGatewayStatus();

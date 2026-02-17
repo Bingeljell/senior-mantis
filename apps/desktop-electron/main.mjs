@@ -15,6 +15,8 @@ const repoNodeCommand =
   process.env.SM_NODE_COMMAND?.trim() || (process.versions?.electron ? "node" : process.execPath);
 const defaultGatewayHost = process.env.SM_GATEWAY_HOST ?? "127.0.0.1";
 const defaultGatewayPort = process.env.SM_GATEWAY_PORT ?? "18789";
+const seniorMantisStateDir = process.env.SM_STATE_DIR?.trim() || path.join(os.homedir(), ".seniormantis");
+const seniorMantisConfigPath = resolveGatewayConfigPath();
 
 function normalizeUiPath(rawPath) {
   if (typeof rawPath !== "string") {
@@ -29,34 +31,48 @@ function normalizeUiPath(rawPath) {
 }
 
 function resolveGatewayConfigPath() {
-  const explicit = process.env.OPENCLAW_CONFIG_PATH?.trim();
+  const explicit = process.env.SM_CONFIG_PATH?.trim();
   if (explicit) {
     return explicit;
   }
-  return path.join(os.homedir(), ".seniormantis", "seniormantis.json");
+  return path.join(seniorMantisStateDir, "seniormantis.json");
 }
 
-function resolveGatewayUiPath() {
+function readGatewayConfig() {
+  if (!fs.existsSync(seniorMantisConfigPath)) {
+    return null;
+  }
+  try {
+    return JSON5.parse(fs.readFileSync(seniorMantisConfigPath, "utf8"));
+  } catch {
+    return null;
+  }
+}
+
+function resolveGatewayUiPath(parsedConfig) {
   const fromEnv = normalizeUiPath(process.env.SM_GATEWAY_UI_PATH ?? "");
   if (fromEnv || process.env.SM_GATEWAY_UI_PATH !== undefined) {
     return fromEnv;
   }
-  const configPath = resolveGatewayConfigPath();
-  if (!fs.existsSync(configPath)) {
-    return "";
-  }
-  try {
-    const raw = fs.readFileSync(configPath, "utf8");
-    const parsed = JSON5.parse(raw);
-    const basePath = parsed?.gateway?.controlUi?.basePath;
-    return normalizeUiPath(basePath);
-  } catch {
-    return "";
-  }
+  return normalizeUiPath(parsedConfig?.gateway?.controlUi?.basePath);
 }
 
-const defaultGatewayUiPath = resolveGatewayUiPath();
+function resolveGatewayToken(parsedConfig) {
+  const fromEnv = process.env.SM_GATEWAY_TOKEN;
+  if (fromEnv !== undefined) {
+    return fromEnv.trim();
+  }
+  const token = parsedConfig?.gateway?.auth?.token;
+  return typeof token === "string" ? token.trim() : "";
+}
+
+const gatewayConfig = readGatewayConfig();
+const defaultGatewayUiPath = resolveGatewayUiPath(gatewayConfig);
 const defaultGatewayUrl = `http://${defaultGatewayHost}:${defaultGatewayPort}${defaultGatewayUiPath}`;
+const defaultGatewayToken = resolveGatewayToken(gatewayConfig);
+const defaultGatewayUrlWithAuth = defaultGatewayToken
+  ? `${defaultGatewayUrl}#token=${encodeURIComponent(defaultGatewayToken)}`
+  : defaultGatewayUrl;
 
 let gatewayProcess = null;
 let gatewayStartTime = null;
@@ -81,6 +97,10 @@ function resolveCliEnv(baseEnv = process.env) {
   const env = { ...baseEnv };
   // pnpm desktop launches can leak npm_config_prefix and trigger nvm startup warnings in spawned shells.
   delete env.npm_config_prefix;
+  // Force Senior Mantis-local state/config so desktop workflows do not accidentally bind to legacy OpenClaw paths.
+  env.OPENCLAW_STATE_DIR = seniorMantisStateDir;
+  env.OPENCLAW_CONFIG_PATH = seniorMantisConfigPath;
+  env.OPENCLAW_CLI_NAME_OVERRIDE = "seniormantis";
   return env;
 }
 
@@ -368,9 +388,11 @@ ipcMain.handle("sm:get-config", async () => {
   const invocation = resolveCliInvocation([]);
   return {
     gatewayUrl: defaultGatewayUrl,
+    gatewayUrlWithAuth: defaultGatewayUrlWithAuth,
     cliMode: invocation.mode,
     globalCliCommand,
     cliCommand: invocation.command,
+    configPath: seniorMantisConfigPath,
   };
 });
 
@@ -419,7 +441,7 @@ ipcMain.handle("sm:stop-gateway", async () => {
 });
 
 ipcMain.handle("sm:open-dashboard", async () => {
-  await shell.openExternal(defaultGatewayUrl);
+  await shell.openExternal(defaultGatewayUrlWithAuth);
   return { ok: true, message: "Opened dashboard in default browser." };
 });
 
