@@ -102,6 +102,8 @@ Ship a senior-friendly assistant app based on OpenClaw with a narrow v1:
 - Added config validation prune for Senior Mantis mode:
   - `src/config/validation.ts` now rejects non-v1 `channels.*` keys and non-v1 heartbeat targets in plugin-aware validation (`validateConfigObjectWithPlugins`).
   - protects config write/load validation path from non-v1 channel drift.
+- Updated Senior Mantis CLI docs hints to local project docs:
+  - `src/sm/cli/program/build-program.ts` and `src/sm/cli/program/register-status-health-sessions.ts` now reference `docs/sm/*` instead of `docs.openclaw.ai` in SM-specific help output.
 - Locked onboarding channel selection to WhatsApp-only in Senior Mantis mode (`src/commands/onboard-channels.ts`, `src/wizard/onboarding.ts`).
 - Hardened Senior Mantis onboarding allowlist enforcement in `src/commands/onboard-channels.ts`:
   - adapter status is fetched only for allowed onboarding channels

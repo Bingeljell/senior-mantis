@@ -46,6 +46,8 @@ Legend:
   - rationale: filter Senior Mantis config schema channel metadata to v1 channels so Control UI hint/help payloads do not advertise non-v1 channel targets.
 - 2026-02-17: `src/config/validation.ts`
   - rationale: reject non-v1 channel keys/heartbeat targets during plugin-aware config validation in Senior Mantis mode to keep config writes aligned with v1 runtime scope.
+- 2026-02-17: `src/sm/cli/program/build-program.ts`, `src/sm/cli/program/register-status-health-sessions.ts`
+  - rationale: avoid SM-only CLI help output directing users to OpenClaw docs; point to local `docs/sm/*` during forked v1 development.
 
 ## Deletion log (completed)
 

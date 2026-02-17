@@ -58,6 +58,8 @@ Last updated: 2026-02-17
   - banner branding now follows active CLI name:
     - `openclaw` => OpenClaw banner
     - `seniormantis` => Senior Mantis banner/tagline.
+- `src/sm/cli/program/build-program.ts`, `src/sm/cli/program/register-status-health-sessions.ts`
+  - Senior Mantis CLI help/docs hints now point to local `docs/sm/*` references instead of `docs.openclaw.ai` links in SM-only command surfaces.
 - Desktop first-run flow updates:
   - `apps/desktop-electron/main.mjs` adds explicit `Run Setup` terminal action.
   - `apps/desktop-electron/preload.cjs` exposes setup action to renderer.
@@ -143,6 +145,8 @@ Last updated: 2026-02-17
   - pass (8 tests)
 - `pnpm exec vitest run src/config/config.seniormantis-channel-validation.test.ts src/config/schema.test.ts`
   - pass (9 tests)
+- `pnpm exec vitest run src/sm/cli/program/build-program.test.ts src/sm/cli/program/build-program.dashboard.test.ts`
+  - pass (6 tests)
 - `pnpm exec vitest -c vitest.e2e.config.ts run src/gateway/server.channels.e2e.test.ts`
   - pass (4 tests)
 - `node seniormantis.mjs status --json`
