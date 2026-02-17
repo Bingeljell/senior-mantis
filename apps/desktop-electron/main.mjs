@@ -1,8 +1,10 @@
 import fs from "node:fs";
+import os from "node:os";
 import { spawn } from "node:child_process";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { app, BrowserWindow, dialog, ipcMain, shell } from "electron";
+import JSON5 from "json5";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -13,7 +15,48 @@ const repoNodeCommand =
   process.env.SM_NODE_COMMAND?.trim() || (process.versions?.electron ? "node" : process.execPath);
 const defaultGatewayHost = process.env.SM_GATEWAY_HOST ?? "127.0.0.1";
 const defaultGatewayPort = process.env.SM_GATEWAY_PORT ?? "18789";
-const defaultGatewayUrl = `http://${defaultGatewayHost}:${defaultGatewayPort}/ui`;
+
+function normalizeUiPath(rawPath) {
+  if (typeof rawPath !== "string") {
+    return "";
+  }
+  const trimmed = rawPath.trim();
+  if (!trimmed || trimmed === "/") {
+    return "";
+  }
+  const withLeadingSlash = trimmed.startsWith("/") ? trimmed : `/${trimmed}`;
+  return withLeadingSlash.endsWith("/") ? withLeadingSlash.slice(0, -1) : withLeadingSlash;
+}
+
+function resolveGatewayConfigPath() {
+  const explicit = process.env.OPENCLAW_CONFIG_PATH?.trim();
+  if (explicit) {
+    return explicit;
+  }
+  return path.join(os.homedir(), ".seniormantis", "seniormantis.json");
+}
+
+function resolveGatewayUiPath() {
+  const fromEnv = normalizeUiPath(process.env.SM_GATEWAY_UI_PATH ?? "");
+  if (fromEnv || process.env.SM_GATEWAY_UI_PATH !== undefined) {
+    return fromEnv;
+  }
+  const configPath = resolveGatewayConfigPath();
+  if (!fs.existsSync(configPath)) {
+    return "";
+  }
+  try {
+    const raw = fs.readFileSync(configPath, "utf8");
+    const parsed = JSON5.parse(raw);
+    const basePath = parsed?.gateway?.controlUi?.basePath;
+    return normalizeUiPath(basePath);
+  } catch {
+    return "";
+  }
+}
+
+const defaultGatewayUiPath = resolveGatewayUiPath();
+const defaultGatewayUrl = `http://${defaultGatewayHost}:${defaultGatewayPort}${defaultGatewayUiPath}`;
 
 let gatewayProcess = null;
 let gatewayStartTime = null;
