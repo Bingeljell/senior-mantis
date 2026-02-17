@@ -1,7 +1,7 @@
 # Senior Mantis Status
 
 Status: active staged-prune implementation
-Last updated: 2026-02-16
+Last updated: 2026-02-17
 
 ## Source of truth
 
@@ -93,3 +93,20 @@ Last updated: 2026-02-16
 
 - `ERR_CONNECTION_REFUSED` for `http://127.0.0.1:18789/ui` is expected until a local gateway is actually running.
 - `docs/zh-CN/**` remains unchanged by policy (generated content).
+
+## Fork CI/CD mode (temporary)
+
+- As of 2026-02-17, GitHub Actions in this fork are set to manual-only (`workflow_dispatch`) to avoid CI/CD noise and failed publish/release jobs during active solo development.
+- Updated workflow files:
+  - `.github/workflows/ci.yml`
+  - `.github/workflows/install-smoke.yml`
+  - `.github/workflows/docker-release.yml`
+  - `.github/workflows/workflow-sanity.yml`
+  - `.github/workflows/sandbox-common-smoke.yml`
+  - `.github/workflows/auto-response.yml`
+  - `.github/workflows/formal-conformance.yml`
+  - `.github/workflows/labeler.yml`
+  - `.github/workflows/stale.yml`
+- Practical impact:
+  - pushes to `main` no longer auto-run CI, smoke install, Docker release, or housekeeping automations.
+  - workflows can still be run manually from the Actions tab when needed.

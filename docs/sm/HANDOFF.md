@@ -2,7 +2,7 @@
 
 Status: active implementation baseline
 Owner: Senior Mantis product fork
-Last updated: 2026-02-16
+Last updated: 2026-02-17
 
 Primary vision doc: `docs/sm/VISION.md`
 
@@ -136,6 +136,17 @@ This is now an explicit implementation track, not an implicit cleanup.
 - pairing/allowlist style DM controls
 - user-requested email actions only (no auto-send)
 - explicit confirmations for outbound side effects
+
+## Fork CI/CD policy (dev mode)
+
+- Temporary fork policy (2026-02-17): all GitHub workflows are manual-only (`workflow_dispatch`) while v1 is under active solo development.
+- Rationale:
+  - avoid repeated CI/CD runs on every push while refactors are still high-churn
+  - avoid accidental Docker/publish/release side effects from inherited OpenClaw workflows
+- Re-enable plan:
+  1. restore push/PR triggers for `ci.yml` and `install-smoke.yml`
+  2. keep release workflows manual until first Senior Mantis release process is defined
+  3. re-enable housekeeping workflows (`stale`, `labeler`, `auto-response`) only if needed
 
 ## Repo migration checklist (clean non-fork)
 
