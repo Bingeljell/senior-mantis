@@ -1,6 +1,7 @@
 import { resolveCommitHash } from "../infra/git-commit.js";
 import { visibleWidth } from "../terminal/ansi.js";
 import { isRich, theme } from "../terminal/theme.js";
+import { SENIOR_MANTIS_CLI_NAME, resolveCliName } from "./cli-name.js";
 import { pickTagline, type TaglineOptions } from "./tagline.js";
 
 type BannerOptions = TaglineOptions & {
@@ -34,13 +35,39 @@ const hasJsonFlag = (argv: string[]) =>
 const hasVersionFlag = (argv: string[]) =>
   argv.some((arg) => arg === "--version" || arg === "-V" || arg === "-v");
 
+type CliBrand = {
+  title: string;
+  prefix: string;
+  label: string;
+  tagline: string;
+};
+
+function resolveCliBrand(argv: string[]): CliBrand {
+  if (resolveCliName(argv) === SENIOR_MANTIS_CLI_NAME) {
+    return {
+      title: "🪲 Senior Mantis",
+      prefix: "🪲 ",
+      label: "SENIOR MANTIS",
+      tagline: "Desktop-first assistant with WhatsApp and local web UI.",
+    };
+  }
+  return {
+    title: "🦞 OpenClaw",
+    prefix: "🦞 ",
+    label: "OPENCLAW",
+    tagline: pickTagline(),
+  };
+}
+
 export function formatCliBannerLine(version: string, options: BannerOptions = {}): string {
   const commit = options.commit ?? resolveCommitHash({ env: options.env });
   const commitLabel = commit ?? "unknown";
-  const tagline = pickTagline(options);
+  const argv = options.argv ?? process.argv;
+  const brand = resolveCliBrand(argv);
+  const tagline = brand.tagline;
   const rich = options.richTty ?? isRich();
-  const title = "🦞 OpenClaw";
-  const prefix = "🦞 ";
+  const title = brand.title;
+  const prefix = brand.prefix;
   const columns = options.columns ?? process.stdout.columns ?? 120;
   const plainFullLine = `${title} ${version} (${commitLabel}) — ${tagline}`;
   const fitsOnOneLine = visibleWidth(plainFullLine) <= columns;
@@ -74,10 +101,23 @@ const LOBSTER_ASCII = [
   " ",
 ];
 
+const SENIOR_MANTIS_ASCII = [
+  "▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄",
+  "██░▄▄▄░██░▄▄░██░▄▄▄██░▀██░██░▄▄▀██░████░▄▄▀██░███░██",
+  "██░███░██░▀▀░██░▄▄▄██░█░█░██░█████░████░▀▀░██░█░█░██",
+  "██░▀▀▀░██░█████░▀▀▀██░██▄░██░▀▀▄██░▀▀░█░██░██▄▀▄▀▄██",
+  "▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀",
+  "               🪲 SENIOR MANTIS 🪲               ",
+  " ",
+];
+
 export function formatCliBannerArt(options: BannerOptions = {}): string {
+  const argv = options.argv ?? process.argv;
+  const brand = resolveCliBrand(argv);
+  const source = brand.label === "SENIOR MANTIS" ? SENIOR_MANTIS_ASCII : LOBSTER_ASCII;
   const rich = options.richTty ?? isRich();
   if (!rich) {
-    return LOBSTER_ASCII.join("\n");
+    return source.join("\n");
   }
 
   const colorChar = (ch: string) => {
@@ -93,13 +133,13 @@ export function formatCliBannerArt(options: BannerOptions = {}): string {
     return theme.muted(ch);
   };
 
-  const colored = LOBSTER_ASCII.map((line) => {
-    if (line.includes("OPENCLAW")) {
+  const colored = source.map((line) => {
+    if (line.includes(brand.label)) {
       return (
         theme.muted("              ") +
-        theme.accent("🦞") +
-        theme.info(" OPENCLAW ") +
-        theme.accent("🦞")
+        (brand.label === "SENIOR MANTIS" ? theme.accent("🪲") : theme.accent("🦞")) +
+        theme.info(` ${brand.label} `) +
+        (brand.label === "SENIOR MANTIS" ? theme.accent("🪲") : theme.accent("🦞"))
       );
     }
     return splitGraphemes(line).map(colorChar).join("");
