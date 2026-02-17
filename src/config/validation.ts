@@ -9,6 +9,7 @@ import {
 } from "../plugins/config-state.js";
 import { loadPluginManifestRegistry } from "../plugins/manifest-registry.js";
 import { validateJsonSchemaValue } from "../plugins/schema-validator.js";
+import { isSeniorMantisCli, SENIOR_MANTIS_ALLOWED_GATEWAY_CHANNELS } from "../sm/channel-policy.js";
 import { isRecord } from "../utils.js";
 import { findDuplicateAgentDirs, formatDuplicateAgentDirError } from "./agent-dirs.js";
 import { applyAgentDefaults, applyModelDefaults, applySessionDefaults } from "./defaults.js";
@@ -237,7 +238,9 @@ function validateConfigObjectWithPluginsBase(
     return registryInfo;
   };
 
-  const allowedChannels = new Set<string>(["defaults", ...CHANNEL_IDS]);
+  const seniorMantisMode = isSeniorMantisCli();
+  const runtimeChannelIds = seniorMantisMode ? SENIOR_MANTIS_ALLOWED_GATEWAY_CHANNELS : CHANNEL_IDS;
+  const allowedChannels = new Set<string>(["defaults", ...runtimeChannelIds]);
 
   if (config.channels && isRecord(config.channels)) {
     for (const key of Object.keys(config.channels)) {
@@ -246,6 +249,13 @@ function validateConfigObjectWithPluginsBase(
         continue;
       }
       if (!allowedChannels.has(trimmed)) {
+        if (seniorMantisMode) {
+          issues.push({
+            path: `channels.${trimmed}`,
+            message: `unknown channel id: ${trimmed}`,
+          });
+          continue;
+        }
         const { registry } = ensureRegistry();
         for (const record of registry.plugins) {
           for (const channelId of record.channels) {
@@ -263,7 +273,7 @@ function validateConfigObjectWithPluginsBase(
   }
 
   const heartbeatChannelIds = new Set<string>();
-  for (const channelId of CHANNEL_IDS) {
+  for (const channelId of runtimeChannelIds) {
     heartbeatChannelIds.add(channelId.toLowerCase());
   }
 
@@ -278,6 +288,13 @@ function validateConfigObjectWithPluginsBase(
     }
     const normalized = trimmed.toLowerCase();
     if (normalized === "last" || normalized === "none") {
+      return;
+    }
+    if (seniorMantisMode) {
+      if (heartbeatChannelIds.has(normalized)) {
+        return;
+      }
+      issues.push({ path, message: `unknown heartbeat target: ${target}` });
       return;
     }
     if (normalizeChatChannelId(trimmed)) {
