@@ -76,6 +76,8 @@ Last updated: 2026-02-17
     - force desktop CLI env defaults to Senior Mantis paths (`OPENCLAW_STATE_DIR=~/.seniormantis`, `OPENCLAW_CONFIG_PATH=~/.seniormantis/seniormantis.json`) unless explicitly overridden with `SM_STATE_DIR`/`SM_CONFIG_PATH`
     - resolve `gateway.auth.token` from Senior Mantis config and append `#token=...` for embedded/opened dashboard URL
     - re-resolve dashboard URL/token dynamically after gateway start so first-run auto-token generation does not require desktop app restart
+    - token resolution now also honors `OPENCLAW_GATEWAY_TOKEN` env when present (common legacy local setup)
+    - generated dashboard URL always uses a trailing slash for non-root Control UI base paths to avoid redirect edge cases
     - keep activity/status display URL token-free.
 
 ### Behavior impact
