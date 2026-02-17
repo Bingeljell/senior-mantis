@@ -62,6 +62,10 @@ function resolveGatewayToken(parsedConfig) {
   if (fromEnv !== undefined) {
     return fromEnv.trim();
   }
+  const fromGatewayEnv = process.env.OPENCLAW_GATEWAY_TOKEN;
+  if (fromGatewayEnv !== undefined) {
+    return fromGatewayEnv.trim();
+  }
   const token = parsedConfig?.gateway?.auth?.token;
   return typeof token === "string" ? token.trim() : "";
 }
@@ -69,7 +73,8 @@ function resolveGatewayToken(parsedConfig) {
 function resolveGatewayUrls() {
   const gatewayConfig = readGatewayConfig();
   const uiPath = resolveGatewayUiPath(gatewayConfig);
-  const gatewayUrl = `http://${defaultGatewayHost}:${defaultGatewayPort}${uiPath}`;
+  const uiPathForUrl = uiPath ? `${uiPath}/` : "/";
+  const gatewayUrl = `http://${defaultGatewayHost}:${defaultGatewayPort}${uiPathForUrl}`;
   const token = resolveGatewayToken(gatewayConfig);
   const gatewayUrlWithAuth = token
     ? `${gatewayUrl}#token=${encodeURIComponent(token)}`

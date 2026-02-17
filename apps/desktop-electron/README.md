@@ -50,7 +50,7 @@ pnpm desktop:dev
 - Override repo Node runtime command with `SM_NODE_COMMAND` (default auto-detects `node` under Electron).
 - Override state/config paths with `SM_STATE_DIR` and `SM_CONFIG_PATH`.
 - Override UI path with `SM_GATEWAY_UI_PATH` (defaults to config `gateway.controlUi.basePath`, else `/`).
-- Override dashboard token with `SM_GATEWAY_TOKEN` (otherwise uses `gateway.auth.token` from Senior Mantis config when present).
+- Override dashboard token with `SM_GATEWAY_TOKEN` (otherwise uses `OPENCLAW_GATEWAY_TOKEN` env if set, then `gateway.auth.token` from Senior Mantis config).
 
 ```bash
 SM_CLI_COMMAND=/usr/local/bin/seniormantis pnpm desktop:dev
