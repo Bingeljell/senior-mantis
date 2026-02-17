@@ -38,6 +38,8 @@ Legend:
 
 - 2026-02-17: `src/gateway/server-http.ts`
   - rationale: skip Slack HTTP route handling in Senior Mantis mode to keep active runtime channel wiring aligned to v1 scope.
+- 2026-02-17: `apps/desktop-electron/main.mjs`, `apps/desktop-electron/renderer/renderer.js`
+  - rationale: enforce Senior Mantis config/state paths in desktop launcher and inject config token into dashboard URL to avoid legacy OpenClaw auth drift (`1008 unauthorized`) during local v1 flows.
 
 ## Deletion log (completed)
 

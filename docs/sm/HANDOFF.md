@@ -46,7 +46,7 @@ Ship a senior-friendly assistant app based on OpenClaw with a narrow v1:
   - `message send --channel` option now resolves to WhatsApp-only in v1 mode.
 - Added Senior Mantis-specific `status`/`health`/`sessions` registration (`src/sm/cli/program/register-status-health-sessions.ts`) to avoid non-v1 channel phrasing in help text.
 - Added minimal desktop shell at `apps/desktop-electron/*`:
-  - local web UI embed (`http://127.0.0.1:18789/ui`)
+  - local web UI embed (`http://127.0.0.1:18789` root by default, respects `gateway.controlUi.basePath`)
   - setup launch from desktop flow (opens terminal command)
   - onboarding launch from desktop flow (opens terminal command)
   - status/health/sessions snapshots via Senior Mantis CLI commands
@@ -75,6 +75,10 @@ Ship a senior-friendly assistant app based on OpenClaw with a narrow v1:
 - Fixed desktop Control UI URL default:
   - `/ui` is not the universal default route; when `gateway.controlUi.basePath` is unset, Control UI serves from root (`/`)
   - desktop shell now resolves UI path from config (or `SM_GATEWAY_UI_PATH`) before loading iframe URL
+  - file: `apps/desktop-electron/main.mjs`
+- Fixed desktop auth/config drift with legacy OpenClaw installs:
+  - desktop launcher now forces CLI state/config env to Senior Mantis paths by default (`~/.seniormantis`)
+  - embedded dashboard/open-in-browser URLs include `#token=...` when `gateway.auth.token` exists in Senior Mantis config (or via `SM_GATEWAY_TOKEN`)
   - file: `apps/desktop-electron/main.mjs`
 - Added Senior Mantis banner branding path:
   - `src/cli/banner.ts` switches banner identity/tagline based on active CLI name (`openclaw` vs `seniormantis`).

@@ -69,6 +69,13 @@ Last updated: 2026-02-17
   - fix in `apps/desktop-electron/main.mjs`:
     - resolve UI path from `SM_GATEWAY_UI_PATH` or local config `gateway.controlUi.basePath`
     - default to root path when unset.
+- Desktop auth/config isolation fix:
+  - root cause: desktop-launched CLI could drift into legacy OpenClaw state/config/auth context.
+  - symptom: embedded UI showed `disconnected (1008): unauthorized` while desktop reported gateway running.
+  - fix in `apps/desktop-electron/main.mjs` + `apps/desktop-electron/renderer/renderer.js`:
+    - force desktop CLI env defaults to Senior Mantis paths (`OPENCLAW_STATE_DIR=~/.seniormantis`, `OPENCLAW_CONFIG_PATH=~/.seniormantis/seniormantis.json`) unless explicitly overridden with `SM_STATE_DIR`/`SM_CONFIG_PATH`
+    - resolve `gateway.auth.token` from Senior Mantis config and append `#token=...` for embedded/opened dashboard URL
+    - keep activity/status display URL token-free.
 
 ### Behavior impact
 
