@@ -34,6 +34,7 @@ Last updated: 2026-02-17
 - `src/sm/cli/program/build-program.ts`
   - removed generic gateway CLI registration from Senior Mantis runner.
   - message channel option now advertises WhatsApp-only for v1 (`message send --channel whatsapp`).
+  - fixed dashboard flag wiring so `seniormantis dashboard --no-open` reliably suppresses browser launch.
 - `src/sm/cli/program/register-gateway.ts` (new)
   - added Senior Mantis-only gateway command surface:
     - `seniormantis gateway run`
@@ -41,6 +42,8 @@ Last updated: 2026-02-17
   - excludes non-v1 gateway subcommands (`call`, `discover`, `probe`, `usage-cost`, service install/start/stop/restart/uninstall).
 - `src/gateway/server-http.ts`
   - in Senior Mantis mode, skip Slack HTTP route handling (`/api/slack/*`) so non-v1 channel wiring is not active in runtime path.
+- `src/channels/plugins/index.ts`
+  - in Senior Mantis mode, runtime channel plugin listing is filtered to v1 channels only (`whatsapp`, `webchat`) as a defense-in-depth prune layer for gateway/command channel surfaces.
 
 ### Rename pass + first-run hardening
 
@@ -127,6 +130,8 @@ Last updated: 2026-02-17
   - pass (26 tests)
 - `pnpm exec vitest run src/sm/cli/program/build-program.test.ts src/gateway/server-http.seniormantis.test.ts src/cron/store.test.ts src/gateway/server-methods/agent-job.test.ts src/gateway/server-methods/agents-mutate.test.ts src/logging/subsystem.test.ts`
   - pass (32 tests)
+- `pnpm exec vitest run src/channels/plugins/index.test.ts src/sm/cli/program/build-program.test.ts src/sm/cli/program/build-program.dashboard.test.ts`
+  - pass (8 tests)
 - `node seniormantis.mjs status --json`
   - pass
 - `node seniormantis.mjs gateway --help`
