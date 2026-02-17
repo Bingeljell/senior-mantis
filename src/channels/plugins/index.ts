@@ -1,5 +1,6 @@
 import type { ChannelId, ChannelPlugin } from "./types.js";
 import { requireActivePluginRegistry } from "../../plugins/runtime.js";
+import { isSeniorMantisAllowedGatewayChannel, isSeniorMantisCli } from "../../sm/channel-policy.js";
 import { CHAT_CHANNEL_ORDER, type ChatChannelId, normalizeAnyChannelId } from "../registry.js";
 
 // Channel plugins registry (runtime).
@@ -30,7 +31,10 @@ function dedupeChannels(channels: ChannelPlugin[]): ChannelPlugin[] {
 
 export function listChannelPlugins(): ChannelPlugin[] {
   const combined = dedupeChannels(listPluginChannels());
-  return combined.toSorted((a, b) => {
+  const scoped = isSeniorMantisCli()
+    ? combined.filter((plugin) => isSeniorMantisAllowedGatewayChannel(plugin.id))
+    : combined;
+  return scoped.toSorted((a, b) => {
     const indexA = CHAT_CHANNEL_ORDER.indexOf(a.id as ChatChannelId);
     const indexB = CHAT_CHANNEL_ORDER.indexOf(b.id as ChatChannelId);
     const orderA = a.meta.order ?? (indexA === -1 ? 999 : indexA);

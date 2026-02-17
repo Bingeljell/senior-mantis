@@ -28,6 +28,7 @@ describe("channel plugin registry", () => {
   });
 
   afterEach(() => {
+    delete process.env.OPENCLAW_CLI_NAME_OVERRIDE;
     setActivePluginRegistry(emptyRegistry);
   });
 
@@ -42,5 +43,19 @@ describe("channel plugin registry", () => {
     setActivePluginRegistry(registry);
     const pluginIds = listChannelPlugins().map((plugin) => plugin.id);
     expect(pluginIds).toEqual(["telegram", "slack", "signal"]);
+  });
+
+  it("filters channel plugins to v1 channels in Senior Mantis mode", () => {
+    process.env.OPENCLAW_CLI_NAME_OVERRIDE = "seniormantis";
+    const registry = createTestRegistry(
+      ["telegram", "whatsapp", "webchat"].map((id) => ({
+        pluginId: id,
+        plugin: createPlugin(id),
+        source: "test",
+      })),
+    );
+    setActivePluginRegistry(registry);
+    const pluginIds = listChannelPlugins().map((plugin) => plugin.id);
+    expect(pluginIds).toEqual(["whatsapp", "webchat"]);
   });
 });
