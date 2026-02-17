@@ -66,13 +66,19 @@ function resolveGatewayToken(parsedConfig) {
   return typeof token === "string" ? token.trim() : "";
 }
 
-const gatewayConfig = readGatewayConfig();
-const defaultGatewayUiPath = resolveGatewayUiPath(gatewayConfig);
-const defaultGatewayUrl = `http://${defaultGatewayHost}:${defaultGatewayPort}${defaultGatewayUiPath}`;
-const defaultGatewayToken = resolveGatewayToken(gatewayConfig);
-const defaultGatewayUrlWithAuth = defaultGatewayToken
-  ? `${defaultGatewayUrl}#token=${encodeURIComponent(defaultGatewayToken)}`
-  : defaultGatewayUrl;
+function resolveGatewayUrls() {
+  const gatewayConfig = readGatewayConfig();
+  const uiPath = resolveGatewayUiPath(gatewayConfig);
+  const gatewayUrl = `http://${defaultGatewayHost}:${defaultGatewayPort}${uiPath}`;
+  const token = resolveGatewayToken(gatewayConfig);
+  const gatewayUrlWithAuth = token
+    ? `${gatewayUrl}#token=${encodeURIComponent(token)}`
+    : gatewayUrl;
+  return {
+    gatewayUrl,
+    gatewayUrlWithAuth,
+  };
+}
 
 let gatewayProcess = null;
 let gatewayStartTime = null;
@@ -385,10 +391,11 @@ function createMainWindow() {
 }
 
 ipcMain.handle("sm:get-config", async () => {
+  const urls = resolveGatewayUrls();
   const invocation = resolveCliInvocation([]);
   return {
-    gatewayUrl: defaultGatewayUrl,
-    gatewayUrlWithAuth: defaultGatewayUrlWithAuth,
+    gatewayUrl: urls.gatewayUrl,
+    gatewayUrlWithAuth: urls.gatewayUrlWithAuth,
     cliMode: invocation.mode,
     globalCliCommand,
     cliCommand: invocation.command,
@@ -415,11 +422,12 @@ ipcMain.handle("sm:run-readonly", async (_event, action) => {
 });
 
 ipcMain.handle("sm:gateway-status", async () => {
+  const urls = resolveGatewayUrls();
   const running = Boolean(gatewayProcess && gatewayProcess.exitCode == null);
   return {
     running,
     startedAt: gatewayStartTime,
-    gatewayUrl: defaultGatewayUrl,
+    gatewayUrl: urls.gatewayUrl,
     launchMode: lastGatewayLaunchMode,
   };
 });
@@ -441,7 +449,8 @@ ipcMain.handle("sm:stop-gateway", async () => {
 });
 
 ipcMain.handle("sm:open-dashboard", async () => {
-  await shell.openExternal(defaultGatewayUrlWithAuth);
+  const urls = resolveGatewayUrls();
+  await shell.openExternal(urls.gatewayUrlWithAuth);
   return { ok: true, message: "Opened dashboard in default browser." };
 });
 

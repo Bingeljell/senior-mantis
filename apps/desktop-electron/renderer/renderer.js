@@ -66,10 +66,17 @@ async function refreshReadOnlyView(action, target) {
   }
 }
 
-async function boot() {
+async function loadUiFrame(log = false) {
   const cfg = await window.smDesktop.getConfig();
   els.webUiFrame.src = cfg.gatewayUrlWithAuth || cfg.gatewayUrl;
-  logActivity(`Loaded UI frame: ${cfg.gatewayUrl}`);
+  if (log) {
+    logActivity(`Loaded UI frame: ${cfg.gatewayUrl}`);
+  }
+  return cfg;
+}
+
+async function boot() {
+  const cfg = await loadUiFrame(true);
   logActivity(`CLI mode: ${cfg.cliMode} (${cfg.cliCommand})`);
   await refreshGatewayStatus();
   await Promise.all([
@@ -83,6 +90,7 @@ els.startGateway.addEventListener("click", async () => {
   const result = await window.smDesktop.startGateway();
   logActivity(result.message ?? "Start gateway completed.");
   await refreshGatewayStatus();
+  await loadUiFrame(false);
 });
 
 els.runSetup.addEventListener("click", async () => {
@@ -121,7 +129,8 @@ els.refreshStatus.addEventListener("click", async () => {
   logActivity("Refreshed status snapshot.");
 });
 
-els.refreshFrame.addEventListener("click", () => {
+els.refreshFrame.addEventListener("click", async () => {
+  await loadUiFrame(false);
   els.webUiFrame.contentWindow?.location.reload();
   logActivity("Reloaded embedded local web UI.");
 });
