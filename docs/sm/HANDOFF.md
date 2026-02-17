@@ -67,6 +67,11 @@ Ship a senior-friendly assistant app based on OpenClaw with a narrow v1:
   - `apps/desktop-electron/main.mjs` now detects early gateway process exit and reports actionable messages (including missing setup/config guidance) instead of reporting success immediately on spawn
 - Added setup-aware desktop first-run hints:
   - renderer logs explicit guidance to run setup when status/health output indicates missing config.
+- Fixed Electron repo CLI invocation mismatch in desktop shell:
+  - under Electron, `process.execPath` points to Electron, not Node
+  - desktop launcher now uses Node command resolution for repo mode (`SM_NODE_COMMAND` override supported)
+  - launcher sanitizes `npm_config_prefix` to avoid zsh/nvm initialization warnings in setup/onboarding terminal launches
+  - file: `apps/desktop-electron/main.mjs`
 - Added Senior Mantis banner branding path:
   - `src/cli/banner.ts` switches banner identity/tagline based on active CLI name (`openclaw` vs `seniormantis`).
 - Added runtime HTTP channel wiring prune for Senior Mantis mode:

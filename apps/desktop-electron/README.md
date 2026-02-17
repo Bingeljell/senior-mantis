@@ -46,9 +46,12 @@ pnpm desktop:dev
 - Preferred mode: repo CLI (`node seniormantis.mjs ...`) when repo runtime deps and dist entry are present.
 - Fallback mode: global `seniormantis` command if repo mode fails with module-resolution errors.
 - Override global command path with `SM_CLI_COMMAND` (binary path).
+- Override repo Node runtime command with `SM_NODE_COMMAND` (default auto-detects `node` under Electron).
 
 ```bash
 SM_CLI_COMMAND=/usr/local/bin/seniormantis pnpm desktop:dev
+# optional:
+SM_NODE_COMMAND=/opt/homebrew/bin/node pnpm desktop:dev
 ```
 
 ## Notes and troubleshooting
@@ -56,6 +59,7 @@ SM_CLI_COMMAND=/usr/local/bin/seniormantis pnpm desktop:dev
 - This is an MVP shell, not a packaged release.
 - Onboarding launches in your system terminal for interactive prompts.
 - If gateway start fails with `ENOENT`, install or point `SM_CLI_COMMAND` to a valid `seniormantis` binary.
+- If setup/onboarding opens a terminal and reports an unexpected runtime command, set `SM_NODE_COMMAND` to your Node binary path.
 - If status/health commands fail with missing `dist/entry-seniormantis`, run `pnpm build`.
 - If status/health or gateway launch reports missing config, run `seniormantis setup` (or click `Run Setup` in the desktop app).
 - If the embedded UI is blank, verify local gateway is running on `127.0.0.1:18789`.

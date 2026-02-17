@@ -56,6 +56,13 @@ Last updated: 2026-02-17
 - Docs/readme updates for local testing path:
   - `apps/desktop-electron/README.md`
   - `README.md` (Senior Mantis section).
+- Desktop launcher runtime fix for Electron:
+  - root cause: repo CLI invocation used `process.execPath`, which is the Electron binary under desktop runtime.
+  - symptom: terminal setup/onboarding commands failed with `unknown command '/.../seniormantis.mjs'`.
+  - fix in `apps/desktop-electron/main.mjs`:
+    - use `node` (or `SM_NODE_COMMAND`) for repo CLI invocation when running inside Electron
+    - sanitize `npm_config_prefix` from spawned env to avoid zsh/nvm initialization warnings
+    - harden spawn error handling in read-only command path.
 
 ### Behavior impact
 
@@ -102,6 +109,8 @@ Last updated: 2026-02-17
   - pass
 - `node seniormantis.mjs gateway --help`
   - pass (shows v1-scoped subcommands: `run`, `status`)
+- `node --check apps/desktop-electron/main.mjs`
+  - pass
 - `node seniormantis.mjs sessions --json`
   - pass
 - `node dist/entry-seniormantis.js status --json`
