@@ -148,6 +148,29 @@ This is now an explicit implementation track, not an implicit cleanup.
   2. keep release workflows manual until first Senior Mantis release process is defined
   3. re-enable housekeeping workflows (`stale`, `labeler`, `auto-response`) only if needed
 
+### Disabled workflow inventory (2026-02-17)
+
+All entries below were changed to `on: workflow_dispatch` only.
+
+- `.github/workflows/ci.yml`
+  - removed: `push` on `main`, `pull_request`
+- `.github/workflows/install-smoke.yml`
+  - removed: `push` on `main`, `pull_request`
+- `.github/workflows/docker-release.yml`
+  - removed: `push` on `main`/`v*` tags
+- `.github/workflows/workflow-sanity.yml`
+  - removed: `push` on `main`, `pull_request`
+- `.github/workflows/sandbox-common-smoke.yml`
+  - removed: `push` path triggers, `pull_request` path triggers
+- `.github/workflows/auto-response.yml`
+  - removed: `issues` (`opened`, `edited`, `labeled`), `pull_request_target` (`labeled`)
+- `.github/workflows/formal-conformance.yml`
+  - removed: `pull_request`
+- `.github/workflows/labeler.yml`
+  - removed: `pull_request_target` (`opened`, `synchronize`, `reopened`), `issues` (`opened`)
+- `.github/workflows/stale.yml`
+  - removed: scheduled cron (`17 3 * * *`)
+
 ## Repo migration checklist (clean non-fork)
 
 1. Copy this `docs/sm/` folder first.
