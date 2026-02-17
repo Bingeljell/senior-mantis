@@ -44,6 +44,8 @@ Legend:
   - rationale: filter runtime channel plugin listing to Senior Mantis v1 channel set (`whatsapp`, `webchat`) so gateway channel/status/logout surfaces cannot expose non-v1 channel plugins.
 - 2026-02-17: `src/config/schema.ts`
   - rationale: filter Senior Mantis config schema channel metadata to v1 channels so Control UI hint/help payloads do not advertise non-v1 channel targets.
+- 2026-02-17: `src/config/validation.ts`
+  - rationale: reject non-v1 channel keys/heartbeat targets during plugin-aware config validation in Senior Mantis mode to keep config writes aligned with v1 runtime scope.
 
 ## Deletion log (completed)
 

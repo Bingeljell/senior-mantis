@@ -48,6 +48,9 @@ Last updated: 2026-02-17
 - `src/config/schema.ts`
   - in Senior Mantis mode, config schema channel metadata is filtered to v1 channels only (`whatsapp`, `webchat`) before hint/schema merge.
   - heartbeat target help text in `config.schema` now avoids advertising non-v1 channels.
+- `src/config/validation.ts`
+  - in Senior Mantis mode, plugin-aware config validation now rejects non-v1 `channels.*` keys and non-v1 heartbeat targets.
+  - this prevents local config writes/load validation from accepting channel targets outside the v1 runtime scope.
 
 ### Rename pass + first-run hardening
 
@@ -138,6 +141,8 @@ Last updated: 2026-02-17
   - pass (8 tests)
 - `pnpm exec vitest run src/config/schema.test.ts src/channels/plugins/index.test.ts`
   - pass (8 tests)
+- `pnpm exec vitest run src/config/config.seniormantis-channel-validation.test.ts src/config/schema.test.ts`
+  - pass (9 tests)
 - `pnpm exec vitest -c vitest.e2e.config.ts run src/gateway/server.channels.e2e.test.ts`
   - pass (4 tests)
 - `node seniormantis.mjs status --json`
