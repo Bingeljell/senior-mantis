@@ -134,8 +134,9 @@ const defaultRegistry = createRegistry([
   },
 ]);
 
-let server: Awaited<ReturnType<typeof startServerWithClient>>["server"];
-let ws: Awaited<ReturnType<typeof startServerWithClient>>["ws"];
+let server: Awaited<ReturnType<typeof startServerWithClient>>["server"] | undefined;
+let ws: Awaited<ReturnType<typeof startServerWithClient>>["ws"] | undefined;
+const originalCliName = process.env.OPENCLAW_CLI_NAME_OVERRIDE;
 
 beforeAll(async () => {
   setRegistry(defaultRegistry);
@@ -146,8 +147,13 @@ beforeAll(async () => {
 });
 
 afterAll(async () => {
-  ws.close();
-  await server.close();
+  if (originalCliName === undefined) {
+    delete process.env.OPENCLAW_CLI_NAME_OVERRIDE;
+  } else {
+    process.env.OPENCLAW_CLI_NAME_OVERRIDE = originalCliName;
+  }
+  ws?.close();
+  await server?.close();
 });
 
 function setRegistry(registry: PluginRegistry) {
@@ -220,5 +226,30 @@ describe("gateway server channels", () => {
     expect(snap.valid).toBe(true);
     expect(snap.config?.channels?.telegram?.botToken).toBeUndefined();
     expect(snap.config?.channels?.telegram?.groups?.["*"]?.requireMention).toBe(false);
+  });
+
+  test("channels.status and logout are pruned to v1 channels in Senior Mantis mode", async () => {
+    process.env.OPENCLAW_CLI_NAME_OVERRIDE = "seniormantis";
+    try {
+      setRegistry(defaultRegistry);
+      const status = await rpcReq<{
+        channels?: Record<string, unknown>;
+        channelOrder?: string[];
+      }>(ws, "channels.status", { probe: false, timeoutMs: 2000 });
+
+      expect(status.ok).toBe(true);
+      expect(status.payload?.channels?.whatsapp).toBeTruthy();
+      expect(status.payload?.channels?.telegram).toBeUndefined();
+      expect(status.payload?.channels?.signal).toBeUndefined();
+      expect(status.payload?.channelOrder).toEqual(["whatsapp"]);
+
+      const logout = await rpcReq(ws, "channels.logout", {
+        channel: "telegram",
+      });
+      expect(logout.ok).toBe(false);
+      expect(logout.error?.message ?? "").toContain("does not support logout");
+    } finally {
+      delete process.env.OPENCLAW_CLI_NAME_OVERRIDE;
+    }
   });
 });
