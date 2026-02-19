@@ -20,6 +20,24 @@ function isBusinessAction(value: string): value is BusinessAction {
   return (HOLYOPS_BUSINESS_ACTIONS as readonly string[]).includes(value);
 }
 
+function isRetryableAdapterFailure(stderr: string, stdout: string, exitCode: number): boolean {
+  if (exitCode === 75 || exitCode === 137 || exitCode === 143) {
+    return true;
+  }
+  const text = `${stderr}\n${stdout}`.toLowerCase();
+  return (
+    text.includes("timed out") ||
+    text.includes("timeout") ||
+    text.includes("econnreset") ||
+    text.includes("econnrefused") ||
+    text.includes("eai_again") ||
+    text.includes("temporarily unavailable") ||
+    text.includes("rate limit") ||
+    text.includes("429") ||
+    text.includes("try again")
+  );
+}
+
 function buildBusinessError(params: {
   requestId: string;
   summary: string;
@@ -73,12 +91,52 @@ function resolveBusinessCommand(action: BusinessAction, args: Record<string, unk
 }
 
 function inferBusinessArtifacts(stdout: string): AdapterArtifact[] {
+  const artifacts: AdapterArtifact[] = [];
+  const seen = new Set<string>();
+  const pushArtifact = (artifact: AdapterArtifact) => {
+    const key = `${artifact.type}:${artifact.value}`;
+    if (seen.has(key)) {
+      return;
+    }
+    seen.add(key);
+    artifacts.push(artifact);
+  };
+
+  try {
+    const parsed = JSON.parse(stdout);
+    if (parsed && typeof parsed === "object") {
+      const proposalId =
+        typeof (parsed as Record<string, unknown>).proposalId === "string"
+          ? String((parsed as Record<string, unknown>).proposalId).trim()
+          : "";
+      if (proposalId) {
+        pushArtifact({ type: "text", value: proposalId, label: "proposal_id" });
+      }
+      const shareUrl =
+        typeof (parsed as Record<string, unknown>).shareUrl === "string"
+          ? String((parsed as Record<string, unknown>).shareUrl).trim()
+          : "";
+      if (shareUrl) {
+        pushArtifact({ type: "url", value: shareUrl, label: "link" });
+      }
+    }
+  } catch {
+    // non-JSON stdout
+  }
+
+  const idMatch =
+    stdout.match(/\bproposal[-_ ]?id\b\s*[:=]\s*([A-Za-z0-9._-]+)/i) ??
+    stdout.match(/\bproposal\b\s*[:=]\s*([A-Za-z0-9._-]+)/i);
+  if (idMatch?.[1]) {
+    pushArtifact({ type: "text", value: idMatch[1], label: "proposal_id" });
+  }
+
   const urlMatches = stdout.match(/https?:\/\/[^\s]+/g) ?? [];
-  return urlMatches.slice(0, 3).map((url) => ({
-    type: "url",
-    value: url,
-    label: "link",
-  }));
+  for (const url of urlMatches.slice(0, 5)) {
+    pushArtifact({ type: "url", value: url, label: "link" });
+  }
+
+  return artifacts;
 }
 
 export async function invokeBusinessCliAdapter(
@@ -132,12 +190,15 @@ export async function invokeBusinessCliAdapter(
     const summary = result.timedOut
       ? `Business ${invocation.action} timed out`
       : `Business ${invocation.action} failed`;
+    const retryable = result.timedOut
+      ? true
+      : isRetryableAdapterFailure(result.stderr, result.stdout, result.exitCode);
     return buildBusinessError({
       requestId: invocation.requestId,
       summary,
       code: result.timedOut ? "timeout" : "command_failed",
       message: truncateOutput(result.stderr || result.stdout || "Unknown business command error"),
-      retryable: result.timedOut,
+      retryable,
       details: {
         exitCode: result.exitCode,
         durationMs: result.durationMs,

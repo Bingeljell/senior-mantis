@@ -33,6 +33,11 @@ Last updated: 2026-02-19
 - Added desktop quick actions that route through HolyOps agent prompts into `video_tool` and `business_tool`:
   - desktop IPC + runner: `apps/desktop-electron/main.mjs`, `apps/desktop-electron/preload.cjs`
   - desktop UI controls: `apps/desktop-electron/renderer/index.html`, `apps/desktop-electron/renderer/renderer.js`, `apps/desktop-electron/renderer/styles.css`
+- Hardened adapter ergonomics for v1 reliability:
+  - stricter action validation (`outputPath`, `clip` args, `musicPath`) in `src/sm/adapters/video-cli-adapter.ts`
+  - richer business artifacts (`proposal_id` + URL inference) in `src/sm/adapters/business-cli-adapter.ts`
+  - retryability heuristics for transient command failures in both adapters
+  - expanded adapter tests in `src/sm/adapters/registry.test.ts`
 - Added explicit migration tracker:
   - `docs/sm/HOLYOPS_MIGRATION_NOTES.md`
   - keeps `~/.seniormantis` path for now, tracks deferred move to `~/.holyops`.

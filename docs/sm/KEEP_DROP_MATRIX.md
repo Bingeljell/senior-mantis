@@ -55,6 +55,8 @@ Legend (HolyOps pivot):
   - rationale: introduce simple JSON adapter contract (video/business) for CLI-first personal workflow integrations without broad framework abstraction.
 - 2026-02-19: `apps/desktop-electron/main.mjs`, `apps/desktop-electron/preload.cjs`, `apps/desktop-electron/renderer/*`
   - rationale: add desktop quick-actions for HolyOps-first workflows (video/business) while preserving explicit side-effect confirmation and local-first defaults.
+- 2026-02-19: `src/sm/adapters/video-cli-adapter.ts`, `src/sm/adapters/business-cli-adapter.ts`, `src/sm/adapters/registry.test.ts`
+  - rationale: harden adapter contract for v1 reliability (required action params, richer artifacts, transient-failure retry hints).
 
 ## Deletion log (completed)
 
