@@ -100,25 +100,27 @@ function readStringFromPayload(payload, key) {
   return raw.trim();
 }
 
-function buildQuickActionPrompt(actionId, payload) {
+function buildQuickActionPlan(actionId, payload) {
   if (actionId === "video_compress") {
     const inputPath = readStringFromPayload(payload, "inputPath") || "~/Videos/input.mp4";
     const outputPath =
       readStringFromPayload(payload, "outputPath") || "~/Videos/input-compressed.mp4";
-    const toolPayload = {
-      action: "compress",
-      inputPath,
-      outputPath,
-      confirm: true,
-    };
     return {
       ok: true,
       actionLabel: "Run quick action: video compress",
-      prompt: [
-        "Run exactly one tool call with video_tool and do not ask follow-up questions.",
-        `Tool args: ${JSON.stringify(toolPayload)}`,
-        "After the tool finishes, return a short result summary and output artifact paths.",
-      ].join("\n"),
+      cliArgs: [
+        "workflow",
+        "--adapter",
+        "video-agent",
+        "--action",
+        "compress",
+        "--arg",
+        `inputPath=${inputPath}`,
+        "--arg",
+        `outputPath=${outputPath}`,
+        "--confirm",
+        "--json",
+      ],
     };
   }
 
@@ -128,34 +130,37 @@ function buildQuickActionPrompt(actionId, payload) {
       readStringFromPayload(payload, "brief") ||
       "Draft a concise proposal for this project with scope, timeline, and pricing options.";
     const template = readStringFromPayload(payload, "template") || "default";
-    const toolPayload = {
-      action: "create_proposal",
-      projectId,
-      brief,
-      template,
-      confirm: true,
-    };
     return {
       ok: true,
       actionLabel: "Run quick action: business proposal",
-      prompt: [
-        "Run exactly one tool call with business_tool and do not ask follow-up questions.",
-        `Tool args: ${JSON.stringify(toolPayload)}`,
-        "After the tool finishes, return proposal id and any share URL in a short bullet list.",
-      ].join("\n"),
+      cliArgs: [
+        "workflow",
+        "--adapter",
+        "business-agent",
+        "--action",
+        "create_proposal",
+        "--arg",
+        `projectId=${projectId}`,
+        "--arg",
+        `brief=${brief}`,
+        "--arg",
+        `template=${template}`,
+        "--confirm",
+        "--json",
+      ],
     };
   }
 
   return {
     ok: false,
     actionLabel: "",
-    prompt: "",
+    cliArgs: [],
     error: `Unsupported quick action: ${actionId}`,
   };
 }
 
 async function runQuickAction(actionId, payload) {
-  const plan = buildQuickActionPrompt(actionId, payload);
+  const plan = buildQuickActionPlan(actionId, payload);
   if (!plan.ok) {
     return {
       ok: false,
@@ -164,19 +169,14 @@ async function runQuickAction(actionId, payload) {
     };
   }
 
-  const confirmed = await confirmSideEffect(`${plan.actionLabel}\n\nThis can execute external CLI tools.`);
+  const confirmed = await confirmSideEffect(
+    `${plan.actionLabel}\n\nThis runs external workflow CLI commands.`,
+  );
   if (!confirmed) {
     return { ok: false, message: "Cancelled by user.", result: null };
   }
 
-  const result = await runSeniorMantis([
-    "agent",
-    "--agent",
-    "main",
-    "--message",
-    plan.prompt,
-    "--json",
-  ]);
+  const result = await runSeniorMantis(plan.cliArgs);
   return {
     ok: result.ok,
     actionId,

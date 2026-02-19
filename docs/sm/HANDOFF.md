@@ -30,8 +30,11 @@ Direction is now personal-first `HolyOps` (creator workflow cockpit) while prese
   - `video-agent` adapter/tool
   - `business-agent` adapter/tool
 - Desktop quick-actions shipped for first adapters:
-  - `Run Video Compress` (routes through `video_tool` prompt path)
-  - `Run Business Proposal` (routes through `business_tool` prompt path)
+  - `Run Video Compress` (routes through direct `workflow` command to `video-agent`)
+  - `Run Business Proposal` (routes through direct `workflow` command to `business-agent`)
+- Direct non-LLM workflow command shipped:
+  - `holyops workflow --adapter ... --action ... --arg key=value --confirm --json`
+  - file: `src/sm/cli/program/register-workflow.ts`
 - Adapter hardening shipped:
   - per-action validation for video workflows (`outputPath`, clip timing, music path)
   - business artifact enrichment (`proposal_id`, URL extraction)
@@ -189,7 +192,7 @@ Gateway subcommands intentionally exposed in Senior Mantis runner:
 2. Add next specialist tools (`research-agent`, `writer-agent`) on the same adapter contract.
 3. Add desktop packaging/distribution flow for `apps/desktop-electron` (dev -> signed release pipeline later).
 4. Add lightweight quick-action history in desktop UI (last run, args, result status).
-5. Introduce direct non-LLM adapter CLI command(s) for deterministic quick actions.
+5. Add workflow presets/templates for common local tasks (video clip pack, proposal draft, analytics pulse).
 
 ## Brand migration track (OpenClaw -> HolyOps)
 

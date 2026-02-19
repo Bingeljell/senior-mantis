@@ -14,6 +14,7 @@ import { theme } from "../../../terminal/theme.js";
 import { VERSION } from "../../../version.js";
 import { registerSeniorMantisGatewayCommands } from "./register-gateway.js";
 import { registerSeniorMantisStatusHealthSessionsCommands } from "./register-status-health-sessions.js";
+import { registerSeniorMantisWorkflowCommands } from "./register-workflow.js";
 
 const SM_AGENT_CHANNELS = ["whatsapp", "webchat"] as const;
 const SM_MESSAGE_CHANNELS = ["whatsapp"] as const;
@@ -56,6 +57,10 @@ ${theme.heading("Quick Start:")}
 ${example("holyops onboard --install-daemon", "Run guided setup with simple prompts.")}
 ${example("holyops gateway status", "Check local gateway health.")}
 ${example("holyops dashboard", "Open desktop/browser control UI.")}
+${example(
+  "holyops workflow --adapter business-agent --action analytics_summary --arg projectId=main --json",
+  "Run a workflow adapter directly (no LLM step).",
+)}
 ${example(
   'holyops agent --message "Summarize my inbox" --deliver',
   "Run one agent turn and deliver output.",
@@ -127,6 +132,7 @@ export function buildSeniorMantisProgram(): Command {
   registerSeniorMantisMaintenanceCommands(program);
   registerSeniorMantisMessageCommands(program, ctx);
   registerAgentCommands(program, { agentChannelOptions: ctx.agentChannelOptions });
+  registerSeniorMantisWorkflowCommands(program);
   registerSeniorMantisStatusHealthSessionsCommands(program);
   registerSeniorMantisGatewayCommands(program);
 

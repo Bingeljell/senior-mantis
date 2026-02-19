@@ -16,6 +16,7 @@ describe("buildSeniorMantisProgram", () => {
     expect(commandNames).toContain("dashboard");
     expect(commandNames).toContain("message");
     expect(commandNames).toContain("agent");
+    expect(commandNames).toContain("workflow");
     expect(commandNames).toContain("status");
     expect(commandNames).toContain("gateway");
   });

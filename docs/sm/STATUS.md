@@ -30,7 +30,11 @@ Last updated: 2026-02-19
   - video adapter: `src/sm/adapters/video-cli-adapter.ts`
   - business adapter: `src/sm/adapters/business-cli-adapter.ts`
   - agent tools + registration: `src/agents/tools/holyops-video-tool.ts`, `src/agents/tools/holyops-business-tool.ts`, `src/agents/openclaw-tools.ts` (HolyOps-mode only)
-- Added desktop quick actions that route through HolyOps agent prompts into `video_tool` and `business_tool`:
+- Added direct workflow command for deterministic adapter execution (non-LLM path):
+  - command surface + validation: `src/sm/cli/program/register-workflow.ts`
+  - command registration: `src/sm/cli/program/build-program.ts`
+  - parser/confirmation tests: `src/sm/cli/program/register-workflow.test.ts`, `src/sm/cli/program/build-program.test.ts`
+- Added desktop quick actions that route into direct workflow command paths:
   - desktop IPC + runner: `apps/desktop-electron/main.mjs`, `apps/desktop-electron/preload.cjs`
   - desktop UI controls: `apps/desktop-electron/renderer/index.html`, `apps/desktop-electron/renderer/renderer.js`, `apps/desktop-electron/renderer/styles.css`
 - Hardened adapter ergonomics for v1 reliability:
