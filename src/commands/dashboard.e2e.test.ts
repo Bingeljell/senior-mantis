@@ -90,6 +90,29 @@ describe("dashboardCommand", () => {
     );
   });
 
+  it("uses HolyOps branding when CLI override is set", async () => {
+    const previous = process.env.OPENCLAW_CLI_NAME_OVERRIDE;
+    process.env.OPENCLAW_CLI_NAME_OVERRIDE = "holyops";
+    try {
+      mockSnapshot("abc123");
+      mocks.copyToClipboard.mockResolvedValue(true);
+      mocks.detectBrowserOpenSupport.mockResolvedValue({ ok: true });
+      mocks.openUrl.mockResolvedValue(true);
+
+      await dashboardCommand(runtime);
+
+      expect(runtime.log).toHaveBeenCalledWith(
+        "Opened in your browser. Keep that tab to control HolyOps.",
+      );
+    } finally {
+      if (previous === undefined) {
+        delete process.env.OPENCLAW_CLI_NAME_OVERRIDE;
+      } else {
+        process.env.OPENCLAW_CLI_NAME_OVERRIDE = previous;
+      }
+    }
+  });
+
   it("prints SSH hint when browser cannot open", async () => {
     mockSnapshot("shhhh");
     mocks.copyToClipboard.mockResolvedValue(false);

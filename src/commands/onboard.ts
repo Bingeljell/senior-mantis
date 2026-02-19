@@ -4,6 +4,7 @@ import { formatCliCommand } from "../cli/command-format.js";
 import { readConfigFileSnapshot } from "../config/config.js";
 import { assertSupportedRuntime } from "../infra/runtime-guard.js";
 import { defaultRuntime } from "../runtime.js";
+import { isHolyOpsBrand, resolveProductBrand } from "../sm/brand.js";
 import { resolveUserPath } from "../utils.js";
 import { isDeprecatedAuthChoice, normalizeLegacyOnboardAuthChoice } from "./auth-choice-legacy.js";
 import { DEFAULT_WORKSPACE, handleReset } from "./onboard-helpers.js";
@@ -11,6 +12,8 @@ import { runInteractiveOnboarding } from "./onboard-interactive.js";
 import { runNonInteractiveOnboarding } from "./onboard-non-interactive.js";
 
 export async function onboardCommand(opts: OnboardOptions, runtime: RuntimeEnv = defaultRuntime) {
+  const brand = resolveProductBrand();
+  const holyOpsMode = isHolyOpsBrand();
   assertSupportedRuntime(runtime);
   const originalAuthChoice = opts.authChoice;
   const normalizedAuthChoice = normalizeLegacyOnboardAuthChoice(originalAuthChoice);
@@ -40,7 +43,9 @@ export async function onboardCommand(opts: OnboardOptions, runtime: RuntimeEnv =
     runtime.error(
       [
         "Non-interactive onboarding requires explicit risk acknowledgement.",
-        "Read: https://docs.openclaw.ai/security",
+        holyOpsMode
+          ? "Read: docs/sm/HANDOFF.md#safety-defaults-to-preserve"
+          : "Read: https://docs.openclaw.ai/security",
         `Re-run with: ${formatCliCommand("openclaw onboard --non-interactive --accept-risk ...")}`,
       ].join("\n"),
     );
@@ -59,10 +64,10 @@ export async function onboardCommand(opts: OnboardOptions, runtime: RuntimeEnv =
   if (process.platform === "win32") {
     runtime.log(
       [
-        "Windows detected — OpenClaw runs great on WSL2!",
+        `Windows detected — ${brand} runs great on WSL2!`,
         "Native Windows might be trickier.",
         "Quick setup: wsl --install (one command, one reboot)",
-        "Guide: https://docs.openclaw.ai/windows",
+        holyOpsMode ? "Guide: docs/sm/HANDOFF.md" : "Guide: https://docs.openclaw.ai/windows",
       ].join("\n"),
     );
   }

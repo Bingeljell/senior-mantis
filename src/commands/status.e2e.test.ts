@@ -250,6 +250,7 @@ vi.mock("../infra/update-check.js", () => ({
     registry: { latestVersion: "0.0.0" },
   }),
   compareSemverStrings: vi.fn(() => 0),
+  formatGitInstallLabel: vi.fn(() => "git: main"),
 }));
 vi.mock("../config/config.js", async (importOriginal) => {
   const actual = await importOriginal<typeof import("../config/config.js")>();
@@ -398,6 +399,25 @@ describe("statusCommand", () => {
           l.includes("openclaw --profile isolated status --all"),
       ),
     ).toBe(true);
+  });
+
+  it("uses HolyOps heading/docs in HolyOps mode", async () => {
+    const previous = process.env.OPENCLAW_CLI_NAME_OVERRIDE;
+    process.env.OPENCLAW_CLI_NAME_OVERRIDE = "holyops";
+    try {
+      (runtime.log as vi.Mock).mockClear();
+      await statusCommand({}, runtime as never);
+      const logs = (runtime.log as vi.Mock).mock.calls.map((c) => String(c[0]));
+      expect(logs.some((l) => l.includes("HolyOps status"))).toBe(true);
+      expect(logs.some((l) => l.includes("FAQ: docs/sm/STATUS.md"))).toBe(true);
+      expect(logs.some((l) => l.includes("Troubleshooting: docs/sm/HANDOFF.md"))).toBe(true);
+    } finally {
+      if (previous === undefined) {
+        delete process.env.OPENCLAW_CLI_NAME_OVERRIDE;
+      } else {
+        process.env.OPENCLAW_CLI_NAME_OVERRIDE = previous;
+      }
+    }
   });
 
   it("shows gateway auth when reachable", async () => {

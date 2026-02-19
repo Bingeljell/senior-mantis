@@ -2,6 +2,7 @@ import type { RuntimeEnv } from "../runtime.js";
 import { readConfigFileSnapshot, resolveGatewayPort } from "../config/config.js";
 import { copyToClipboard } from "../infra/clipboard.js";
 import { defaultRuntime } from "../runtime.js";
+import { resolveProductBrand } from "../sm/brand.js";
 import {
   detectBrowserOpenSupport,
   formatControlUiSshHint,
@@ -17,6 +18,7 @@ export async function dashboardCommand(
   runtime: RuntimeEnv = defaultRuntime,
   options: DashboardOptions = {},
 ) {
+  const brand = resolveProductBrand();
   const snapshot = await readConfigFileSnapshot();
   const cfg = snapshot.valid ? snapshot.config : {};
   const port = resolveGatewayPort(cfg);
@@ -62,7 +64,7 @@ export async function dashboardCommand(
   }
 
   if (opened) {
-    runtime.log("Opened in your browser. Keep that tab to control OpenClaw.");
+    runtime.log(`Opened in your browser. Keep that tab to control ${brand}.`);
   } else if (hint) {
     runtime.log(hint);
   }

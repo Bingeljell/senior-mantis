@@ -20,6 +20,7 @@ import {
   type Tone,
 } from "../memory/status-format.js";
 import { runSecurityAudit } from "../security/audit.js";
+import { resolveProductBrand, resolveStatusDocsLinks } from "../sm/brand.js";
 import { renderTable } from "../terminal/table.js";
 import { theme } from "../terminal/theme.js";
 import { formatHealthChannelLines, type HealthSummary } from "./health.js";
@@ -177,6 +178,8 @@ export async function statusCommand(
   }
 
   const rich = true;
+  const brand = resolveProductBrand();
+  const docs = resolveStatusDocsLinks();
   const muted = (value: string) => (rich ? theme.muted(value) : value);
   const ok = (value: string) => (rich ? theme.success(value) : value);
   const warn = (value: string) => (rich ? theme.warn(value) : value);
@@ -393,7 +396,7 @@ export async function statusCommand(
     },
   ];
 
-  runtime.log(theme.heading("OpenClaw status"));
+  runtime.log(theme.heading(`${brand} status`));
   runtime.log("");
   runtime.log(theme.heading("Overview"));
   runtime.log(
@@ -615,8 +618,8 @@ export async function statusCommand(
   }
 
   runtime.log("");
-  runtime.log("FAQ: https://docs.openclaw.ai/faq");
-  runtime.log("Troubleshooting: https://docs.openclaw.ai/troubleshooting");
+  runtime.log(`FAQ: ${docs.faq}`);
+  runtime.log(`Troubleshooting: ${docs.troubleshooting}`);
   runtime.log("");
   const updateHint = formatUpdateAvailableHint(update);
   if (updateHint) {

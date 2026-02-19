@@ -18,6 +18,7 @@ import { resolveGatewayAuth } from "../gateway/auth.js";
 import { buildGatewayConnectionDetails } from "../gateway/call.js";
 import { resolveOpenClawPackageRoot } from "../infra/openclaw-root.js";
 import { defaultRuntime } from "../runtime.js";
+import { resolveProductBrand } from "../sm/brand.js";
 import { note } from "../terminal/note.js";
 import { stylePromptTitle } from "../terminal/prompt-style.js";
 import { shortenHomePath } from "../utils.js";
@@ -67,10 +68,11 @@ export async function doctorCommand(
   runtime: RuntimeEnv = defaultRuntime,
   options: DoctorOptions = {},
 ) {
+  const brand = resolveProductBrand();
   const prompter = createDoctorPrompter({ runtime, options });
   let configMutated = false;
   printWizardHeader(runtime);
-  intro("OpenClaw doctor");
+  intro(`${brand} doctor`);
 
   const root = await resolveOpenClawPackageRoot({
     moduleUrl: import.meta.url,
