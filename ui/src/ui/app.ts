@@ -84,6 +84,8 @@ import { type ChatAttachment, type ChatQueueItem, type CronFormState } from "./u
 declare global {
   interface Window {
     __OPENCLAW_CONTROL_UI_BASE_PATH__?: string;
+    __OPENCLAW_CLI_COMMAND__?: string;
+    __OPENCLAW_PRODUCT_BRAND__?: string;
   }
 }
 

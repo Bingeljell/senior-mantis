@@ -1,6 +1,7 @@
 import { html } from "lit";
 import type { GatewayHelloOk } from "../gateway.ts";
 import type { UiSettings } from "../storage.ts";
+import { formatCliCommandForUi } from "../brand.ts";
 import { formatRelativeTimestamp, formatDurationHuman } from "../format.ts";
 import { formatNextRun } from "../presenter.ts";
 
@@ -50,8 +51,12 @@ export function renderOverview(props: OverviewProps) {
         <div class="muted" style="margin-top: 8px">
           This gateway requires auth. Add a token or password, then click Connect.
           <div style="margin-top: 6px">
-            <span class="mono">openclaw dashboard --no-open</span> → open the Control UI<br />
-            <span class="mono">openclaw doctor --generate-gateway-token</span> → set token
+            <span class="mono">${formatCliCommandForUi("openclaw dashboard --no-open")}</span> →
+            open the Control UI<br />
+            <span class="mono"
+              >${formatCliCommandForUi("openclaw doctor --generate-gateway-token")}</span
+            >
+            → set token
           </div>
           <div style="margin-top: 6px">
             <a

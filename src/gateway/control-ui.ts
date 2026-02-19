@@ -2,6 +2,7 @@ import type { IncomingMessage, ServerResponse } from "node:http";
 import fs from "node:fs";
 import path from "node:path";
 import type { OpenClawConfig } from "../config/config.js";
+import { HOLYOPS_COMPAT_CLI_NAMES, resolveCliName } from "../cli/cli-name.js";
 import { resolveControlUiRootSync } from "../infra/control-ui-assets.js";
 import { DEFAULT_ASSISTANT_IDENTITY, resolveAssistantIdentity } from "./assistant-identity.js";
 import {
@@ -164,13 +165,23 @@ interface ControlUiInjectionOpts {
   basePath: string;
   assistantName?: string;
   assistantAvatar?: string;
+  cliCommand: string;
+  productBrand: "HolyOps" | "OpenClaw";
+}
+
+function resolveProductBrand(cliCommand: string): "HolyOps" | "OpenClaw" {
+  return (HOLYOPS_COMPAT_CLI_NAMES as readonly string[]).includes(cliCommand)
+    ? "HolyOps"
+    : "OpenClaw";
 }
 
 function injectControlUiConfig(html: string, opts: ControlUiInjectionOpts): string {
-  const { basePath, assistantName, assistantAvatar } = opts;
+  const { basePath, assistantName, assistantAvatar, cliCommand, productBrand } = opts;
   const script =
     `<script>` +
     `window.__OPENCLAW_CONTROL_UI_BASE_PATH__=${JSON.stringify(basePath)};` +
+    `window.__OPENCLAW_CLI_COMMAND__=${JSON.stringify(cliCommand)};` +
+    `window.__OPENCLAW_PRODUCT_BRAND__=${JSON.stringify(productBrand)};` +
     `window.__OPENCLAW_ASSISTANT_NAME__=${JSON.stringify(
       assistantName ?? DEFAULT_ASSISTANT_IDENTITY.name,
     )};` +
@@ -216,6 +227,8 @@ function serveIndexHtml(res: ServerResponse, indexPath: string, opts: ServeIndex
   res.end(
     injectControlUiConfig(raw, {
       basePath,
+      cliCommand: resolveCliName(),
+      productBrand: resolveProductBrand(resolveCliName()),
       assistantName: identity.name,
       assistantAvatar: avatarValue,
     }),
