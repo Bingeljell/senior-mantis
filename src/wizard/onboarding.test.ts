@@ -298,6 +298,7 @@ describe("runOnboardingWizard", () => {
         .map((call) => call?.[0])
         .filter((entry): entry is string => typeof entry === "string");
       expect(notes.some((entry) => entry.includes("What now: docs/sm/HANDOFF.md"))).toBe(true);
+      expect(notes.some((entry) => entry.includes("Docs: docs/sm/HANDOFF.md"))).toBe(true);
 
       const outroCalls = (outro as unknown as { mock: { calls: unknown[][] } }).mock.calls;
       const outroMessage = outroCalls.at(-1)?.[0];

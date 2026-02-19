@@ -4,7 +4,7 @@ import { formatCliCommand } from "../cli/command-format.js";
 import { readConfigFileSnapshot } from "../config/config.js";
 import { assertSupportedRuntime } from "../infra/runtime-guard.js";
 import { defaultRuntime } from "../runtime.js";
-import { isHolyOpsBrand, resolveProductBrand } from "../sm/brand.js";
+import { isHolyOpsBrand, resolveBrandDocsLinks, resolveProductBrand } from "../sm/brand.js";
 import { resolveUserPath } from "../utils.js";
 import { isDeprecatedAuthChoice, normalizeLegacyOnboardAuthChoice } from "./auth-choice-legacy.js";
 import { DEFAULT_WORKSPACE, handleReset } from "./onboard-helpers.js";
@@ -14,6 +14,7 @@ import { runNonInteractiveOnboarding } from "./onboard-non-interactive.js";
 export async function onboardCommand(opts: OnboardOptions, runtime: RuntimeEnv = defaultRuntime) {
   const brand = resolveProductBrand();
   const holyOpsMode = isHolyOpsBrand();
+  const docsLinks = resolveBrandDocsLinks();
   assertSupportedRuntime(runtime);
   const originalAuthChoice = opts.authChoice;
   const normalizedAuthChoice = normalizeLegacyOnboardAuthChoice(originalAuthChoice);
@@ -67,7 +68,7 @@ export async function onboardCommand(opts: OnboardOptions, runtime: RuntimeEnv =
         `Windows detected — ${brand} runs great on WSL2!`,
         "Native Windows might be trickier.",
         "Quick setup: wsl --install (one command, one reboot)",
-        holyOpsMode ? "Guide: docs/sm/HANDOFF.md" : "Guide: https://docs.openclaw.ai/windows",
+        `Guide: ${docsLinks.windows}`,
       ].join("\n"),
     );
   }

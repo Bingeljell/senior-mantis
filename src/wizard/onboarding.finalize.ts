@@ -6,7 +6,6 @@ import type { RuntimeEnv } from "../runtime.js";
 import type { GatewayWizardSettings, WizardFlow } from "./onboarding.types.js";
 import type { WizardPrompter } from "./prompts.js";
 import { DEFAULT_BOOTSTRAP_FILENAME } from "../agents/workspace.js";
-import { HOLYOPS_COMPAT_CLI_NAMES, resolveCliName } from "../cli/cli-name.js";
 import { formatCliCommand } from "../cli/command-format.js";
 import {
   buildGatewayInstallPlan,
@@ -29,6 +28,7 @@ import {
 import { resolveGatewayService } from "../daemon/service.js";
 import { isSystemdUserServiceAvailable } from "../daemon/systemd.js";
 import { ensureControlUiAssetsBuilt } from "../infra/control-ui-assets.js";
+import { isHolyOpsBrand, resolveBrandDocsLinks, resolveProductBrand } from "../sm/brand.js";
 import { restoreTerminalState } from "../terminal/restore.js";
 import { runTui } from "../tui/tui.js";
 import { resolveUserPath } from "../utils.js";
@@ -49,15 +49,16 @@ export async function finalizeOnboardingWizard(
   options: FinalizeOnboardingOptions,
 ): Promise<{ launchedTui: boolean }> {
   const { flow, opts, baseConfig, nextConfig, settings, prompter, runtime } = options;
-  const cliName = resolveCliName().trim().toLowerCase();
-  const holyOpsMode = (HOLYOPS_COMPAT_CLI_NAMES as readonly string[]).includes(cliName);
-  const productBrand = holyOpsMode ? "HolyOps" : "OpenClaw";
+  const holyOpsMode = isHolyOpsBrand();
+  const productBrand = resolveProductBrand();
+  const docsLinks = resolveBrandDocsLinks();
   const configPathHint = holyOpsMode
     ? "~/.seniormantis/seniormantis.json"
     : "~/.openclaw/openclaw.json";
-  const controlUiStorageKey = holyOpsMode
-    ? "holyops.control.settings.v1"
-    : "openclaw.control.settings.v1";
+  const controlUiStorageKey = "openclaw.control.settings.v1";
+  const controlUiStorageLabel = holyOpsMode
+    ? `${controlUiStorageKey} (legacy key name)`
+    : controlUiStorageKey;
 
   const withWizardProgress = async <T>(
     label: string,
@@ -223,11 +224,7 @@ export async function finalizeOnboardingWizard(
     } catch (err) {
       runtime.error(formatHealthCheckFailure(err));
       await prompter.note(
-        [
-          "Docs:",
-          "https://docs.openclaw.ai/gateway/health",
-          "https://docs.openclaw.ai/gateway/troubleshooting",
-        ].join("\n"),
+        ["Docs:", docsLinks.gatewayHealth, docsLinks.gatewayTroubleshooting].join("\n"),
         "Health check help",
       );
     }
@@ -289,7 +286,7 @@ export async function finalizeOnboardingWizard(
         : undefined,
       `Gateway WS: ${links.wsUrl}`,
       gatewayStatusLine,
-      "Docs: https://docs.openclaw.ai/web/control-ui",
+      `Docs: ${docsLinks.controlUi}`,
     ]
       .filter(Boolean)
       .join("\n"),
@@ -321,7 +318,7 @@ export async function finalizeOnboardingWizard(
         `Stored in: ${configPathHint} (gateway.auth.token) or OPENCLAW_GATEWAY_TOKEN.`,
         `View token: ${formatCliCommand("openclaw config get gateway.auth.token")}`,
         `Generate token: ${formatCliCommand("openclaw doctor --generate-gateway-token")}`,
-        `Web UI stores a copy in this browser's localStorage (${controlUiStorageKey}).`,
+        `Web UI stores a copy in this browser's localStorage (${controlUiStorageLabel}).`,
         `Open the dashboard anytime: ${formatCliCommand("openclaw dashboard --no-open")}`,
         "If prompted: paste the token into Control UI settings (or use the tokenized dashboard URL).",
       ].join("\n"),
@@ -390,15 +387,12 @@ export async function finalizeOnboardingWizard(
   }
 
   await prompter.note(
-    [
-      "Back up your agent workspace.",
-      "Docs: https://docs.openclaw.ai/concepts/agent-workspace",
-    ].join("\n"),
+    ["Back up your agent workspace.", `Docs: ${docsLinks.agentWorkspace}`].join("\n"),
     "Workspace backup",
   );
 
   await prompter.note(
-    "Running agents on your computer is risky — harden your setup: https://docs.openclaw.ai/security",
+    `Running agents on your computer is risky — harden your setup: ${docsLinks.security}`,
     "Security",
   );
 
@@ -453,7 +447,7 @@ export async function finalizeOnboardingWizard(
           webSearchKey
             ? "API key: stored in config (tools.web.search.apiKey)."
             : "API key: provided via BRAVE_API_KEY env var (Gateway environment).",
-          "Docs: https://docs.openclaw.ai/tools/web",
+          `Docs: ${docsLinks.toolsWeb}`,
         ].join("\n")
       : [
           "If you want your agent to be able to search the web, you’ll need an API key.",
@@ -465,7 +459,7 @@ export async function finalizeOnboardingWizard(
           "- Enable web_search and paste your Brave Search API key",
           "",
           "Alternative: set BRAVE_API_KEY in the Gateway environment (no config changes).",
-          "Docs: https://docs.openclaw.ai/tools/web",
+          `Docs: ${docsLinks.toolsWeb}`,
         ].join("\n"),
     "Web search (optional)",
   );

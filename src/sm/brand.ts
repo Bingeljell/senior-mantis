@@ -13,14 +13,49 @@ export function resolveStatusDocsLinks(argv: string[] = process.argv): {
   faq: string;
   troubleshooting: string;
 } {
+  const links = resolveBrandDocsLinks(argv);
+  return {
+    faq: links.faq,
+    troubleshooting: links.troubleshooting,
+  };
+}
+
+export function resolveBrandDocsLinks(argv: string[] = process.argv): {
+  faq: string;
+  troubleshooting: string;
+  security: string;
+  gatewayConfiguration: string;
+  gatewayHealth: string;
+  gatewayTroubleshooting: string;
+  controlUi: string;
+  agentWorkspace: string;
+  toolsWeb: string;
+  windows: string;
+} {
   if (isHolyOpsBrand(argv)) {
     return {
       faq: "docs/sm/STATUS.md",
       troubleshooting: "docs/sm/HANDOFF.md",
+      security: "docs/sm/HANDOFF.md",
+      gatewayConfiguration: "docs/sm/HANDOFF.md",
+      gatewayHealth: "docs/sm/STATUS.md",
+      gatewayTroubleshooting: "docs/sm/HANDOFF.md",
+      controlUi: "docs/sm/HANDOFF.md",
+      agentWorkspace: "docs/sm/HANDOFF.md",
+      toolsWeb: "docs/sm/HANDOFF.md",
+      windows: "docs/sm/HANDOFF.md",
     };
   }
   return {
     faq: "https://docs.openclaw.ai/faq",
     troubleshooting: "https://docs.openclaw.ai/troubleshooting",
+    security: "https://docs.openclaw.ai/security",
+    gatewayConfiguration: "https://docs.openclaw.ai/gateway/configuration",
+    gatewayHealth: "https://docs.openclaw.ai/gateway/health",
+    gatewayTroubleshooting: "https://docs.openclaw.ai/gateway/troubleshooting",
+    controlUi: "https://docs.openclaw.ai/web/control-ui",
+    agentWorkspace: "https://docs.openclaw.ai/concepts/agent-workspace",
+    toolsWeb: "https://docs.openclaw.ai/tools/web",
+    windows: "https://docs.openclaw.ai/windows",
   };
 }

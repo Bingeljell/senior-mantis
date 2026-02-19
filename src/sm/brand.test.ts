@@ -1,5 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { isHolyOpsBrand, resolveProductBrand, resolveStatusDocsLinks } from "./brand.js";
+import {
+  isHolyOpsBrand,
+  resolveBrandDocsLinks,
+  resolveProductBrand,
+  resolveStatusDocsLinks,
+} from "./brand.js";
 
 describe("HolyOps brand helpers", () => {
   it("detects HolyOps aliases", () => {
@@ -8,6 +13,8 @@ describe("HolyOps brand helpers", () => {
     try {
       expect(isHolyOpsBrand()).toBe(true);
       expect(resolveProductBrand()).toBe("HolyOps");
+      expect(resolveBrandDocsLinks().controlUi).toBe("docs/sm/HANDOFF.md");
+      expect(resolveBrandDocsLinks().toolsWeb).toBe("docs/sm/HANDOFF.md");
     } finally {
       if (prev === undefined) {
         delete process.env.OPENCLAW_CLI_NAME_OVERRIDE;
@@ -25,6 +32,10 @@ describe("HolyOps brand helpers", () => {
       expect(resolveStatusDocsLinks(["node", "/tmp/openclaw.mjs"])).toEqual({
         faq: "https://docs.openclaw.ai/faq",
         troubleshooting: "https://docs.openclaw.ai/troubleshooting",
+      });
+      expect(resolveBrandDocsLinks(["node", "/tmp/openclaw.mjs"])).toMatchObject({
+        security: "https://docs.openclaw.ai/security",
+        gatewayConfiguration: "https://docs.openclaw.ai/gateway/configuration",
       });
     } finally {
       if (prev === undefined) {

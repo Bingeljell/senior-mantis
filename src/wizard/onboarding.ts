@@ -40,6 +40,7 @@ import {
 } from "../config/config.js";
 import { logConfigUpdated } from "../config/logging.js";
 import { defaultRuntime } from "../runtime.js";
+import { resolveBrandDocsLinks } from "../sm/brand.js";
 import { isSeniorMantisAllowedOnboardingChannel, isSeniorMantisCli } from "../sm/channel-policy.js";
 import { resolveUserPath } from "../utils.js";
 import { finalizeOnboardingWizard } from "./onboarding.finalize.js";
@@ -50,6 +51,7 @@ async function requireRiskAcknowledgement(params: {
   opts: OnboardOptions;
   prompter: WizardPrompter;
 }) {
+  const docsLinks = resolveBrandDocsLinks();
   if (params.opts.acceptRisk === true) {
     return;
   }
@@ -78,7 +80,7 @@ async function requireRiskAcknowledgement(params: {
       auditDeep,
       auditFix,
       "",
-      "Must read: https://docs.openclaw.ai/gateway/security",
+      `Must read: ${docsLinks.security}`,
     ].join("\n"),
     "Security",
   );
@@ -97,6 +99,7 @@ export async function runOnboardingWizard(
   runtime: RuntimeEnv = defaultRuntime,
   prompter: WizardPrompter,
 ) {
+  const docsLinks = resolveBrandDocsLinks();
   printWizardHeader(runtime);
   await prompter.intro(isSeniorMantisCli() ? "Senior Mantis onboarding" : "OpenClaw onboarding");
   await requireRiskAcknowledgement({ opts, prompter });
@@ -111,7 +114,7 @@ export async function runOnboardingWizard(
         [
           ...snapshot.issues.map((iss) => `- ${iss.path}: ${iss.message}`),
           "",
-          "Docs: https://docs.openclaw.ai/gateway/configuration",
+          `Docs: ${docsLinks.gatewayConfiguration}`,
         ].join("\n"),
         "Config issues",
       );
