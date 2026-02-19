@@ -316,7 +316,7 @@ function resolveSectionMeta(
   };
 }
 
-function resolveSubsections(params: {
+export function resolveSubsections(params: {
   key: string;
   schema: JsonSchema | undefined;
   uiHints: ConfigUiHints;
@@ -339,7 +339,7 @@ function resolveSubsections(params: {
   return entries;
 }
 
-function resolveConfigSchemaForMode(schema: JsonSchema | null): JsonSchema | null {
+export function resolveConfigSchemaForMode(schema: JsonSchema | null): JsonSchema | null {
   if (!schema || resolveProductBrand() !== "HolyOps") {
     return schema;
   }
