@@ -87,6 +87,14 @@ Legend (HolyOps pivot):
   - rationale: reduce high-visibility OpenClaw naming drift by using mode-aware export filename prefixes (`holyops-*` in HolyOps mode).
 - 2026-02-19: `scripts/smoke-desktop-local.sh`, `apps/desktop-electron/README.md`
   - rationale: add deterministic non-GUI preflight checks for local desktop testing before launching Electron.
+- 2026-02-19: `ui/src/ui/views/config.node.test.ts`, `ui/package.json`
+  - rationale: ensure HolyOps Config > Channels v1 filter behavior is covered by node-safe UI tests without requiring Playwright/browser-mode execution.
+- 2026-02-19: `apps/desktop-electron/main.mjs`, `apps/desktop-electron/preload.cjs`, `apps/desktop-electron/renderer/index.html`, `apps/desktop-electron/renderer/renderer.js`
+  - rationale: add in-app desktop diagnostics action that runs local smoke checks and surfaces output directly in desktop shell.
+- 2026-02-19: `scripts/smoke-desktop-local.sh`
+  - rationale: enforce read-only default for smoke checks (no implicit setup side effects) and require explicit `--with-setup` opt-in when setup bootstrap is desired.
+- 2026-02-19: `ui/src/ui/navigation.ts`, `ui/src/ui/views/overview.ts`
+  - rationale: reduce high-visibility OpenClaw naming in HolyOps mode and align visible runtime labels/placeholders to neutral or HolyOps-aware wording.
 
 ## Deletion log (completed)
 

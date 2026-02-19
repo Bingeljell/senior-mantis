@@ -80,6 +80,20 @@ Direction is now personal-first `HolyOps` (creator workflow cockpit) while prese
   - `scripts/smoke-desktop-local.sh`
   - checks Node/pnpm/Electron dependency wiring, HolyOps CLI command surface, setup bootstrap (if needed), and status JSON probe.
   - documented in `apps/desktop-electron/README.md`.
+- Added node-safe Control UI regression path for Config view:
+  - new `ui/src/ui/views/config.node.test.ts` (`happy-dom`) covers HolyOps Config > Channels v1 filtering.
+  - `ui/package.json` adds `test:node` script to run node-safe UI tests without Playwright browser mode.
+- Added desktop diagnostics action in app shell:
+  - IPC: `sm:run-diagnostics` in `apps/desktop-electron/main.mjs`
+  - preload bridge: `apps/desktop-electron/preload.cjs`
+  - renderer UI wiring: `apps/desktop-electron/renderer/index.html`, `apps/desktop-electron/renderer/renderer.js`
+  - diagnostics runs `scripts/smoke-desktop-local.sh` and renders command output inline.
+- Updated smoke script safety default:
+  - `scripts/smoke-desktop-local.sh` now defaults to read-only behavior and exits with actionable setup instruction if config is missing.
+  - setup bootstrap is now opt-in via `--with-setup`.
+- Continued high-visibility naming cleanup:
+  - `ui/src/ui/navigation.ts` config subtitle no longer references `~/.openclaw/openclaw.json`.
+  - `ui/src/ui/views/overview.ts` token field placeholder now uses generic copy.
 - Migration tracking doc:
   - `docs/sm/HOLYOPS_MIGRATION_NOTES.md`
 - HolyOps workflow adapter implementation:

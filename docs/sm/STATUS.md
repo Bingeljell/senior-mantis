@@ -154,6 +154,25 @@ Last updated: 2026-02-19
 - `apps/desktop-electron/README.md`
   - added `scripts/smoke-desktop-local.sh` runbook step before `pnpm desktop:dev`.
 
+### Node-safe test wiring + desktop diagnostics action (2026-02-19)
+
+- `ui/src/ui/views/config.node.test.ts` (new)
+  - added node-safe regression coverage for HolyOps Config > Channels filtering.
+- `ui/package.json`
+  - added `test:node` script for deterministic non-Playwright UI test runs (`vitest.node.config.ts`).
+- `ui/src/ui/navigation.ts`, `ui/src/ui/navigation.test.ts`
+  - removed high-visibility OpenClaw path copy from Config subtitle (`Edit local gateway config safely.`).
+- `ui/src/ui/views/overview.ts`
+  - token input placeholder now uses generic wording (`gateway auth token`) instead of OpenClaw-specific env label.
+- `scripts/smoke-desktop-local.sh`
+  - now defaults to read-only behavior when config is missing (no implicit setup side effect).
+  - added `--with-setup` opt-in flag for setup bootstrap.
+- Desktop diagnostics action shipped:
+  - `apps/desktop-electron/main.mjs`: new `sm:run-diagnostics` IPC handler runs smoke script and returns full output.
+  - `apps/desktop-electron/preload.cjs`: exposes `runDiagnostics`.
+  - `apps/desktop-electron/renderer/index.html`, `apps/desktop-electron/renderer/renderer.js`: added `Run Diagnostics` button and diagnostics output panel.
+  - `apps/desktop-electron/README.md`: updated local testing flow for diagnostics-first startup.
+
 ### Command/runtime pruning updates
 
 - `src/sm/cli/program/build-program.ts`
