@@ -11,6 +11,8 @@ describe("createOpenClawTools HolyOps registration", () => {
     const names = createOpenClawTools({ disableMessageTool: true }).map((tool) => tool.name);
     expect(names).toContain("video_tool");
     expect(names).toContain("business_tool");
+    expect(names).toContain("research_tool");
+    expect(names).toContain("writer_tool");
   });
 
   it("does not add holyops workflow tools in openclaw mode", () => {
@@ -18,5 +20,7 @@ describe("createOpenClawTools HolyOps registration", () => {
     const names = createOpenClawTools({ disableMessageTool: true }).map((tool) => tool.name);
     expect(names).not.toContain("video_tool");
     expect(names).not.toContain("business_tool");
+    expect(names).not.toContain("research_tool");
+    expect(names).not.toContain("writer_tool");
   });
 });

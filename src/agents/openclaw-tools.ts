@@ -11,7 +11,9 @@ import { createCanvasTool } from "./tools/canvas-tool.js";
 import { createCronTool } from "./tools/cron-tool.js";
 import { createGatewayTool } from "./tools/gateway-tool.js";
 import { createHolyOpsBusinessTool } from "./tools/holyops-business-tool.js";
+import { createHolyOpsResearchTool } from "./tools/holyops-research-tool.js";
 import { createHolyOpsVideoTool } from "./tools/holyops-video-tool.js";
+import { createHolyOpsWriterTool } from "./tools/holyops-writer-tool.js";
 import { createImageTool } from "./tools/image-tool.js";
 import { createMessageTool } from "./tools/message-tool.js";
 import { createNodesTool } from "./tools/nodes-tool.js";
@@ -65,6 +67,7 @@ export function createOpenClawTools(options?: {
   /** If true, omit the message tool from the tool list. */
   disableMessageTool?: boolean;
 }): AnyAgentTool[] {
+  const holyOpsMode = isHolyOpsCli();
   const workspaceDir = resolveWorkspaceRoot(options?.workspaceDir);
   const imageTool = options?.agentDir?.trim()
     ? createImageTool({
@@ -100,8 +103,13 @@ export function createOpenClawTools(options?: {
         sandboxRoot: options?.sandboxRoot,
         requireExplicitTarget: options?.requireExplicitMessageTarget,
       });
-  const holyOpsTools = isHolyOpsCli()
-    ? [createHolyOpsVideoTool(), createHolyOpsBusinessTool()]
+  const holyOpsTools = holyOpsMode
+    ? [
+        createHolyOpsVideoTool(),
+        createHolyOpsBusinessTool(),
+        createHolyOpsResearchTool(),
+        createHolyOpsWriterTool(),
+      ]
     : [];
   const tools: AnyAgentTool[] = [
     createBrowserTool({
@@ -167,23 +175,25 @@ export function createOpenClawTools(options?: {
     ...holyOpsTools,
   ];
 
-  const pluginTools = resolvePluginTools({
-    context: {
-      config: options?.config,
-      workspaceDir,
-      agentDir: options?.agentDir,
-      agentId: resolveSessionAgentId({
-        sessionKey: options?.agentSessionKey,
-        config: options?.config,
-      }),
-      sessionKey: options?.agentSessionKey,
-      messageChannel: options?.agentChannel,
-      agentAccountId: options?.agentAccountId,
-      sandboxed: options?.sandboxed,
-    },
-    existingToolNames: new Set(tools.map((tool) => tool.name)),
-    toolAllowlist: options?.pluginToolAllowlist,
-  });
+  const pluginTools = holyOpsMode
+    ? []
+    : resolvePluginTools({
+        context: {
+          config: options?.config,
+          workspaceDir,
+          agentDir: options?.agentDir,
+          agentId: resolveSessionAgentId({
+            sessionKey: options?.agentSessionKey,
+            config: options?.config,
+          }),
+          sessionKey: options?.agentSessionKey,
+          messageChannel: options?.agentChannel,
+          agentAccountId: options?.agentAccountId,
+          sandboxed: options?.sandboxed,
+        },
+        existingToolNames: new Set(tools.map((tool) => tool.name)),
+        toolAllowlist: options?.pluginToolAllowlist,
+      });
 
   return [...tools, ...pluginTools];
 }

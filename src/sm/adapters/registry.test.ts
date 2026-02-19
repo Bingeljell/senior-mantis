@@ -9,6 +9,10 @@ const ENV_KEYS = [
   "HOLYOPS_VIDEO_CLI_BASE_ARGS",
   "HOLYOPS_BUSINESS_CLI_BIN",
   "HOLYOPS_BUSINESS_CLI_BASE_ARGS",
+  "HOLYOPS_RESEARCH_CLI_BIN",
+  "HOLYOPS_RESEARCH_CLI_BASE_ARGS",
+  "HOLYOPS_WRITER_CLI_BIN",
+  "HOLYOPS_WRITER_CLI_BASE_ARGS",
 ] as const;
 
 async function createAdapterCliScript(): Promise<string> {
@@ -30,6 +34,10 @@ async function createAdapterCliScript(): Promise<string> {
       '  console.log("https://example.com/share/abc123");',
       '} else if (args[0] === "create-proposal") {',
       '  console.log(JSON.stringify({ proposalId: "proposal-123", shareUrl: "https://example.com/proposal/proposal-123" }));',
+      '} else if (args[0] === "collect-links") {',
+      '  console.log("https://example.com/source-1 https://example.com/source-2");',
+      '} else if (args[0] === "draft-post") {',
+      '  console.log("Draft complete");',
       "} else {",
       "  console.log(JSON.stringify(args));",
       "}",
@@ -62,6 +70,17 @@ describe("holyops adapter registry", () => {
       adapterId: "video-agent",
       action: "compress",
       args: { inputPath: "/tmp/in.mp4", outputPath: "/tmp/out.mp4" },
+      invokedBy: "agent",
+    });
+    expect(res.ok).toBe(false);
+    expect(res.error?.code).toBe("not_configured");
+  });
+
+  it("returns not_configured when research adapter is missing CLI bin", async () => {
+    const res = await invokeHolyOpsAdapter({
+      adapterId: "research-agent",
+      action: "scan_topic",
+      args: { topic: "agent workflows" },
       invokedBy: "agent",
     });
     expect(res.ok).toBe(false);
@@ -194,5 +213,58 @@ describe("holyops adapter registry", () => {
     expect(res.ok).toBe(false);
     expect(res.error?.code).toBe("command_failed");
     expect(res.error?.retryable).toBe(true);
+  });
+
+  it("runs research adapter and infers URL artifacts", async () => {
+    const scriptPath = await createAdapterCliScript();
+    process.env.HOLYOPS_RESEARCH_CLI_BIN = process.execPath;
+    process.env.HOLYOPS_RESEARCH_CLI_BASE_ARGS = JSON.stringify([scriptPath]);
+
+    const res = await invokeHolyOpsAdapter({
+      adapterId: "research-agent",
+      action: "collect_links",
+      args: {
+        topic: "local automation",
+      },
+      invokedBy: "agent",
+    });
+
+    expect(res.ok).toBe(true);
+    expect(res.artifacts).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          type: "url",
+          value: "https://example.com/source-1",
+          label: "source",
+        }),
+      ]),
+    );
+  });
+
+  it("runs writer adapter and reports output artifact", async () => {
+    const scriptPath = await createAdapterCliScript();
+    process.env.HOLYOPS_WRITER_CLI_BIN = process.execPath;
+    process.env.HOLYOPS_WRITER_CLI_BASE_ARGS = JSON.stringify([scriptPath]);
+
+    const res = await invokeHolyOpsAdapter({
+      adapterId: "writer-agent",
+      action: "draft_post",
+      args: {
+        topic: "weekly build log",
+        outputPath: "/tmp/draft.md",
+      },
+      invokedBy: "agent",
+    });
+
+    expect(res.ok).toBe(true);
+    expect(res.artifacts).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          type: "file",
+          value: "/tmp/draft.md",
+          label: "output",
+        }),
+      ]),
+    );
   });
 });

@@ -4,9 +4,13 @@ import { formatHelpExamples } from "../../../cli/help-format.js";
 import { defaultRuntime } from "../../../runtime.js";
 import { invokeHolyOpsAdapter, type HolyOpsAdapterId } from "../../../sm/adapters/registry.js";
 import { HOLYOPS_VIDEO_ACTIONS } from "../../../sm/adapters/video-cli-adapter.js";
+import { HOLYOPS_WRITER_ACTIONS } from "../../../sm/adapters/writer-cli-adapter.js";
 import { theme } from "../../../terminal/theme.js";
 
 const BUSINESS_SIDE_EFFECT_ACTIONS = new Set<string>(["create_proposal", "create_share_link"]);
+const WRITER_SIDE_EFFECT_ACTIONS = new Set<string>(
+  HOLYOPS_WRITER_ACTIONS.filter((action) => action === "draft_post" || action === "draft_blog"),
+);
 
 type WorkflowArgs = Record<string, unknown>;
 
@@ -89,15 +93,25 @@ export function requiresWorkflowConfirmation(adapterId: HolyOpsAdapterId, action
   if (adapterId === "business-agent") {
     return BUSINESS_SIDE_EFFECT_ACTIONS.has(action);
   }
+  if (adapterId === "writer-agent") {
+    return WRITER_SIDE_EFFECT_ACTIONS.has(action);
+  }
   return false;
 }
 
 function parseAdapterId(raw: unknown): HolyOpsAdapterId {
   const value = typeof raw === "string" ? raw.trim() : "";
-  if (value === "video-agent" || value === "business-agent") {
+  if (
+    value === "video-agent" ||
+    value === "business-agent" ||
+    value === "research-agent" ||
+    value === "writer-agent"
+  ) {
     return value;
   }
-  throw new Error("--adapter must be one of: video-agent, business-agent");
+  throw new Error(
+    "--adapter must be one of: video-agent, business-agent, research-agent, writer-agent",
+  );
 }
 
 function parseAction(raw: unknown): string {
@@ -112,7 +126,10 @@ export function registerSeniorMantisWorkflowCommands(program: Command) {
   program
     .command("workflow")
     .description("Run HolyOps workflow adapters directly (non-LLM path)")
-    .requiredOption("--adapter <id>", "Adapter id: video-agent | business-agent")
+    .requiredOption(
+      "--adapter <id>",
+      "Adapter id: video-agent | business-agent | research-agent | writer-agent",
+    )
     .requiredOption("--action <name>", "Action name")
     .option("--args <json>", "JSON object payload passed to adapter")
     .option(
@@ -142,6 +159,14 @@ export function registerSeniorMantisWorkflowCommands(program: Command) {
           [
             "holyops workflow --adapter business-agent --action analytics_summary --arg projectId=acme --json",
             "Read-only business summary action.",
+          ],
+          [
+            "holyops workflow --adapter research-agent --action scan_topic --arg topic='creator tools' --arg maxResults=5 --json",
+            "Run a research scan directly through adapter contract.",
+          ],
+          [
+            "holyops workflow --adapter writer-agent --action draft_post --arg topic='weekly build log' --arg tone=clear --confirm --json",
+            "Draft a post through writer adapter (side-effect-confirmed).",
           ],
         ])}\n\n${theme.muted("Docs:")} docs/sm/HANDOFF.md\n`,
     )

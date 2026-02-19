@@ -37,5 +37,7 @@ describe("register workflow helpers", () => {
     expect(requiresWorkflowConfirmation("video-agent", "compress")).toBe(true);
     expect(requiresWorkflowConfirmation("business-agent", "create_proposal")).toBe(true);
     expect(requiresWorkflowConfirmation("business-agent", "analytics_summary")).toBe(false);
+    expect(requiresWorkflowConfirmation("writer-agent", "draft_post")).toBe(true);
+    expect(requiresWorkflowConfirmation("writer-agent", "rewrite")).toBe(false);
   });
 });
