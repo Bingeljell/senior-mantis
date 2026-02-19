@@ -268,4 +268,49 @@ describe("runOnboardingWizard", () => {
       }
     }
   });
+
+  it("uses HolyOps copy when HolyOps CLI mode is active", async () => {
+    const prevCliName = process.env.OPENCLAW_CLI_NAME_OVERRIDE;
+    process.env.OPENCLAW_CLI_NAME_OVERRIDE = "holyops";
+    try {
+      const note: WizardPrompter["note"] = vi.fn(async () => {});
+      const outro: WizardPrompter["outro"] = vi.fn(async () => {});
+      const prompter = createWizardPrompter({ note, outro });
+      const runtime = createRuntime();
+
+      await runOnboardingWizard(
+        {
+          acceptRisk: true,
+          flow: "quickstart",
+          authChoice: "skip",
+          installDaemon: false,
+          skipProviders: true,
+          skipSkills: true,
+          skipHealth: true,
+          skipUi: true,
+        },
+        runtime,
+        prompter,
+      );
+
+      const noteCalls = (note as unknown as { mock: { calls: unknown[][] } }).mock.calls;
+      const notes = noteCalls
+        .map((call) => call?.[0])
+        .filter((entry): entry is string => typeof entry === "string");
+      expect(notes.some((entry) => entry.includes("What now: docs/sm/HANDOFF.md"))).toBe(true);
+
+      const outroCalls = (outro as unknown as { mock: { calls: unknown[][] } }).mock.calls;
+      const outroMessage = outroCalls.at(-1)?.[0];
+      expect(typeof outroMessage).toBe("string");
+      if (typeof outroMessage === "string") {
+        expect(outroMessage).toContain("control HolyOps");
+      }
+    } finally {
+      if (prevCliName === undefined) {
+        delete process.env.OPENCLAW_CLI_NAME_OVERRIDE;
+      } else {
+        process.env.OPENCLAW_CLI_NAME_OVERRIDE = prevCliName;
+      }
+    }
+  });
 });

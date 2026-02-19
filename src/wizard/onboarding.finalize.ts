@@ -6,6 +6,7 @@ import type { RuntimeEnv } from "../runtime.js";
 import type { GatewayWizardSettings, WizardFlow } from "./onboarding.types.js";
 import type { WizardPrompter } from "./prompts.js";
 import { DEFAULT_BOOTSTRAP_FILENAME } from "../agents/workspace.js";
+import { HOLYOPS_COMPAT_CLI_NAMES, resolveCliName } from "../cli/cli-name.js";
 import { formatCliCommand } from "../cli/command-format.js";
 import {
   buildGatewayInstallPlan,
@@ -48,6 +49,15 @@ export async function finalizeOnboardingWizard(
   options: FinalizeOnboardingOptions,
 ): Promise<{ launchedTui: boolean }> {
   const { flow, opts, baseConfig, nextConfig, settings, prompter, runtime } = options;
+  const cliName = resolveCliName().trim().toLowerCase();
+  const holyOpsMode = (HOLYOPS_COMPAT_CLI_NAMES as readonly string[]).includes(cliName);
+  const productBrand = holyOpsMode ? "HolyOps" : "OpenClaw";
+  const configPathHint = holyOpsMode
+    ? "~/.seniormantis/seniormantis.json"
+    : "~/.openclaw/openclaw.json";
+  const controlUiStorageKey = holyOpsMode
+    ? "holyops.control.settings.v1"
+    : "openclaw.control.settings.v1";
 
   const withWizardProgress = async <T>(
     label: string,
@@ -308,10 +318,10 @@ export async function finalizeOnboardingWizard(
     await prompter.note(
       [
         "Gateway token: shared auth for the Gateway + Control UI.",
-        "Stored in: ~/.openclaw/openclaw.json (gateway.auth.token) or OPENCLAW_GATEWAY_TOKEN.",
+        `Stored in: ${configPathHint} (gateway.auth.token) or OPENCLAW_GATEWAY_TOKEN.`,
         `View token: ${formatCliCommand("openclaw config get gateway.auth.token")}`,
         `Generate token: ${formatCliCommand("openclaw doctor --generate-gateway-token")}`,
-        "Web UI stores a copy in this browser's localStorage (openclaw.control.settings.v1).",
+        `Web UI stores a copy in this browser's localStorage (${controlUiStorageKey}).`,
         `Open the dashboard anytime: ${formatCliCommand("openclaw dashboard --no-open")}`,
         "If prompted: paste the token into Control UI settings (or use the tokenized dashboard URL).",
       ].join("\n"),
@@ -361,8 +371,8 @@ export async function finalizeOnboardingWizard(
         [
           `Dashboard link (with token): ${authedUrl}`,
           controlUiOpened
-            ? "Opened in your browser. Keep that tab to control OpenClaw."
-            : "Copy/paste this URL in a browser on this machine to control OpenClaw.",
+            ? `Opened in your browser. Keep that tab to control ${productBrand}.`
+            : `Copy/paste this URL in a browser on this machine to control ${productBrand}.`,
           controlUiOpenHint,
         ]
           .filter(Boolean)
@@ -422,8 +432,8 @@ export async function finalizeOnboardingWizard(
       [
         `Dashboard link (with token): ${authedUrl}`,
         controlUiOpened
-          ? "Opened in your browser. Keep that tab to control OpenClaw."
-          : "Copy/paste this URL in a browser on this machine to control OpenClaw.",
+          ? `Opened in your browser. Keep that tab to control ${productBrand}.`
+          : `Copy/paste this URL in a browser on this machine to control ${productBrand}.`,
         controlUiOpenHint,
       ]
         .filter(Boolean)
@@ -448,7 +458,7 @@ export async function finalizeOnboardingWizard(
       : [
           "If you want your agent to be able to search the web, you’ll need an API key.",
           "",
-          "OpenClaw uses Brave Search for the `web_search` tool. Without a Brave Search API key, web search won’t work.",
+          `${productBrand} uses Brave Search for the \`web_search\` tool. Without a Brave Search API key, web search won’t work.`,
           "",
           "Set it up interactively:",
           `- Run: ${formatCliCommand("openclaw configure --section web")}`,
@@ -461,16 +471,18 @@ export async function finalizeOnboardingWizard(
   );
 
   await prompter.note(
-    'What now: https://openclaw.ai/showcase ("What People Are Building").',
+    holyOpsMode
+      ? "What now: docs/sm/HANDOFF.md"
+      : 'What now: https://openclaw.ai/showcase ("What People Are Building").',
     "What now",
   );
 
   await prompter.outro(
     controlUiOpened
-      ? "Onboarding complete. Dashboard opened; keep that tab to control OpenClaw."
+      ? `Onboarding complete. Dashboard opened; keep that tab to control ${productBrand}.`
       : seededInBackground
         ? "Onboarding complete. Web UI seeded in the background; open it anytime with the dashboard link above."
-        : "Onboarding complete. Use the dashboard link above to control OpenClaw.",
+        : `Onboarding complete. Use the dashboard link above to control ${productBrand}.`,
   );
 
   return { launchedTui };
