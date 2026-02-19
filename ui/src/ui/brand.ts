@@ -38,6 +38,10 @@ export function resolveProductBrand(): "HolyOps" | "OpenClaw" {
   return HOLYOPS_COMPAT_CLI_NAMES.has(resolveCliCommand()) ? "HolyOps" : "OpenClaw";
 }
 
+export function resolveProductSlugForUi(): "holyops" | "openclaw" {
+  return resolveProductBrand() === "HolyOps" ? "holyops" : "openclaw";
+}
+
 export function formatCliCommandForUi(command: string): string {
   if (!command.trim() || !CLI_PREFIX_RE.test(command)) {
     return command;

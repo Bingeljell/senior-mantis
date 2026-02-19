@@ -1,4 +1,5 @@
 import { html, nothing } from "lit";
+import { resolveProductSlugForUi } from "../brand.ts";
 import { extractQueryTerms, filterSessionsByQuery } from "../usage-helpers.ts";
 import {
   buildAggregatesFromSessions,
@@ -443,6 +444,7 @@ export function renderUsage(props: UsageProps) {
     `;
   };
   const exportStamp = formatIsoDate(new Date());
+  const exportPrefix = resolveProductSlugForUi();
 
   return html`
     <style>${usageStylesString}</style>
@@ -519,7 +521,7 @@ export function renderUsage(props: UsageProps) {
                   class="usage-export-item"
                   @click=${() =>
                     downloadTextFile(
-                      `openclaw-usage-sessions-${exportStamp}.csv`,
+                      `${exportPrefix}-usage-sessions-${exportStamp}.csv`,
                       buildSessionsCsv(filteredSessions),
                       "text/csv",
                     )}
@@ -531,7 +533,7 @@ export function renderUsage(props: UsageProps) {
                   class="usage-export-item"
                   @click=${() =>
                     downloadTextFile(
-                      `openclaw-usage-daily-${exportStamp}.csv`,
+                      `${exportPrefix}-usage-daily-${exportStamp}.csv`,
                       buildDailyCsv(filteredDaily),
                       "text/csv",
                     )}
@@ -543,7 +545,7 @@ export function renderUsage(props: UsageProps) {
                   class="usage-export-item"
                   @click=${() =>
                     downloadTextFile(
-                      `openclaw-usage-${exportStamp}.json`,
+                      `${exportPrefix}-usage-${exportStamp}.json`,
                       JSON.stringify(
                         {
                           totals: displayTotals,

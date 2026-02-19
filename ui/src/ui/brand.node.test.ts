@@ -3,6 +3,7 @@ import {
   formatCliCommandForUi,
   resolveConfigPathForUi,
   resolveProductBrand,
+  resolveProductSlugForUi,
   resolveUiDocsLinks,
 } from "./brand.ts";
 
@@ -20,6 +21,7 @@ describe("ui brand helpers", () => {
 
   it("uses OpenClaw defaults when no injection exists", () => {
     expect(resolveProductBrand()).toBe("OpenClaw");
+    expect(resolveProductSlugForUi()).toBe("openclaw");
     expect(resolveConfigPathForUi()).toBe("~/.openclaw/openclaw.json");
     const docs = resolveUiDocsLinks();
     expect(docs.home.href).toBe("https://docs.openclaw.ai");
@@ -32,6 +34,7 @@ describe("ui brand helpers", () => {
   it("switches to HolyOps docs/paths when injected", () => {
     setInjectedUiEnv({ cli: "holyops", brand: "HolyOps" });
     expect(resolveProductBrand()).toBe("HolyOps");
+    expect(resolveProductSlugForUi()).toBe("holyops");
     expect(resolveConfigPathForUi()).toBe("~/.seniormantis/seniormantis.json");
     const docs = resolveUiDocsLinks();
     expect(docs.home.href).toBeNull();

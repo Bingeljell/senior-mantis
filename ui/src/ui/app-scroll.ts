@@ -1,3 +1,5 @@
+import { resolveProductSlugForUi } from "./brand.ts";
+
 /** Distance (px) from the bottom within which we consider the user "near bottom". */
 const NEAR_BOTTOM_THRESHOLD = 450;
 
@@ -155,8 +157,9 @@ export function exportLogs(lines: string[], label: string) {
   const url = URL.createObjectURL(blob);
   const anchor = document.createElement("a");
   const stamp = new Date().toISOString().slice(0, 19).replace(/[:T]/g, "-");
+  const filePrefix = resolveProductSlugForUi();
   anchor.href = url;
-  anchor.download = `openclaw-logs-${label}-${stamp}.log`;
+  anchor.download = `${filePrefix}-logs-${label}-${stamp}.log`;
   anchor.click();
   URL.revokeObjectURL(url);
 }
