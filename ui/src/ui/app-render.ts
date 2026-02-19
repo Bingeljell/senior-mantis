@@ -4,7 +4,7 @@ import { parseAgentSessionKey } from "../../../src/routing/session-key.js";
 import { refreshChatAvatar } from "./app-chat.ts";
 import { renderUsageTab } from "./app-render-usage-tab.ts";
 import { renderChatControls, renderTab, renderThemeToggle } from "./app-render.helpers.ts";
-import { resolveConfigPathForUi, resolveProductBrand } from "./brand.ts";
+import { resolveConfigPathForUi, resolveProductBrand, resolveUiDocsLinks } from "./brand.ts";
 import { loadAgentFileContent, loadAgentFiles, saveAgentFile } from "./controllers/agent-files.ts";
 import { loadAgentIdentities, loadAgentIdentity } from "./controllers/agent-identity.ts";
 import { loadAgentSkills } from "./controllers/agent-skills.ts";
@@ -98,6 +98,7 @@ export function renderApp(state: AppViewState) {
   const assistantAvatarUrl = resolveAssistantAvatarUrl(state);
   const chatAvatarUrl = state.chatAvatarUrl ?? assistantAvatarUrl ?? null;
   const productBrand = resolveProductBrand();
+  const uiDocs = resolveUiDocsLinks();
   const configPath = resolveConfigPathForUi();
   const pageSubtitle =
     state.tab === "config" ? `Edit ${configPath} safely.` : subtitleForTab(state.tab);
@@ -177,16 +178,23 @@ export function renderApp(state: AppViewState) {
             <span class="nav-label__text">Resources</span>
           </div>
           <div class="nav-group__items">
-            <a
-              class="nav-item nav-item--external"
-              href="https://docs.openclaw.ai"
-              target="_blank"
-              rel="noreferrer"
-              title="Docs (opens in new tab)"
-            >
-              <span class="nav-item__icon" aria-hidden="true">${icons.book}</span>
-              <span class="nav-item__text">Docs</span>
-            </a>
+            ${
+              uiDocs.home.href
+                ? html`<a
+                    class="nav-item nav-item--external"
+                    href=${uiDocs.home.href}
+                    target="_blank"
+                    rel="noreferrer"
+                    title="Docs (opens in new tab)"
+                  >
+                    <span class="nav-item__icon" aria-hidden="true">${icons.book}</span>
+                    <span class="nav-item__text">${uiDocs.home.label}</span>
+                  </a>`
+                : html`<div class="nav-item">
+                    <span class="nav-item__icon" aria-hidden="true">${icons.book}</span>
+                    <span class="nav-item__text">${uiDocs.home.label}</span>
+                  </div>`
+            }
           </div>
         </div>
       </aside>

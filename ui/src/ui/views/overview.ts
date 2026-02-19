@@ -1,7 +1,7 @@
 import { html } from "lit";
 import type { GatewayHelloOk } from "../gateway.ts";
 import type { UiSettings } from "../storage.ts";
-import { formatCliCommandForUi } from "../brand.ts";
+import { formatCliCommandForUi, resolveProductBrand, resolveUiDocsLinks } from "../brand.ts";
 import { formatRelativeTimestamp, formatDurationHuman } from "../format.ts";
 import { formatNextRun } from "../presenter.ts";
 
@@ -24,6 +24,8 @@ export type OverviewProps = {
 };
 
 export function renderOverview(props: OverviewProps) {
+  const holyOpsMode = resolveProductBrand() === "HolyOps";
+  const docs = resolveUiDocsLinks();
   const snapshot = props.hello?.snapshot as
     | {
         uptimeMs?: number;
@@ -59,14 +61,18 @@ export function renderOverview(props: OverviewProps) {
             → set token
           </div>
           <div style="margin-top: 6px">
-            <a
-              class="session-link"
-              href="https://docs.openclaw.ai/web/dashboard"
-              target="_blank"
-              rel="noreferrer"
-              title="Control UI auth docs (opens in new tab)"
-              >Docs: Control UI auth</a
-            >
+            ${
+              docs.controlUiAuth.href
+                ? html`<a
+                    class="session-link"
+                    href=${docs.controlUiAuth.href}
+                    target="_blank"
+                    rel="noreferrer"
+                    title="Control UI auth docs (opens in new tab)"
+                    >${docs.controlUiAuth.label}</a
+                  >`
+                : html`<span class="mono">${docs.controlUiAuth.label}</span>`
+            }
           </div>
         </div>
       `;
@@ -75,14 +81,18 @@ export function renderOverview(props: OverviewProps) {
       <div class="muted" style="margin-top: 8px">
         Auth failed. Update the token or password in Control UI settings, then click Connect.
         <div style="margin-top: 6px">
-          <a
-            class="session-link"
-            href="https://docs.openclaw.ai/web/dashboard"
-            target="_blank"
-            rel="noreferrer"
-            title="Control UI auth docs (opens in new tab)"
-            >Docs: Control UI auth</a
-          >
+          ${
+            docs.controlUiAuth.href
+              ? html`<a
+                  class="session-link"
+                  href=${docs.controlUiAuth.href}
+                  target="_blank"
+                  rel="noreferrer"
+                  title="Control UI auth docs (opens in new tab)"
+                  >${docs.controlUiAuth.label}</a
+                >`
+              : html`<span class="mono">${docs.controlUiAuth.label}</span>`
+          }
         </div>
       </div>
     `;
@@ -108,23 +118,31 @@ export function renderOverview(props: OverviewProps) {
           <span class="mono">gateway.controlUi.allowInsecureAuth: true</span> (token-only).
         </div>
         <div style="margin-top: 6px">
-          <a
-            class="session-link"
-            href="https://docs.openclaw.ai/gateway/tailscale"
-            target="_blank"
-            rel="noreferrer"
-            title="Tailscale Serve docs (opens in new tab)"
-            >Docs: Tailscale Serve</a
-          >
+          ${
+            docs.tailscale.href
+              ? html`<a
+                  class="session-link"
+                  href=${docs.tailscale.href}
+                  target="_blank"
+                  rel="noreferrer"
+                  title="Tailscale Serve docs (opens in new tab)"
+                  >${docs.tailscale.label}</a
+                >`
+              : html`<span class="mono">${docs.tailscale.label}</span>`
+          }
           <span class="muted"> · </span>
-          <a
-            class="session-link"
-            href="https://docs.openclaw.ai/web/control-ui#insecure-http"
-            target="_blank"
-            rel="noreferrer"
-            title="Insecure HTTP docs (opens in new tab)"
-            >Docs: Insecure HTTP</a
-          >
+          ${
+            docs.insecureHttp.href
+              ? html`<a
+                  class="session-link"
+                  href=${docs.insecureHttp.href}
+                  target="_blank"
+                  rel="noreferrer"
+                  title="Insecure HTTP docs (opens in new tab)"
+                  >${docs.insecureHttp.label}</a
+                >`
+              : html`<span class="mono">${docs.insecureHttp.label}</span>`
+          }
         </div>
       </div>
     `;
@@ -228,7 +246,11 @@ export function renderOverview(props: OverviewProps) {
             </div>`
             : html`
                 <div class="callout" style="margin-top: 14px">
-                  Use Channels to link WhatsApp, Telegram, Discord, Signal, or iMessage.
+                  ${
+                    holyOpsMode
+                      ? "Use Channels to link WhatsApp for HolyOps v1."
+                      : "Use Channels to link WhatsApp, Telegram, Discord, Signal, or iMessage."
+                  }
                 </div>
               `
         }
