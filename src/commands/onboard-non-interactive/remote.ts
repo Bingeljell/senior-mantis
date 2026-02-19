@@ -4,6 +4,7 @@ import type { OnboardOptions } from "../onboard-types.js";
 import { formatCliCommand } from "../../cli/command-format.js";
 import { writeConfigFile } from "../../config/config.js";
 import { logConfigUpdated } from "../../config/logging.js";
+import { resolveBrandDocsLinks } from "../../sm/brand.js";
 import { applyWizardMetadata } from "../onboard-helpers.js";
 
 export async function runNonInteractiveOnboardingRemote(params: {
@@ -12,6 +13,7 @@ export async function runNonInteractiveOnboardingRemote(params: {
   baseConfig: OpenClawConfig;
 }) {
   const { opts, runtime, baseConfig } = params;
+  const docsLinks = resolveBrandDocsLinks();
   const mode = "remote" as const;
 
   const remoteUrl = opts.remoteUrl?.trim();
@@ -47,7 +49,7 @@ export async function runNonInteractiveOnboardingRemote(params: {
     runtime.log(`Remote gateway: ${remoteUrl}`);
     runtime.log(`Auth: ${payload.auth}`);
     runtime.log(
-      `Tip: run \`${formatCliCommand("openclaw configure --section web")}\` to store your Brave API key for web_search. Docs: https://docs.openclaw.ai/tools/web`,
+      `Tip: run \`${formatCliCommand("openclaw configure --section web")}\` to store your Brave API key for web_search. Docs: ${docsLinks.toolsWeb}`,
     );
   }
 }

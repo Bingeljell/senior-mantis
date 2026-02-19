@@ -30,6 +30,7 @@ export function resolveBrandDocsLinks(argv: string[] = process.argv): {
   controlUi: string;
   agentWorkspace: string;
   toolsWeb: string;
+  skills: string;
   windows: string;
 } {
   if (isHolyOpsBrand(argv)) {
@@ -43,6 +44,7 @@ export function resolveBrandDocsLinks(argv: string[] = process.argv): {
       controlUi: "docs/sm/HANDOFF.md",
       agentWorkspace: "docs/sm/HANDOFF.md",
       toolsWeb: "docs/sm/HANDOFF.md",
+      skills: "docs/sm/HANDOFF.md",
       windows: "docs/sm/HANDOFF.md",
     };
   }
@@ -56,6 +58,7 @@ export function resolveBrandDocsLinks(argv: string[] = process.argv): {
     controlUi: "https://docs.openclaw.ai/web/control-ui",
     agentWorkspace: "https://docs.openclaw.ai/concepts/agent-workspace",
     toolsWeb: "https://docs.openclaw.ai/tools/web",
+    skills: "https://docs.openclaw.ai/skills",
     windows: "https://docs.openclaw.ai/windows",
   };
 }
