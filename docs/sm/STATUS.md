@@ -29,7 +29,9 @@ Last updated: 2026-02-19
   - adapter types/runner/registry: `src/sm/adapters/types.ts`, `src/sm/adapters/runner.ts`, `src/sm/adapters/registry.ts`
   - video adapter: `src/sm/adapters/video-cli-adapter.ts`
   - business adapter: `src/sm/adapters/business-cli-adapter.ts`
-  - agent tools + registration: `src/agents/tools/holyops-video-tool.ts`, `src/agents/tools/holyops-business-tool.ts`, `src/agents/openclaw-tools.ts` (HolyOps-mode only)
+  - research adapter: `src/sm/adapters/research-cli-adapter.ts`
+  - writer adapter: `src/sm/adapters/writer-cli-adapter.ts`
+  - agent tools + registration: `src/agents/tools/holyops-video-tool.ts`, `src/agents/tools/holyops-business-tool.ts`, `src/agents/tools/holyops-research-tool.ts`, `src/agents/tools/holyops-writer-tool.ts`, `src/agents/openclaw-tools.ts` (HolyOps-mode only)
 - Added direct workflow command for deterministic adapter execution (non-LLM path):
   - command surface + validation: `src/sm/cli/program/register-workflow.ts`
   - command registration: `src/sm/cli/program/build-program.ts`
@@ -37,11 +39,27 @@ Last updated: 2026-02-19
 - Added desktop quick actions that route into direct workflow command paths:
   - desktop IPC + runner: `apps/desktop-electron/main.mjs`, `apps/desktop-electron/preload.cjs`
   - desktop UI controls: `apps/desktop-electron/renderer/index.html`, `apps/desktop-electron/renderer/renderer.js`, `apps/desktop-electron/renderer/styles.css`
+  - current quick actions:
+    - `video_compress`
+    - `business_proposal`
+    - `research_scan`
+    - `writer_draft`
 - Hardened adapter ergonomics for v1 reliability:
   - stricter action validation (`outputPath`, `clip` args, `musicPath`) in `src/sm/adapters/video-cli-adapter.ts`
   - richer business artifacts (`proposal_id` + URL inference) in `src/sm/adapters/business-cli-adapter.ts`
   - retryability heuristics for transient command failures in both adapters
   - expanded adapter tests in `src/sm/adapters/registry.test.ts`
+- Added HolyOps-mode runtime branding pass for high-visibility output:
+  - dynamic product label helper: `src/sm/brand.ts`
+  - updated runtime output copy:
+    - dashboard success line: `src/commands/dashboard.ts`
+    - doctor title line: `src/commands/doctor.ts`
+    - onboarding warnings/windows tips: `src/commands/onboard.ts`
+    - status heading/docs footer links: `src/commands/status.command.ts`
+  - tests: `src/sm/brand.test.ts`, `src/commands/dashboard.e2e.test.ts`, `src/commands/status.e2e.test.ts`
+- Pruned extension/plugin tool surface in HolyOps mode:
+  - `createOpenClawTools` now skips plugin tool resolution in HolyOps mode while retaining OpenClaw behavior in OpenClaw mode.
+  - files: `src/agents/openclaw-tools.ts`, `src/agents/openclaw-tools.holyops-plugin-prune.test.ts`
 - Added explicit migration tracker:
   - `docs/sm/HOLYOPS_MIGRATION_NOTES.md`
   - keeps `~/.seniormantis` path for now, tracks deferred move to `~/.holyops`.
@@ -184,6 +202,10 @@ Last updated: 2026-02-19
   - pass (6 tests)
 - `pnpm exec vitest run src/sm/adapters/registry.test.ts src/agents/openclaw-tools.holyops.test.ts src/cli/cli-name.test.ts src/sm/channel-policy.test.ts`
   - pass (14 tests)
+- `pnpm exec vitest run src/sm/brand.test.ts src/sm/cli/program/register-workflow.test.ts src/sm/adapters/registry.test.ts src/agents/openclaw-tools.holyops.test.ts src/agents/openclaw-tools.holyops-plugin-prune.test.ts`
+  - pass (21 tests)
+- `pnpm exec vitest -c vitest.e2e.config.ts run src/commands/dashboard.e2e.test.ts src/commands/status.e2e.test.ts`
+  - pass (12 tests)
 - `pnpm exec vitest -c vitest.e2e.config.ts run src/gateway/server.channels.e2e.test.ts`
   - pass (4 tests)
 - `node seniormantis.mjs status --json`

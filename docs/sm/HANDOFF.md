@@ -2,7 +2,7 @@
 
 Status: active implementation baseline
 Owner: Senior Mantis product fork
-Last updated: 2026-02-17
+Last updated: 2026-02-19
 
 Primary vision doc: `docs/sm/VISION.md`
 
@@ -29,9 +29,13 @@ Direction is now personal-first `HolyOps` (creator workflow cockpit) while prese
 - First specialist workflow adapters shipped:
   - `video-agent` adapter/tool
   - `business-agent` adapter/tool
+  - `research-agent` adapter/tool
+  - `writer-agent` adapter/tool
 - Desktop quick-actions shipped for first adapters:
   - `Run Video Compress` (routes through direct `workflow` command to `video-agent`)
   - `Run Business Proposal` (routes through direct `workflow` command to `business-agent`)
+  - `Run Research Scan` (routes through direct `workflow` command to `research-agent`)
+  - `Run Writer Draft` (routes through direct `workflow` command to `writer-agent`)
 - Direct non-LLM workflow command shipped:
   - `holyops workflow --adapter ... --action ... --arg key=value --confirm --json`
   - file: `src/sm/cli/program/register-workflow.ts`
@@ -39,6 +43,12 @@ Direction is now personal-first `HolyOps` (creator workflow cockpit) while prese
   - per-action validation for video workflows (`outputPath`, clip timing, music path)
   - business artifact enrichment (`proposal_id`, URL extraction)
   - retryability heuristics for transient adapter failures
+- HolyOps branding visibility pass shipped:
+  - user-facing runtime output now switches to HolyOps wording in HolyOps mode (`dashboard`, `doctor`, `onboard`, `status`)
+  - helper: `src/sm/brand.ts`
+- Plugin/extension tool surface pruned in HolyOps mode:
+  - `src/agents/openclaw-tools.ts` now skips `resolvePluginTools(...)` when HolyOps mode is active
+  - keeps OpenClaw-mode plugin behavior unchanged outside HolyOps mode
 - Migration tracking doc:
   - `docs/sm/HOLYOPS_MIGRATION_NOTES.md`
 - HolyOps workflow adapter implementation:
@@ -46,7 +56,9 @@ Direction is now personal-first `HolyOps` (creator workflow cockpit) while prese
   - command runner: `src/sm/adapters/runner.ts`
   - video adapter: `src/sm/adapters/video-cli-adapter.ts`
   - business adapter: `src/sm/adapters/business-cli-adapter.ts`
-  - agent tool wiring: `src/agents/tools/holyops-video-tool.ts`, `src/agents/tools/holyops-business-tool.ts`, `src/agents/openclaw-tools.ts`
+  - research adapter: `src/sm/adapters/research-cli-adapter.ts`
+  - writer adapter: `src/sm/adapters/writer-cli-adapter.ts`
+  - agent tool wiring: `src/agents/tools/holyops-video-tool.ts`, `src/agents/tools/holyops-business-tool.ts`, `src/agents/tools/holyops-research-tool.ts`, `src/agents/tools/holyops-writer-tool.ts`, `src/agents/openclaw-tools.ts`
 
 ## Implemented in this baseline
 
@@ -189,10 +201,10 @@ Gateway subcommands intentionally exposed in Senior Mantis runner:
 ## Immediate next tasks
 
 1. Complete phase-2 hard prune of non-v1 channel wiring beyond guardrails (runtime loaders, command surfaces, docs).
-2. Add next specialist tools (`research-agent`, `writer-agent`) on the same adapter contract.
+2. Replace remaining HolyOps-mode OpenClaw user-facing copy in shared commands/docs where feasible without risky internal rewrites.
 3. Add desktop packaging/distribution flow for `apps/desktop-electron` (dev -> signed release pipeline later).
 4. Add lightweight quick-action history in desktop UI (last run, args, result status).
-5. Add workflow presets/templates for common local tasks (video clip pack, proposal draft, analytics pulse).
+5. Add workflow presets/templates for common local tasks (video clip pack, proposal draft, analytics pulse, research sweep).
 
 ## Brand migration track (OpenClaw -> HolyOps)
 

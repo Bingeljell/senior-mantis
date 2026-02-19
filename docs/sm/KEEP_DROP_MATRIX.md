@@ -59,6 +59,14 @@ Legend (HolyOps pivot):
   - rationale: harden adapter contract for v1 reliability (required action params, richer artifacts, transient-failure retry hints).
 - 2026-02-19: `src/sm/cli/program/register-workflow.ts`, `src/sm/cli/program/register-workflow.test.ts`
   - rationale: add deterministic non-LLM workflow command for local adapter execution and desktop quick-action reliability.
+- 2026-02-19: `src/sm/brand.ts`, `src/commands/dashboard.ts`, `src/commands/doctor.ts`, `src/commands/onboard.ts`, `src/commands/status.command.ts`
+  - rationale: increase HolyOps identity visibility by switching high-frequency runtime output copy to HolyOps wording in HolyOps mode.
+- 2026-02-19: `src/sm/adapters/research-cli-adapter.ts`, `src/sm/adapters/writer-cli-adapter.ts`, `src/agents/tools/holyops-research-tool.ts`, `src/agents/tools/holyops-writer-tool.ts`
+  - rationale: add research/writer workflow adapters on the same deterministic contract as video/business for personal creator operations.
+- 2026-02-19: `src/agents/openclaw-tools.ts`
+  - rationale: prune extension/plugin tool surface in HolyOps mode by skipping plugin tool resolution while preserving OpenClaw-mode behavior.
+- 2026-02-19: `apps/desktop-electron/main.mjs`, `apps/desktop-electron/renderer/index.html`, `apps/desktop-electron/renderer/renderer.js`
+  - rationale: expand desktop quick actions to research/writer workflows so visible product capability shifts beyond legacy OpenClaw defaults.
 
 ## Deletion log (completed)
 
