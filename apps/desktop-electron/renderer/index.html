@@ -46,6 +46,43 @@
         </article>
       </section>
 
+      <section class="quick-row">
+        <article class="card">
+          <h2>Quick Actions</h2>
+          <p class="quick-hint">
+            Runs HolyOps agent with explicit tool-call prompts for `video_tool` and `business_tool`.
+          </p>
+          <div class="quick-grid">
+            <div class="quick-item">
+              <h3>Video Compress</h3>
+              <input id="videoInputPath" type="text" placeholder="Input path (default ~/Videos/input.mp4)" />
+              <input
+                id="videoOutputPath"
+                type="text"
+                placeholder="Output path (default ~/Videos/input-compressed.mp4)"
+              />
+              <button id="runVideoCompress" class="secondary">Run Video Compress</button>
+            </div>
+            <div class="quick-item">
+              <h3>Business Proposal</h3>
+              <input id="businessProjectId" type="text" placeholder="Project id (default default)" />
+              <input
+                id="businessTemplate"
+                type="text"
+                placeholder="Template (default default)"
+              />
+              <input
+                id="businessBrief"
+                type="text"
+                placeholder="Brief (default: concise proposal with scope/timeline/pricing)"
+              />
+              <button id="runBusinessProposal" class="secondary">Run Business Proposal</button>
+            </div>
+          </div>
+          <pre id="quickActionOutput">No quick action run yet.</pre>
+        </article>
+      </section>
+
       <section class="layout">
         <article class="card full">
           <div class="card-header">

@@ -30,6 +30,9 @@ Last updated: 2026-02-19
   - video adapter: `src/sm/adapters/video-cli-adapter.ts`
   - business adapter: `src/sm/adapters/business-cli-adapter.ts`
   - agent tools + registration: `src/agents/tools/holyops-video-tool.ts`, `src/agents/tools/holyops-business-tool.ts`, `src/agents/openclaw-tools.ts` (HolyOps-mode only)
+- Added desktop quick actions that route through HolyOps agent prompts into `video_tool` and `business_tool`:
+  - desktop IPC + runner: `apps/desktop-electron/main.mjs`, `apps/desktop-electron/preload.cjs`
+  - desktop UI controls: `apps/desktop-electron/renderer/index.html`, `apps/desktop-electron/renderer/renderer.js`, `apps/desktop-electron/renderer/styles.css`
 - Added explicit migration tracker:
   - `docs/sm/HOLYOPS_MIGRATION_NOTES.md`
   - keeps `~/.seniormantis` path for now, tracks deferred move to `~/.holyops`.

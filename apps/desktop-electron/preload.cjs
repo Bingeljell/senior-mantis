@@ -9,4 +9,5 @@ contextBridge.exposeInMainWorld("smDesktop", {
   runSetup: () => ipcRenderer.invoke("sm:run-setup"),
   openDashboard: () => ipcRenderer.invoke("sm:open-dashboard"),
   runOnboarding: () => ipcRenderer.invoke("sm:run-onboarding"),
+  runQuickAction: (input) => ipcRenderer.invoke("sm:run-quick-action", input),
 });

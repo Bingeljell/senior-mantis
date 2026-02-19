@@ -29,6 +29,9 @@ Direction is now personal-first `HolyOps` (creator workflow cockpit) while prese
 - First specialist workflow adapters shipped:
   - `video-agent` adapter/tool
   - `business-agent` adapter/tool
+- Desktop quick-actions shipped for first adapters:
+  - `Run Video Compress` (routes through `video_tool` prompt path)
+  - `Run Business Proposal` (routes through `business_tool` prompt path)
 - Migration tracking doc:
   - `docs/sm/HOLYOPS_MIGRATION_NOTES.md`
 - HolyOps workflow adapter implementation:
@@ -180,9 +183,9 @@ Gateway subcommands intentionally exposed in Senior Mantis runner:
 
 1. Complete phase-2 hard prune of non-v1 channel wiring beyond guardrails (runtime loaders, command surfaces, docs).
 2. Harden HolyOps tool-adapter ergonomics (per-action validation, richer artifacts, retry semantics).
-3. Add desktop quick-actions that route into `video_tool` and `business_tool`.
-4. Add next specialist tools (`research-agent`, `writer-agent`) on the same adapter contract.
-5. Add desktop packaging/distribution flow for `apps/desktop-electron` (dev -> signed release pipeline later).
+3. Add next specialist tools (`research-agent`, `writer-agent`) on the same adapter contract.
+4. Add desktop packaging/distribution flow for `apps/desktop-electron` (dev -> signed release pipeline later).
+5. Add lightweight quick-action history in desktop UI (last run, args, result status).
 
 ## Brand migration track (OpenClaw -> HolyOps)
 

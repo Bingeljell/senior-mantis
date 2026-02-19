@@ -89,6 +89,104 @@ let gatewayProcess = null;
 let gatewayStartTime = null;
 let lastGatewayLaunchMode = "repo";
 
+function readStringFromPayload(payload, key) {
+  if (!payload || typeof payload !== "object") {
+    return "";
+  }
+  const raw = payload[key];
+  if (typeof raw !== "string") {
+    return "";
+  }
+  return raw.trim();
+}
+
+function buildQuickActionPrompt(actionId, payload) {
+  if (actionId === "video_compress") {
+    const inputPath = readStringFromPayload(payload, "inputPath") || "~/Videos/input.mp4";
+    const outputPath =
+      readStringFromPayload(payload, "outputPath") || "~/Videos/input-compressed.mp4";
+    const toolPayload = {
+      action: "compress",
+      inputPath,
+      outputPath,
+      confirm: true,
+    };
+    return {
+      ok: true,
+      actionLabel: "Run quick action: video compress",
+      prompt: [
+        "Run exactly one tool call with video_tool and do not ask follow-up questions.",
+        `Tool args: ${JSON.stringify(toolPayload)}`,
+        "After the tool finishes, return a short result summary and output artifact paths.",
+      ].join("\n"),
+    };
+  }
+
+  if (actionId === "business_proposal") {
+    const projectId = readStringFromPayload(payload, "projectId") || "default";
+    const brief =
+      readStringFromPayload(payload, "brief") ||
+      "Draft a concise proposal for this project with scope, timeline, and pricing options.";
+    const template = readStringFromPayload(payload, "template") || "default";
+    const toolPayload = {
+      action: "create_proposal",
+      projectId,
+      brief,
+      template,
+      confirm: true,
+    };
+    return {
+      ok: true,
+      actionLabel: "Run quick action: business proposal",
+      prompt: [
+        "Run exactly one tool call with business_tool and do not ask follow-up questions.",
+        `Tool args: ${JSON.stringify(toolPayload)}`,
+        "After the tool finishes, return proposal id and any share URL in a short bullet list.",
+      ].join("\n"),
+    };
+  }
+
+  return {
+    ok: false,
+    actionLabel: "",
+    prompt: "",
+    error: `Unsupported quick action: ${actionId}`,
+  };
+}
+
+async function runQuickAction(actionId, payload) {
+  const plan = buildQuickActionPrompt(actionId, payload);
+  if (!plan.ok) {
+    return {
+      ok: false,
+      message: plan.error ?? "Unsupported quick action.",
+      result: null,
+    };
+  }
+
+  const confirmed = await confirmSideEffect(`${plan.actionLabel}\n\nThis can execute external CLI tools.`);
+  if (!confirmed) {
+    return { ok: false, message: "Cancelled by user.", result: null };
+  }
+
+  const result = await runSeniorMantis([
+    "agent",
+    "--agent",
+    "main",
+    "--message",
+    plan.prompt,
+    "--json",
+  ]);
+  return {
+    ok: result.ok,
+    actionId,
+    message: result.ok
+      ? `Quick action '${actionId}' finished.`
+      : `Quick action '${actionId}' failed.`,
+    result,
+  };
+}
+
 function quoted(command) {
   return `"${command.replace(/(["\\$`])/g, "\\$1")}"`;
 }
@@ -489,6 +587,19 @@ ipcMain.handle("sm:run-setup", async () => {
       message: `Failed to open setup terminal: ${String(error)}`,
     };
   }
+});
+
+ipcMain.handle("sm:run-quick-action", async (_event, input) => {
+  const actionId = typeof input?.actionId === "string" ? input.actionId.trim() : "";
+  const payload = input?.payload && typeof input.payload === "object" ? input.payload : {};
+  if (!actionId) {
+    return {
+      ok: false,
+      message: "Missing quick action id.",
+      result: null,
+    };
+  }
+  return runQuickAction(actionId, payload);
 });
 
 void app

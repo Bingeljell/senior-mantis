@@ -8,6 +8,7 @@ Minimal desktop shell for local HolyOps workflows on macOS.
 - Opens setup in a terminal window after explicit confirmation.
 - Opens interactive onboarding in a terminal window after explicit confirmation.
 - Shows status/health/sessions snapshots.
+- Includes quick actions that run HolyOps agent prompts for `video_tool` and `business_tool`.
 - Embeds local web UI in-app (`http://127.0.0.1:18789` by default, or configured `gateway.controlUi.basePath`).
 - Surfaces first-run setup hints when status checks detect missing config.
 
@@ -66,6 +67,7 @@ SM_GATEWAY_TOKEN=replace-with-token pnpm desktop:dev
 
 - This is an MVP shell, not a packaged release.
 - Onboarding launches in your system terminal for interactive prompts.
+- Quick actions require model/auth setup and adapter env vars (`HOLYOPS_VIDEO_CLI_BIN`, `HOLYOPS_BUSINESS_CLI_BIN`).
 - If gateway start fails with `ENOENT`, install or point `SM_CLI_COMMAND` to a valid `holyops` binary.
 - If setup/onboarding opens a terminal and reports an unexpected runtime command, set `SM_NODE_COMMAND` to your Node binary path.
 - If status/health commands fail with missing `dist/entry-seniormantis`, run `pnpm build`.

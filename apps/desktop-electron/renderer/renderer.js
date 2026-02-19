@@ -8,12 +8,20 @@ const els = {
   refreshSessions: document.getElementById("refreshSessions"),
   refreshStatus: document.getElementById("refreshStatus"),
   refreshFrame: document.getElementById("refreshFrame"),
+  runVideoCompress: document.getElementById("runVideoCompress"),
+  runBusinessProposal: document.getElementById("runBusinessProposal"),
   gatewayStatus: document.getElementById("gatewayStatus"),
   healthOutput: document.getElementById("healthOutput"),
   sessionsOutput: document.getElementById("sessionsOutput"),
   statusOutput: document.getElementById("statusOutput"),
   activityLog: document.getElementById("activityLog"),
   webUiFrame: document.getElementById("webUiFrame"),
+  quickActionOutput: document.getElementById("quickActionOutput"),
+  videoInputPath: document.getElementById("videoInputPath"),
+  videoOutputPath: document.getElementById("videoOutputPath"),
+  businessProjectId: document.getElementById("businessProjectId"),
+  businessTemplate: document.getElementById("businessTemplate"),
+  businessBrief: document.getElementById("businessBrief"),
 };
 
 function logActivity(message) {
@@ -52,6 +60,13 @@ function maybeSetupHint(result) {
   return null;
 }
 
+function getFieldValue(inputEl) {
+  if (!inputEl) {
+    return "";
+  }
+  return (inputEl.value ?? "").trim();
+}
+
 async function refreshGatewayStatus() {
   const status = await window.smDesktop.getGatewayStatus();
   const launchMode = status.launchMode ? ` (${status.launchMode} CLI)` : "";
@@ -77,6 +92,17 @@ async function loadUiFrame(log = false) {
     logActivity(`Loaded UI frame: ${cfg.gatewayUrl}`);
   }
   return cfg;
+}
+
+async function runQuickAction(actionId, payload, label) {
+  els.quickActionOutput.textContent = "Running quick action...";
+  const response = await window.smDesktop.runQuickAction({
+    actionId,
+    payload,
+  });
+  const resultBody = response?.result ? response.result : response;
+  els.quickActionOutput.textContent = pretty(resultBody);
+  logActivity(response?.message ?? `${label} completed.`);
 }
 
 async function boot() {
@@ -137,6 +163,34 @@ els.refreshFrame.addEventListener("click", async () => {
   await loadUiFrame(false);
   els.webUiFrame.contentWindow?.location.reload();
   logActivity("Reloaded embedded local web UI.");
+});
+
+els.runVideoCompress.addEventListener("click", async () => {
+  const inputPath = getFieldValue(els.videoInputPath);
+  const outputPath = getFieldValue(els.videoOutputPath);
+  await runQuickAction(
+    "video_compress",
+    {
+      inputPath,
+      outputPath,
+    },
+    "Video compress quick action",
+  );
+});
+
+els.runBusinessProposal.addEventListener("click", async () => {
+  const projectId = getFieldValue(els.businessProjectId);
+  const template = getFieldValue(els.businessTemplate);
+  const brief = getFieldValue(els.businessBrief);
+  await runQuickAction(
+    "business_proposal",
+    {
+      projectId,
+      template,
+      brief,
+    },
+    "Business proposal quick action",
+  );
 });
 
 boot().catch((error) => {

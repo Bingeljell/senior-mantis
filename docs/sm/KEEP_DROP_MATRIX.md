@@ -53,6 +53,8 @@ Legend (HolyOps pivot):
   - rationale: add HolyOps-only workflow tools for personal creator ops while keeping default OpenClaw tool surface unchanged outside HolyOps mode.
 - 2026-02-19: `src/sm/adapters/*`
   - rationale: introduce simple JSON adapter contract (video/business) for CLI-first personal workflow integrations without broad framework abstraction.
+- 2026-02-19: `apps/desktop-electron/main.mjs`, `apps/desktop-electron/preload.cjs`, `apps/desktop-electron/renderer/*`
+  - rationale: add desktop quick-actions for HolyOps-first workflows (video/business) while preserving explicit side-effect confirmation and local-first defaults.
 
 ## Deletion log (completed)
 
