@@ -14,6 +14,7 @@ import type {
   WhatsAppStatus,
 } from "../types.ts";
 import type { ChannelKey, ChannelsChannelData, ChannelsProps } from "./channels.types.ts";
+import { resolveProductBrand } from "../brand.ts";
 import { formatRelativeTimestamp } from "../format.ts";
 import { renderChannelConfigSection } from "./channels.config.ts";
 import { renderDiscordCard } from "./channels.discord.ts";
@@ -26,7 +27,10 @@ import { renderSlackCard } from "./channels.slack.ts";
 import { renderTelegramCard } from "./channels.telegram.ts";
 import { renderWhatsAppCard } from "./channels.whatsapp.ts";
 
+const HOLYOPS_CHANNEL_IDS = new Set(["whatsapp", "webchat"]);
+
 export function renderChannels(props: ChannelsProps) {
+  const holyOpsMode = resolveProductBrand() === "HolyOps";
   const channels = props.snapshot?.channels as Record<string, unknown> | null;
   const whatsapp = (channels?.whatsapp ?? undefined) as WhatsAppStatus | undefined;
   const telegram = (channels?.telegram ?? undefined) as TelegramStatus | undefined;
@@ -36,7 +40,7 @@ export function renderChannels(props: ChannelsProps) {
   const signal = (channels?.signal ?? null) as SignalStatus | null;
   const imessage = (channels?.imessage ?? null) as IMessageStatus | null;
   const nostr = (channels?.nostr ?? null) as NostrStatus | null;
-  const channelOrder = resolveChannelOrder(props.snapshot);
+  const channelOrder = resolveVisibleChannelOrder(props.snapshot, holyOpsMode);
   const orderedChannels = channelOrder
     .map((key, index) => ({
       key,
@@ -71,7 +75,13 @@ export function renderChannels(props: ChannelsProps) {
       <div class="row" style="justify-content: space-between;">
         <div>
           <div class="card-title">Channel health</div>
-          <div class="card-sub">Channel status snapshots from the gateway.</div>
+          <div class="card-sub">
+            ${
+              holyOpsMode
+                ? "HolyOps v1 channel status snapshots (WhatsApp + local web UI)."
+                : "Channel status snapshots from the gateway."
+            }
+          </div>
         </div>
         <div class="muted">${props.lastSuccessAt ? formatRelativeTimestamp(props.lastSuccessAt) : "n/a"}</div>
       </div>
@@ -89,14 +99,35 @@ ${props.snapshot ? JSON.stringify(props.snapshot, null, 2) : "No snapshot yet."}
   `;
 }
 
-function resolveChannelOrder(snapshot: ChannelsStatusSnapshot | null): ChannelKey[] {
+export function resolveVisibleChannelOrder(
+  snapshot: ChannelsStatusSnapshot | null,
+  holyOpsMode: boolean,
+): ChannelKey[] {
+  const fallback: ChannelKey[] = [
+    "whatsapp",
+    "webchat",
+    "telegram",
+    "discord",
+    "googlechat",
+    "slack",
+    "signal",
+    "imessage",
+    "nostr",
+  ];
+  const filterForMode = (channels: ChannelKey[]): ChannelKey[] => {
+    if (!holyOpsMode) {
+      return channels;
+    }
+    return channels.filter((id) => HOLYOPS_CHANNEL_IDS.has(id));
+  };
+
   if (snapshot?.channelMeta?.length) {
-    return snapshot.channelMeta.map((entry) => entry.id);
+    return filterForMode(snapshot.channelMeta.map((entry) => entry.id));
   }
   if (snapshot?.channelOrder?.length) {
-    return snapshot.channelOrder;
+    return filterForMode(snapshot.channelOrder);
   }
-  return ["whatsapp", "telegram", "discord", "googlechat", "slack", "signal", "imessage", "nostr"];
+  return filterForMode(fallback);
 }
 
 function renderChannel(key: ChannelKey, props: ChannelsProps, data: ChannelsChannelData) {
