@@ -1,7 +1,7 @@
 # Senior Mantis Status
 
 Status: active staged-prune implementation
-Last updated: 2026-02-17
+Last updated: 2026-02-19
 
 ## Source of truth
 
@@ -10,6 +10,29 @@ Last updated: 2026-02-17
 - `docs/sm/DECISIONS.md`
 - `docs/sm/KEEP_DROP_MATRIX.md`
 - `docs/sm/BOOTSTRAP_NEW_REPO.md`
+- `docs/sm/HOLYOPS_MIGRATION_NOTES.md`
+
+## HolyOps pivot updates (2026-02-19)
+
+- Added `holyops` CLI alias while preserving `seniormantis` compatibility:
+  - root wrapper: `holyops.mjs`
+  - package bin mapping: `package.json`
+  - CLI name resolver now accepts `openclaw|holyops|seniormantis`: `src/cli/cli-name.ts`
+- HolyOps is now the default CLI identity for the SM/HolyOps runtime path:
+  - default `OPENCLAW_CLI_NAME_OVERRIDE` set to `holyops` in `src/sm/env.ts`
+  - guardrail policy now treats `holyops` and `seniormantis` as compatibility names: `src/sm/channel-policy.ts`
+- Updated HolyOps-facing user surfaces:
+  - banner branding: `src/cli/banner.ts`
+  - SM/HolyOps CLI help text and examples: `src/sm/cli/program/build-program.ts`, `src/sm/cli/program/register-status-health-sessions.ts`, `src/sm/cli/program/register-gateway.ts`
+  - desktop shell labels and default CLI command: `apps/desktop-electron/main.mjs`, `apps/desktop-electron/renderer/index.html`
+- Implemented first HolyOps workflow adapter contract + tools:
+  - adapter types/runner/registry: `src/sm/adapters/types.ts`, `src/sm/adapters/runner.ts`, `src/sm/adapters/registry.ts`
+  - video adapter: `src/sm/adapters/video-cli-adapter.ts`
+  - business adapter: `src/sm/adapters/business-cli-adapter.ts`
+  - agent tools + registration: `src/agents/tools/holyops-video-tool.ts`, `src/agents/tools/holyops-business-tool.ts`, `src/agents/openclaw-tools.ts` (HolyOps-mode only)
+- Added explicit migration tracker:
+  - `docs/sm/HOLYOPS_MIGRATION_NOTES.md`
+  - keeps `~/.seniormantis` path for now, tracks deferred move to `~/.holyops`.
 
 ## Reality check (implemented)
 
@@ -147,6 +170,8 @@ Last updated: 2026-02-17
   - pass (9 tests)
 - `pnpm exec vitest run src/sm/cli/program/build-program.test.ts src/sm/cli/program/build-program.dashboard.test.ts`
   - pass (6 tests)
+- `pnpm exec vitest run src/sm/adapters/registry.test.ts src/agents/openclaw-tools.holyops.test.ts src/cli/cli-name.test.ts src/sm/channel-policy.test.ts`
+  - pass (14 tests)
 - `pnpm exec vitest -c vitest.e2e.config.ts run src/gateway/server.channels.e2e.test.ts`
   - pass (4 tests)
 - `node seniormantis.mjs status --json`

@@ -1,6 +1,6 @@
-# Senior Mantis Desktop (Electron)
+# HolyOps Desktop (Electron)
 
-Minimal desktop shell for local Senior Mantis workflows on macOS.
+Minimal desktop shell for local HolyOps workflows on macOS.
 
 ## What it does
 
@@ -16,7 +16,7 @@ Minimal desktop shell for local Senior Mantis workflows on macOS.
 - Node `22.12+`
 - `pnpm` `10.x`
 - Root dependencies installed (`pnpm install`)
-- Senior Mantis dist entry available (`pnpm build` if missing)
+- HolyOps/Senior Mantis dist entry available (`pnpm build` if missing)
 - Electron package dependencies installed (`pnpm --dir apps/desktop-electron install`)
 
 ## Run locally on macOS
@@ -26,7 +26,7 @@ From repo root:
 ```bash
 pnpm install
 pnpm build
-node seniormantis.mjs setup
+node holyops.mjs setup
 pnpm --dir apps/desktop-electron install
 pnpm desktop:dev
 ```
@@ -43,17 +43,17 @@ pnpm desktop:dev
 
 ## CLI resolution behavior
 
-- Preferred mode: repo CLI (`node seniormantis.mjs ...`) when repo runtime deps and dist entry are present.
-- Fallback mode: global `seniormantis` command if repo mode fails with module-resolution errors.
-- Desktop launcher always sets `OPENCLAW_STATE_DIR` + `OPENCLAW_CONFIG_PATH` to Senior Mantis paths by default (`~/.seniormantis`, `~/.seniormantis/seniormantis.json`) to avoid accidental OpenClaw config reuse.
+- Preferred mode: repo CLI (`node holyops.mjs ...`) when repo runtime deps and dist entry are present.
+- Fallback mode: global `holyops` command if repo mode fails with module-resolution errors.
+- Desktop launcher always sets `OPENCLAW_STATE_DIR` + `OPENCLAW_CONFIG_PATH` to HolyOps compatibility paths by default (`~/.seniormantis`, `~/.seniormantis/seniormantis.json`) to avoid accidental OpenClaw config reuse.
 - Override global command path with `SM_CLI_COMMAND` (binary path).
 - Override repo Node runtime command with `SM_NODE_COMMAND` (default auto-detects `node` under Electron).
 - Override state/config paths with `SM_STATE_DIR` and `SM_CONFIG_PATH`.
 - Override UI path with `SM_GATEWAY_UI_PATH` (defaults to config `gateway.controlUi.basePath`, else `/`).
-- Override dashboard token with `SM_GATEWAY_TOKEN` (otherwise uses `OPENCLAW_GATEWAY_TOKEN` env if set, then `gateway.auth.token` from Senior Mantis config).
+- Override dashboard token with `SM_GATEWAY_TOKEN` (otherwise uses `OPENCLAW_GATEWAY_TOKEN` env if set, then `gateway.auth.token` from HolyOps config).
 
 ```bash
-SM_CLI_COMMAND=/usr/local/bin/seniormantis pnpm desktop:dev
+SM_CLI_COMMAND=/usr/local/bin/holyops pnpm desktop:dev
 # optional:
 SM_NODE_COMMAND=/opt/homebrew/bin/node pnpm desktop:dev
 SM_STATE_DIR=$HOME/.seniormantis pnpm desktop:dev
@@ -66,8 +66,8 @@ SM_GATEWAY_TOKEN=replace-with-token pnpm desktop:dev
 
 - This is an MVP shell, not a packaged release.
 - Onboarding launches in your system terminal for interactive prompts.
-- If gateway start fails with `ENOENT`, install or point `SM_CLI_COMMAND` to a valid `seniormantis` binary.
+- If gateway start fails with `ENOENT`, install or point `SM_CLI_COMMAND` to a valid `holyops` binary.
 - If setup/onboarding opens a terminal and reports an unexpected runtime command, set `SM_NODE_COMMAND` to your Node binary path.
 - If status/health commands fail with missing `dist/entry-seniormantis`, run `pnpm build`.
-- If status/health or gateway launch reports missing config, run `seniormantis setup` (or click `Run Setup` in the desktop app).
+- If status/health or gateway launch reports missing config, run `holyops setup` (or click `Run Setup` in the desktop app).
 - If the embedded UI is blank or 404s, verify local gateway is running and check `gateway.controlUi.basePath` (or set `SM_GATEWAY_UI_PATH`).

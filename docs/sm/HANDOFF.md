@@ -16,14 +16,36 @@ Ship a senior-friendly assistant app based on OpenClaw with a narrow v1:
 - guided onboarding
 - safe/manual task workflows
 
+## HolyOps pivot (2026-02-19)
+
+Direction is now personal-first `HolyOps` (creator workflow cockpit) while preserving safe staged cleanup.
+
+- Primary UX command is now `holyops`; `seniormantis` remains as a compatibility alias.
+- Runtime/state path remains `~/.seniormantis` for now (migration deferred, explicitly tracked).
+- Surface focus remains:
+  - desktop-first local control flow
+  - WhatsApp interaction path
+  - local web UI
+- First specialist workflow adapters shipped:
+  - `video-agent` adapter/tool
+  - `business-agent` adapter/tool
+- Migration tracking doc:
+  - `docs/sm/HOLYOPS_MIGRATION_NOTES.md`
+- HolyOps workflow adapter implementation:
+  - adapter contract + registry: `src/sm/adapters/types.ts`, `src/sm/adapters/registry.ts`
+  - command runner: `src/sm/adapters/runner.ts`
+  - video adapter: `src/sm/adapters/video-cli-adapter.ts`
+  - business adapter: `src/sm/adapters/business-cli-adapter.ts`
+  - agent tool wiring: `src/agents/tools/holyops-video-tool.ts`, `src/agents/tools/holyops-business-tool.ts`, `src/agents/openclaw-tools.ts`
+
 ## Implemented in this baseline
 
-- Added `seniormantis` binary entry (`package.json`, `seniormantis.mjs`).
+- Added `seniormantis` binary entry and `holyops` primary alias (`package.json`, `seniormantis.mjs`, `holyops.mjs`).
 - Added dedicated entrypoint `src/entry-seniormantis.ts`.
 - Added Senior Mantis environment defaults in `src/sm/env.ts`:
   - state path defaults to `~/.seniormantis`
   - config path defaults to `~/.seniormantis/seniormantis.json`
-  - CLI name override defaults to `seniormantis`
+  - CLI name override defaults to `holyops` (with `seniormantis` compatibility)
 - Added reduced CLI program at `src/sm/cli/program/build-program.ts`.
 - Added Senior Mantis-only gateway CLI registration at `src/sm/cli/program/register-gateway.ts`:
   - keeps `gateway run` + `gateway status`
@@ -53,7 +75,7 @@ Ship a senior-friendly assistant app based on OpenClaw with a narrow v1:
   - explicit confirmations before side effects (start/stop gateway, onboarding launch)
   - CLI invocation mode selection:
     - prefer repo CLI when local dependencies and `dist/entry-seniormantis.*` are present
-    - fallback to global `seniormantis` command when repo runtime modules are missing
+    - fallback to global `holyops` command when repo runtime modules are missing
     - return explicit startup errors if gateway command cannot be launched
 - Hardened startup-cycle paths for bundled Senior Mantis CLI:
   - removed eager module-scope initialization that caused TDZ startup failures in bundled desktop CLI path
@@ -84,17 +106,17 @@ Ship a senior-friendly assistant app based on OpenClaw with a narrow v1:
   - dashboard URL uses trailing slash for non-root base paths to avoid auth fragment loss on redirect edge cases
   - file: `apps/desktop-electron/main.mjs`
 - Fixed CLI auth-recovery command behavior:
-  - `seniormantis dashboard --no-open` now honors `--no-open` correctly (`src/cli/program/register.maintenance.ts`)
-  - `seniormantis doctor --generate-gateway-token` now persists generated token config even when not using `--fix` (`src/commands/doctor.ts`)
+  - `holyops dashboard --no-open` now honors `--no-open` correctly (`src/cli/program/register.maintenance.ts`)
+  - `holyops doctor --generate-gateway-token` now persists generated token config even when not using `--fix` (`src/commands/doctor.ts`)
   - tests added:
     - `src/cli/program/register.maintenance.test.ts`
     - `src/commands/doctor.runs-legacy-state-migrations-yes-mode-without.e2e.test.ts` (token persistence case)
-- Added Senior Mantis banner branding path:
-  - `src/cli/banner.ts` switches banner identity/tagline based on active CLI name (`openclaw` vs `seniormantis`).
-- Added runtime HTTP channel wiring prune for Senior Mantis mode:
-  - `src/gateway/server-http.ts` skips Slack HTTP route handling when `OPENCLAW_CLI_NAME_OVERRIDE=seniormantis`.
-- Added runtime channel-plugin listing prune for Senior Mantis mode:
-  - `src/channels/plugins/index.ts` filters runtime channel list to `whatsapp|webchat` when `OPENCLAW_CLI_NAME_OVERRIDE=seniormantis` (defense in depth beyond loader/config guardrails).
+- Added HolyOps banner branding path:
+  - `src/cli/banner.ts` switches banner identity/tagline based on active CLI name (`openclaw` vs `holyops`/`seniormantis`).
+- Added runtime HTTP channel wiring prune for HolyOps mode:
+  - `src/gateway/server-http.ts` skips Slack HTTP route handling when `OPENCLAW_CLI_NAME_OVERRIDE=holyops`.
+- Added runtime channel-plugin listing prune for HolyOps mode:
+  - `src/channels/plugins/index.ts` filters runtime channel list to `whatsapp|webchat` when `OPENCLAW_CLI_NAME_OVERRIDE=holyops` (defense in depth beyond loader/config guardrails).
   - gateway channel status/logout behavior now inherits this filter (non-v1 channels are not surfaced in `channels.status`; non-v1 logout attempts are rejected).
 - Added config schema channel metadata prune for Senior Mantis mode:
   - `src/config/schema.ts` filters channel metadata to v1 channel policy before building merged schema/ui hints.
@@ -157,19 +179,19 @@ Gateway subcommands intentionally exposed in Senior Mantis runner:
 ## Immediate next tasks
 
 1. Complete phase-2 hard prune of non-v1 channel wiring beyond guardrails (runtime loaders, command surfaces, docs).
-2. Replace generic onboarding with senior-focused question flow and caregiver-safe defaults.
-3. Add desktop packaging/distribution flow for `apps/desktop-electron` (dev -> signed release pipeline later).
-4. Add Senior Mantis config schema adapter (`src/sm/config/*`).
-5. Add feature modules for email/manual workflows and guided browser workflows.
+2. Harden HolyOps tool-adapter ergonomics (per-action validation, richer artifacts, retry semantics).
+3. Add desktop quick-actions that route into `video_tool` and `business_tool`.
+4. Add next specialist tools (`research-agent`, `writer-agent`) on the same adapter contract.
+5. Add desktop packaging/distribution flow for `apps/desktop-electron` (dev -> signed release pipeline later).
 
-## Brand migration track (OpenClaw -> Senior Mantis)
+## Brand migration track (OpenClaw -> HolyOps)
 
 This is now an explicit implementation track, not an implicit cleanup.
 
 ### Stage A (now): user-facing rename first
 
-- Keep `seniormantis` CLI as primary surface and avoid new `openclaw` mentions in Senior Mantis docs/help text.
-- Prefer "Senior Mantis" naming in onboarding/status/help copy for SM runner.
+- Keep `holyops` CLI as primary surface (`seniormantis` remains compatibility-only) and avoid new `openclaw` mentions in HolyOps docs/help text.
+- Prefer "HolyOps" naming in onboarding/status/help copy for SM/HolyOps runner.
 - Keep safe behavior unchanged (local mode, loopback bind, explicit confirmations).
 
 ### Stage B (after v1 parity): internal identifier migration
@@ -180,7 +202,7 @@ This is now an explicit implementation track, not an implicit cleanup.
 
 ### Stage C (new repo cut)
 
-- Publish from a clean non-fork repo with Senior Mantis-first naming throughout.
+- Publish from a clean non-fork repo with HolyOps-first naming throughout.
 - Remove temporary compatibility aliases once migration window closes.
 
 ## Safety defaults to preserve
@@ -237,6 +259,7 @@ All entries below were changed to `on: workflow_dispatch` only.
 pnpm install
 pnpm build
 node seniormantis.mjs setup
+node holyops.mjs setup
 pnpm --dir apps/desktop-electron install
 pnpm desktop:dev
 ```
