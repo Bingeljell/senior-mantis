@@ -75,6 +75,12 @@ Legend (HolyOps pivot):
   - rationale: centralize HolyOps/OpenClaw docs-link routing for onboarding/security/help output and remove hardcoded `docs.openclaw.ai` references from HolyOps-mode active onboarding flows.
 - 2026-02-19: `ui/src/ui/brand.ts`, `ui/src/ui/views/overview.ts`, `ui/src/ui/app-render.ts`
   - rationale: show local `docs/sm/*` guidance in HolyOps mode for Control UI auth/help/resources surfaces while preserving OpenClaw docs links in OpenClaw mode.
+- 2026-02-19: `ui/src/ui/views/channels.ts`, `ui/src/ui/views/channels.node.test.ts`
+  - rationale: prune HolyOps-mode Control UI channel health surface to v1 channels (`whatsapp`, `webchat`) while retaining full channel visibility outside HolyOps mode.
+- 2026-02-19: `src/commands/onboard-non-interactive/local.ts`, `src/commands/onboard-non-interactive/remote.ts`, `src/commands/onboard-skills.ts`, `src/sm/brand.ts`
+  - rationale: remove remaining hardcoded onboarding docs links to `docs.openclaw.ai` in HolyOps-mode active onboarding paths and route all docs pointers through centralized brand-aware docs mapping.
+- 2026-02-19: `apps/desktop-electron/README.md`
+  - rationale: document exact local-first desktop recovery for token/auth disconnect (`1008 unauthorized`) and expected state progression during v1 testing.
 
 ## Deletion log (completed)
 

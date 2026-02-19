@@ -112,6 +112,24 @@ Last updated: 2026-02-19
 
 ## Current pass: phase 2 prune + desktop first-run hardening
 
+### Control UI and onboarding prune continuation (2026-02-19)
+
+- `ui/src/ui/views/channels.ts`
+  - HolyOps mode now filters channel cards/order to v1 channels only (`whatsapp`, `webchat`).
+  - Channel health subtitle now reflects HolyOps v1 scope when HolyOps mode is active.
+- `ui/src/ui/views/channels.node.test.ts` (new)
+  - added regression coverage for HolyOps-mode channel filtering vs OpenClaw/full mode order.
+- `src/commands/onboard-non-interactive/local.ts`
+  - web tools docs hint now routes through `resolveBrandDocsLinks()` (`toolsWeb`) instead of hardcoded `docs.openclaw.ai`.
+- `src/commands/onboard-non-interactive/remote.ts`
+  - web tools docs hint now routes through `resolveBrandDocsLinks()` (`toolsWeb`) instead of hardcoded `docs.openclaw.ai`.
+- `src/commands/onboard-skills.ts`
+  - skills docs hint now routes through `resolveBrandDocsLinks()` (`skills`) instead of hardcoded `docs.openclaw.ai`.
+- `src/sm/brand.ts`
+  - added `skills` docs-link key to centralized HolyOps/OpenClaw docs resolver.
+- `apps/desktop-electron/README.md`
+  - added explicit unauthorized/token recovery flow and expected desktop-state checklist for local testing.
+
 ### Command/runtime pruning updates
 
 - `src/sm/cli/program/build-program.ts`

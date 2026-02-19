@@ -41,6 +41,17 @@ pnpm desktop:dev
 5. Click `Run Onboarding` and accept confirmation.
 6. Complete onboarding in Terminal and verify WhatsApp connection.
 7. Return to desktop app and click `Refresh` on Status/Health/Sessions.
+8. If the embedded Web UI says `unauthorized`, run:
+   - `node holyops.mjs dashboard --no-open`
+   - copy the `#token=...` URL and use it once in browser/dashboard settings
+   - then reload the embedded Web UI.
+
+## Expected desktop states
+
+- `Gateway` card should show `Running (desktop-managed) ...` after successful start.
+- `Health` should return JSON output (not gateway closed/connection errors).
+- `Sessions` should return JSON output with at least default/main keys after setup.
+- Embedded `Local Web UI` should load and connect without auth errors once token is configured.
 
 ## CLI resolution behavior
 
@@ -73,3 +84,6 @@ SM_GATEWAY_TOKEN=replace-with-token pnpm desktop:dev
 - If status/health commands fail with missing `dist/entry-seniormantis`, run `pnpm build`.
 - If status/health or gateway launch reports missing config, run `holyops setup` (or click `Run Setup` in the desktop app).
 - If the embedded UI is blank or 404s, verify local gateway is running and check `gateway.controlUi.basePath` (or set `SM_GATEWAY_UI_PATH`).
+- If the embedded UI shows `disconnected (1008): unauthorized`, generate/read the gateway token and reconnect:
+  - `node holyops.mjs dashboard --no-open`
+  - `node holyops.mjs doctor --generate-gateway-token`

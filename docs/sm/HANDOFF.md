@@ -61,6 +61,15 @@ Direction is now personal-first `HolyOps` (creator workflow cockpit) while prese
   - `src/wizard/onboarding.ts`, `src/wizard/onboarding.finalize.ts`, and `src/commands/onboard.ts` use mode-aware docs links.
   - `ui/src/ui/brand.ts` (`resolveUiDocsLinks`) controls Control UI docs labels/links in HolyOps mode.
   - HolyOps mode now avoids `docs.openclaw.ai` links in key Control UI auth/help hints (`ui/src/ui/views/overview.ts`, `ui/src/ui/app-render.ts`).
+- Continued docs-link migration in onboarding and skills flows:
+  - `src/commands/onboard-non-interactive/local.ts` and `src/commands/onboard-non-interactive/remote.ts` now route web tools docs hints through `resolveBrandDocsLinks().toolsWeb`.
+  - `src/commands/onboard-skills.ts` now routes skill docs hints through `resolveBrandDocsLinks().skills`.
+  - `src/sm/brand.ts` now includes a `skills` docs-link key.
+- Continued v1 channel-surface prune in Control UI:
+  - HolyOps mode channel health view now filters displayed channel cards/order to `whatsapp` + `webchat`.
+  - files: `ui/src/ui/views/channels.ts`, `ui/src/ui/views/channels.node.test.ts`.
+- Desktop local test runbook tightening:
+  - `apps/desktop-electron/README.md` now includes explicit token/unauthorized recovery and expected state checklist.
 - Migration tracking doc:
   - `docs/sm/HOLYOPS_MIGRATION_NOTES.md`
 - HolyOps workflow adapter implementation:
