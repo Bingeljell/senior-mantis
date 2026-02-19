@@ -198,4 +198,46 @@ describe("config view", () => {
     input.dispatchEvent(new Event("input", { bubbles: true }));
     expect(onSearchChange).toHaveBeenCalledWith("gateway");
   });
+
+  it("shows only v1 channel subsections in HolyOps mode", () => {
+    const injectedWindow = window as Window & { __OPENCLAW_PRODUCT_BRAND__?: string };
+    const prevBrand = injectedWindow.__OPENCLAW_PRODUCT_BRAND__;
+    injectedWindow.__OPENCLAW_PRODUCT_BRAND__ = "HolyOps";
+    try {
+      const container = document.createElement("div");
+      render(
+        renderConfig({
+          ...baseProps(),
+          activeSection: "channels",
+          schema: {
+            type: "object",
+            properties: {
+              channels: {
+                type: "object",
+                properties: {
+                  whatsapp: { type: "object", properties: {} },
+                  telegram: { type: "object", properties: {} },
+                  webchat: { type: "object", properties: {} },
+                },
+              },
+            },
+          },
+        }),
+        container,
+      );
+
+      const labels = Array.from(container.querySelectorAll(".config-subnav__item")).map((entry) =>
+        entry.textContent?.trim().toLowerCase(),
+      );
+      expect(labels.some((label) => label?.includes("whatsapp"))).toBe(true);
+      expect(labels.some((label) => label?.includes("webchat"))).toBe(true);
+      expect(labels.some((label) => label?.includes("telegram"))).toBe(false);
+    } finally {
+      if (prevBrand === undefined) {
+        delete injectedWindow.__OPENCLAW_PRODUCT_BRAND__;
+      } else {
+        injectedWindow.__OPENCLAW_PRODUCT_BRAND__ = prevBrand;
+      }
+    }
+  });
 });

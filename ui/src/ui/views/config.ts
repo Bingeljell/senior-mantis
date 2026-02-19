@@ -1,5 +1,6 @@
 import { html, nothing } from "lit";
 import type { ConfigUiHints } from "../types.ts";
+import { resolveProductBrand } from "../brand.ts";
 import { hintForPath, humanize, schemaType, type JsonSchema } from "./config-form.shared.ts";
 import { analyzeConfigSchema, renderConfigForm, SECTION_META } from "./config-form.ts";
 
@@ -286,6 +287,7 @@ type SubsectionEntry = {
 };
 
 const ALL_SUBSECTION = "__all__";
+const HOLYOPS_V1_CHANNEL_KEYS = new Set(["whatsapp", "webchat"]);
 
 function getSectionIcon(key: string) {
   return sidebarIcons[key as keyof typeof sidebarIcons] ?? sidebarIcons.default;
@@ -298,6 +300,12 @@ function resolveSectionMeta(
   label: string;
   description?: string;
 } {
+  if (key === "channels" && resolveProductBrand() === "HolyOps") {
+    return {
+      label: "Channels",
+      description: "Messaging channels (WhatsApp + local web UI).",
+    };
+  }
   const meta = SECTION_META[key];
   if (meta) {
     return meta;
@@ -325,7 +333,39 @@ function resolveSubsections(params: {
     return { key: subKey, label, description, order };
   });
   entries.sort((a, b) => (a.order !== b.order ? a.order - b.order : a.key.localeCompare(b.key)));
+  if (key === "channels" && resolveProductBrand() === "HolyOps") {
+    return entries.filter((entry) => HOLYOPS_V1_CHANNEL_KEYS.has(entry.key));
+  }
   return entries;
+}
+
+function resolveConfigSchemaForMode(schema: JsonSchema | null): JsonSchema | null {
+  if (!schema || resolveProductBrand() !== "HolyOps") {
+    return schema;
+  }
+  if (schemaType(schema) !== "object" || !schema.properties?.channels) {
+    return schema;
+  }
+  const channelsSchema = schema.properties.channels;
+  if (schemaType(channelsSchema) !== "object" || !channelsSchema.properties) {
+    return schema;
+  }
+  const filteredChannels = Object.fromEntries(
+    Object.entries(channelsSchema.properties).filter(([key]) => HOLYOPS_V1_CHANNEL_KEYS.has(key)),
+  );
+  if (Object.keys(filteredChannels).length === Object.keys(channelsSchema.properties).length) {
+    return schema;
+  }
+  return {
+    ...schema,
+    properties: {
+      ...schema.properties,
+      channels: {
+        ...channelsSchema,
+        properties: filteredChannels,
+      },
+    },
+  };
 }
 
 function computeDiff(
@@ -386,10 +426,11 @@ function truncateValue(value: unknown, maxLen = 40): string {
 export function renderConfig(props: ConfigProps) {
   const validity = props.valid == null ? "unknown" : props.valid ? "valid" : "invalid";
   const analysis = analyzeConfigSchema(props.schema);
-  const formUnsafe = analysis.schema ? analysis.unsupportedPaths.length > 0 : false;
+  const schemaForMode = resolveConfigSchemaForMode(analysis.schema);
+  const formUnsafe = schemaForMode ? analysis.unsupportedPaths.length > 0 : false;
 
   // Get available sections from schema
-  const schemaProps = analysis.schema?.properties ?? {};
+  const schemaProps = schemaForMode?.properties ?? {};
   const availableSections = SECTIONS.filter((s) => s.key in schemaProps);
 
   // Add any sections in schema but not in our list
@@ -401,8 +442,8 @@ export function renderConfig(props: ConfigProps) {
   const allSections = [...availableSections, ...extraSections];
 
   const activeSectionSchema =
-    props.activeSection && analysis.schema && schemaType(analysis.schema) === "object"
-      ? analysis.schema.properties?.[props.activeSection]
+    props.activeSection && schemaForMode && schemaType(schemaForMode) === "object"
+      ? schemaForMode.properties?.[props.activeSection]
       : undefined;
   const activeSectionMeta = props.activeSection
     ? resolveSectionMeta(props.activeSection, activeSectionSchema)
@@ -695,7 +736,7 @@ export function renderConfig(props: ConfigProps) {
                         </div>
                       `
                     : renderConfigForm({
-                        schema: analysis.schema,
+                        schema: schemaForMode,
                         uiHints: props.uiHints,
                         value: props.formValue,
                         disabled: props.loading || !props.formValue,
