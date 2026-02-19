@@ -81,6 +81,12 @@ Legend (HolyOps pivot):
   - rationale: remove remaining hardcoded onboarding docs links to `docs.openclaw.ai` in HolyOps-mode active onboarding paths and route all docs pointers through centralized brand-aware docs mapping.
 - 2026-02-19: `apps/desktop-electron/README.md`
   - rationale: document exact local-first desktop recovery for token/auth disconnect (`1008 unauthorized`) and expected state progression during v1 testing.
+- 2026-02-19: `ui/src/ui/views/config.ts`, `ui/src/ui/views/config.browser.test.ts`
+  - rationale: constrain HolyOps-mode Config > Channels surfaces to v1 channels (`whatsapp`, `webchat`) even when upstream schema includes broader channel keys.
+- 2026-02-19: `ui/src/ui/views/usage.ts`, `ui/src/ui/app-scroll.ts`, `ui/src/ui/brand.ts`, `ui/src/ui/brand.node.test.ts`
+  - rationale: reduce high-visibility OpenClaw naming drift by using mode-aware export filename prefixes (`holyops-*` in HolyOps mode).
+- 2026-02-19: `scripts/smoke-desktop-local.sh`, `apps/desktop-electron/README.md`
+  - rationale: add deterministic non-GUI preflight checks for local desktop testing before launching Electron.
 
 ## Deletion log (completed)
 

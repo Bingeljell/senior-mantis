@@ -32,6 +32,14 @@ pnpm --dir apps/desktop-electron install
 pnpm desktop:dev
 ```
 
+## Non-GUI smoke check
+
+Run this before `pnpm desktop:dev` to verify desktop dependencies + HolyOps CLI wiring:
+
+```bash
+scripts/smoke-desktop-local.sh
+```
+
 ## Fast local test flow
 
 1. Start the desktop app with `pnpm desktop:dev`.

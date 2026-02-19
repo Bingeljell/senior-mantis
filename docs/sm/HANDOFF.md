@@ -70,6 +70,16 @@ Direction is now personal-first `HolyOps` (creator workflow cockpit) while prese
   - files: `ui/src/ui/views/channels.ts`, `ui/src/ui/views/channels.node.test.ts`.
 - Desktop local test runbook tightening:
   - `apps/desktop-electron/README.md` now includes explicit token/unauthorized recovery and expected state checklist.
+- Control UI config hardening for v1 scope:
+  - `ui/src/ui/views/config.ts` now filters HolyOps-mode channel subsections/schema to `whatsapp` + `webchat`.
+  - `ui/src/ui/views/config.browser.test.ts` verifies HolyOps mode hides non-v1 channel entries in Config > Channels.
+- High-visibility export naming cleanup:
+  - `ui/src/ui/views/usage.ts` and `ui/src/ui/app-scroll.ts` now use product-aware file prefixes in HolyOps mode (`holyops-*`).
+  - resolver: `ui/src/ui/brand.ts` (`resolveProductSlugForUi`), covered by `ui/src/ui/brand.node.test.ts`.
+- Local desktop preflight smoke script added:
+  - `scripts/smoke-desktop-local.sh`
+  - checks Node/pnpm/Electron dependency wiring, HolyOps CLI command surface, setup bootstrap (if needed), and status JSON probe.
+  - documented in `apps/desktop-electron/README.md`.
 - Migration tracking doc:
   - `docs/sm/HOLYOPS_MIGRATION_NOTES.md`
 - HolyOps workflow adapter implementation:

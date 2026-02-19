@@ -130,6 +130,30 @@ Last updated: 2026-02-19
 - `apps/desktop-electron/README.md`
   - added explicit unauthorized/token recovery flow and expected desktop-state checklist for local testing.
 
+### Control UI v1 hardening + local smoke pass (2026-02-19)
+
+- `ui/src/ui/views/config.ts`
+  - HolyOps mode now filters Config > Channels subsection entries to v1 channels only (`whatsapp`, `webchat`).
+  - HolyOps mode now narrows form schema rendering for `channels.*` to v1 keys as defense in depth.
+  - HolyOps mode channel section description now reflects v1 scope (WhatsApp + local web UI).
+- `ui/src/ui/views/config.browser.test.ts`
+  - added regression coverage to confirm HolyOps mode hides non-v1 channel subsections (example: `telegram`).
+- `ui/src/ui/brand.ts`, `ui/src/ui/brand.node.test.ts`
+  - added product slug resolver for HolyOps/OpenClaw UI mode (`holyops`/`openclaw`).
+- `ui/src/ui/views/usage.ts`, `ui/src/ui/app-scroll.ts`
+  - export filenames are now brand-aware in HolyOps mode:
+    - usage exports: `holyops-usage-*`
+    - log exports: `holyops-logs-*`
+- `scripts/smoke-desktop-local.sh` (new)
+  - added non-GUI local desktop smoke checks:
+    - Node/pnpm availability
+    - Electron dependency resolution in desktop app package
+    - HolyOps CLI wiring (`--help`, `gateway --help`)
+    - setup bootstrap if local config is missing
+    - status JSON probe.
+- `apps/desktop-electron/README.md`
+  - added `scripts/smoke-desktop-local.sh` runbook step before `pnpm desktop:dev`.
+
 ### Command/runtime pruning updates
 
 - `src/sm/cli/program/build-program.ts`
