@@ -75,6 +75,21 @@ Last updated: 2026-02-19
   - `src/wizard/onboarding.finalize.ts` now uses active brand wording for dashboard control copy and local "What now" guidance in HolyOps mode.
   - tests:
     - `src/wizard/onboarding.test.ts`
+- Completed active-flow docs-link migration pass for HolyOps mode:
+  - centralized docs routing for HolyOps/OpenClaw mode:
+    - `src/sm/brand.ts` (`resolveBrandDocsLinks`)
+  - onboarding docs/help text now routes through HolyOps local docs in HolyOps mode:
+    - `src/wizard/onboarding.ts`
+    - `src/wizard/onboarding.finalize.ts`
+    - `src/commands/onboard.ts`
+  - Control UI docs/help hints now use HolyOps local docs labels in HolyOps mode:
+    - `ui/src/ui/brand.ts` (`resolveUiDocsLinks`)
+    - `ui/src/ui/views/overview.ts`
+    - `ui/src/ui/app-render.ts`
+  - tests:
+    - `src/sm/brand.test.ts`
+    - `src/wizard/onboarding.test.ts`
+    - `ui/src/ui/brand.node.test.ts`
 - Added explicit migration tracker:
   - `docs/sm/HOLYOPS_MIGRATION_NOTES.md`
   - keeps `~/.seniormantis` path for now, tracks deferred move to `~/.holyops`.
@@ -195,6 +210,16 @@ Last updated: 2026-02-19
 
 - none
 
+## Active-flow docs migration table (HolyOps mode)
+
+| File                                | Old reference                                                                                                                                                   | HolyOps-mode replacement                                                        |
+| ----------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------- |
+| `src/wizard/onboarding.ts`          | `https://docs.openclaw.ai/gateway/security` and `.../gateway/configuration`                                                                                     | `docs/sm/HANDOFF.md`                                                            |
+| `src/wizard/onboarding.finalize.ts` | `https://docs.openclaw.ai/web/control-ui`, `.../gateway/health`, `.../gateway/troubleshooting`, `.../concepts/agent-workspace`, `.../security`, `.../tools/web` | `docs/sm/HANDOFF.md` and `docs/sm/STATUS.md` (health/insecure-http context)     |
+| `src/commands/onboard.ts`           | `https://docs.openclaw.ai/windows`                                                                                                                              | `docs/sm/HANDOFF.md`                                                            |
+| `ui/src/ui/views/overview.ts`       | `https://docs.openclaw.ai/web/dashboard`, `.../gateway/tailscale`, `.../web/control-ui#insecure-http`                                                           | `Docs: docs/sm/HANDOFF.md` and `Docs: docs/sm/STATUS.md` labels in HolyOps mode |
+| `ui/src/ui/app-render.ts`           | `https://docs.openclaw.ai` resource nav link                                                                                                                    | `Docs: docs/sm/HANDOFF.md` label in HolyOps mode                                |
+
 ## Validation (this environment)
 
 - `pnpm build`
@@ -225,6 +250,10 @@ Last updated: 2026-02-19
   - pass (4 tests)
 - `pnpm exec vitest run src/gateway/control-ui.test.ts src/wizard/onboarding.test.ts`
   - pass (8 tests)
+- `pnpm exec vitest run src/sm/brand.test.ts src/wizard/onboarding.test.ts`
+  - pass (8 tests)
+- `pnpm --dir ui exec vitest run --config vitest.node.config.ts src/ui/brand.node.test.ts src/ui/app-gateway.node.test.ts`
+  - pass (5 tests)
 - `node seniormantis.mjs status --json`
   - pass
 - `node seniormantis.mjs gateway --help`

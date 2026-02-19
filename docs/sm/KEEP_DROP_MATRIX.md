@@ -71,6 +71,10 @@ Legend (HolyOps pivot):
   - rationale: route Control UI command hints and topbar branding through active HolyOps/OpenClaw mode so web auth guidance no longer hardcodes `openclaw` in HolyOps flows.
 - 2026-02-19: `src/wizard/onboarding.finalize.ts`
   - rationale: ensure onboarding completion/token guidance uses active product brand and points HolyOps mode to local `docs/sm/HANDOFF.md` for next steps.
+- 2026-02-19: `src/sm/brand.ts`, `src/wizard/onboarding.ts`, `src/wizard/onboarding.finalize.ts`, `src/commands/onboard.ts`
+  - rationale: centralize HolyOps/OpenClaw docs-link routing for onboarding/security/help output and remove hardcoded `docs.openclaw.ai` references from HolyOps-mode active onboarding flows.
+- 2026-02-19: `ui/src/ui/brand.ts`, `ui/src/ui/views/overview.ts`, `ui/src/ui/app-render.ts`
+  - rationale: show local `docs/sm/*` guidance in HolyOps mode for Control UI auth/help/resources surfaces while preserving OpenClaw docs links in OpenClaw mode.
 
 ## Deletion log (completed)
 

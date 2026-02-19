@@ -56,6 +56,11 @@ Direction is now personal-first `HolyOps` (creator workflow cockpit) while prese
 - Onboarding finalization copy now follows active brand:
   - HolyOps mode now shows HolyOps control wording and local "What now" guidance (`docs/sm/HANDOFF.md`) in final onboarding notes/outro.
   - files: `src/wizard/onboarding.finalize.ts`, `src/wizard/onboarding.test.ts`
+- Active-flow docs-link routing now uses centralized HolyOps/OpenClaw docs mapping:
+  - `src/sm/brand.ts` (`resolveBrandDocsLinks`) controls onboarding/docs pointers per mode.
+  - `src/wizard/onboarding.ts`, `src/wizard/onboarding.finalize.ts`, and `src/commands/onboard.ts` use mode-aware docs links.
+  - `ui/src/ui/brand.ts` (`resolveUiDocsLinks`) controls Control UI docs labels/links in HolyOps mode.
+  - HolyOps mode now avoids `docs.openclaw.ai` links in key Control UI auth/help hints (`ui/src/ui/views/overview.ts`, `ui/src/ui/app-render.ts`).
 - Migration tracking doc:
   - `docs/sm/HOLYOPS_MIGRATION_NOTES.md`
 - HolyOps workflow adapter implementation:
