@@ -16,9 +16,7 @@ function parseTimeoutOrExit(timeout: unknown): number | undefined {
 }
 
 export function registerSeniorMantisGatewayCommands(program: Command): void {
-  const gateway = program
-    .command("gateway")
-    .description("Run and inspect local Senior Mantis gateway");
+  const gateway = program.command("gateway").description("Run and inspect local HolyOps gateway");
 
   addGatewayRunCommand(gateway.command("run").description("Run local gateway (foreground)"));
 

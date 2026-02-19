@@ -33,8 +33,8 @@ function configureSeniorMantisHelp(program: Command, ctx: ProgramContext): void 
   };
 
   program
-    .name("seniormantis")
-    .description("Senior Mantis: personal AI assistant with desktop + WhatsApp workflows.")
+    .name("holyops")
+    .description("HolyOps: personal AI ops cockpit for desktop + WhatsApp workflows.")
     .version(ctx.programVersion)
     .option(
       "--profile <name>",
@@ -53,11 +53,11 @@ function configureSeniorMantisHelp(program: Command, ctx: ProgramContext): void 
   program.addHelpText("afterAll", () => {
     return `
 ${theme.heading("Quick Start:")}
-${example("seniormantis onboard --install-daemon", "Run guided setup with simple prompts.")}
-${example("seniormantis gateway status", "Check local gateway health.")}
-${example("seniormantis dashboard", "Open desktop/browser control UI.")}
+${example("holyops onboard --install-daemon", "Run guided setup with simple prompts.")}
+${example("holyops gateway status", "Check local gateway health.")}
+${example("holyops dashboard", "Open desktop/browser control UI.")}
 ${example(
-  'seniormantis agent --message "Summarize my inbox" --deliver',
+  'holyops agent --message "Summarize my inbox" --deliver',
   "Run one agent turn and deliver output.",
 )}
 
@@ -69,7 +69,7 @@ ${theme.muted("Docs:")} docs/sm/HANDOFF.md
 function registerSeniorMantisMaintenanceCommands(program: Command): void {
   program
     .command("doctor")
-    .description("Health checks + quick fixes for Senior Mantis")
+    .description("Health checks + quick fixes for HolyOps")
     .option("--no-workspace-suggestions", "Disable workspace memory system suggestions", false)
     .option("--yes", "Accept defaults without prompting", false)
     .option("--repair", "Apply recommended repairs without prompting", false)
@@ -94,7 +94,7 @@ function registerSeniorMantisMaintenanceCommands(program: Command): void {
 
   program
     .command("dashboard")
-    .description("Open the local Senior Mantis Control UI")
+    .description("Open the local HolyOps Control UI")
     .option("--no-open", "Print URL but do not launch a browser")
     .action(async (opts) => {
       await runCommandWithRuntime(defaultRuntime, async () => {

@@ -1,9 +1,10 @@
 import path from "node:path";
+import { HOLYOPS_CLI_NAME, SENIOR_MANTIS_CLI_NAME } from "../cli/cli-name.js";
 import { resolveRequiredHomeDir } from "../infra/home-dir.js";
 
 export const SENIOR_MANTIS_STATE_DIRNAME = ".seniormantis";
 export const SENIOR_MANTIS_CONFIG_FILENAME = "seniormantis.json";
-export const SENIOR_MANTIS_CLI_NAME = "seniormantis";
+export { HOLYOPS_CLI_NAME, SENIOR_MANTIS_CLI_NAME };
 
 export function applySeniorMantisDefaults(env: NodeJS.ProcessEnv = process.env): void {
   const home = resolveRequiredHomeDir(env);
@@ -18,6 +19,6 @@ export function applySeniorMantisDefaults(env: NodeJS.ProcessEnv = process.env):
   }
 
   if (!env.OPENCLAW_CLI_NAME_OVERRIDE?.trim()) {
-    env.OPENCLAW_CLI_NAME_OVERRIDE = SENIOR_MANTIS_CLI_NAME;
+    env.OPENCLAW_CLI_NAME_OVERRIDE = HOLYOPS_CLI_NAME;
   }
 }

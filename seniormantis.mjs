@@ -13,6 +13,8 @@ if (module.enableCompileCache && !process.env.NODE_DISABLE_COMPILE_CACHE) {
 const isModuleNotFoundError = (err) =>
   err && typeof err === "object" && "code" in err && err.code === "ERR_MODULE_NOT_FOUND";
 
+const cliName = process.env.OPENCLAW_CLI_NAME_OVERRIDE?.trim() || "seniormantis";
+
 const installProcessWarningFilter = async () => {
   for (const specifier of ["./dist/warning-filter.js", "./dist/warning-filter.mjs"]) {
     try {
@@ -49,5 +51,5 @@ if (await tryImport("./dist/entry-seniormantis.js")) {
 } else if (await tryImport("./dist/entry-seniormantis.mjs")) {
   // OK
 } else {
-  throw new Error("seniormantis: missing dist/entry-seniormantis.(m)js (build output).");
+  throw new Error(`${cliName}: missing dist/entry-seniormantis.(m)js (build output).`);
 }

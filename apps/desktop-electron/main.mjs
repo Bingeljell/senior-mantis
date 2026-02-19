@@ -9,8 +9,8 @@ import JSON5 from "json5";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const repoRoot = path.resolve(__dirname, "..", "..");
-const seniorMantisEntry = path.join(repoRoot, "seniormantis.mjs");
-const globalCliCommand = process.env.SM_CLI_COMMAND?.trim() || "seniormantis";
+const seniorMantisEntry = path.join(repoRoot, "holyops.mjs");
+const globalCliCommand = process.env.SM_CLI_COMMAND?.trim() || "holyops";
 const repoNodeCommand =
   process.env.SM_NODE_COMMAND?.trim() || (process.versions?.electron ? "node" : process.execPath);
 const defaultGatewayHost = process.env.SM_GATEWAY_HOST ?? "127.0.0.1";
@@ -108,10 +108,10 @@ function resolveCliEnv(baseEnv = process.env) {
   const env = { ...baseEnv };
   // pnpm desktop launches can leak npm_config_prefix and trigger nvm startup warnings in spawned shells.
   delete env.npm_config_prefix;
-  // Force Senior Mantis-local state/config so desktop workflows do not accidentally bind to legacy OpenClaw paths.
+  // Force HolyOps-local state/config so desktop workflows do not accidentally bind to legacy OpenClaw paths.
   env.OPENCLAW_STATE_DIR = seniorMantisStateDir;
   env.OPENCLAW_CONFIG_PATH = seniorMantisConfigPath;
-  env.OPENCLAW_CLI_NAME_OVERRIDE = "seniormantis";
+  env.OPENCLAW_CLI_NAME_OVERRIDE = "holyops";
   return env;
 }
 
@@ -123,7 +123,7 @@ function resolveCliInvocation(args) {
       args: [seniorMantisEntry, ...args],
       env: {
         ...resolveCliEnv(),
-        OPENCLAW_CLI_NAME_OVERRIDE: "seniormantis",
+        OPENCLAW_CLI_NAME_OVERRIDE: "holyops",
       },
     };
   }
@@ -159,7 +159,7 @@ function formatGatewayStartFailure(invocation, code, stderr, stdout) {
     .map((line) => line.trim())
     .find((line) => line.length > 0);
   if (merged.includes("Missing config.")) {
-    return "Gateway is not configured yet. Run `seniormantis setup` first, then try again.";
+    return "Gateway is not configured yet. Run `holyops setup` first, then try again.";
   }
   const reason = firstLine ? `: ${firstLine}` : "";
   return `Gateway exited early (code ${code ?? -1}) while launching with ${invocation.mode} CLI${reason}`;
@@ -384,7 +384,7 @@ function createMainWindow() {
     minWidth: 1100,
     minHeight: 720,
     backgroundColor: "#091f18",
-    title: "Senior Mantis Desktop",
+    title: "HolyOps Desktop",
     webPreferences: {
       contextIsolation: true,
       nodeIntegration: false,
@@ -438,7 +438,7 @@ ipcMain.handle("sm:gateway-status", async () => {
 });
 
 ipcMain.handle("sm:start-gateway", async () => {
-  const confirmed = await confirmSideEffect("Start local Senior Mantis gateway");
+  const confirmed = await confirmSideEffect("Start local HolyOps gateway");
   if (!confirmed) {
     return { ok: false, message: "Cancelled by user." };
   }
@@ -502,7 +502,7 @@ void app
     });
   })
   .catch((error) => {
-    console.error("Failed to start Senior Mantis desktop app:", error);
+    console.error("Failed to start HolyOps desktop app:", error);
     app.quit();
   });
 

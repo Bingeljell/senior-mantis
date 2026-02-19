@@ -19,14 +19,14 @@ describe("buildSeniorMantisProgram dashboard command", () => {
   it("passes noOpen=true when --no-open is set", async () => {
     dashboardCommand.mockClear();
     const program: Command = buildSeniorMantisProgram();
-    await program.parseAsync(["node", "seniormantis", "dashboard", "--no-open"]);
+    await program.parseAsync(["node", "holyops", "dashboard", "--no-open"]);
     expect(dashboardCommand).toHaveBeenCalledWith(expect.anything(), { noOpen: true });
   });
 
   it("passes noOpen=false by default", async () => {
     dashboardCommand.mockClear();
     const program: Command = buildSeniorMantisProgram();
-    await program.parseAsync(["node", "seniormantis", "dashboard"]);
+    await program.parseAsync(["node", "holyops", "dashboard"]);
     expect(dashboardCommand).toHaveBeenCalledWith(expect.anything(), { noOpen: false });
   });
 });

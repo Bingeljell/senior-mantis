@@ -9,7 +9,10 @@ import {
 } from "./channel-policy.js";
 
 describe("Senior Mantis channel policy", () => {
-  it("detects Senior Mantis CLI mode from env override", () => {
+  it("detects HolyOps mode from CLI override", () => {
+    expect(isSeniorMantisCli({ OPENCLAW_CLI_NAME_OVERRIDE: "holyops" } as NodeJS.ProcessEnv)).toBe(
+      true,
+    );
     expect(
       isSeniorMantisCli({ OPENCLAW_CLI_NAME_OVERRIDE: "seniormantis" } as NodeJS.ProcessEnv),
     ).toBe(true);
@@ -36,7 +39,7 @@ describe("Senior Mantis channel policy", () => {
 
   it("throws for disallowed channels in Senior Mantis mode", () => {
     const previous = process.env.OPENCLAW_CLI_NAME_OVERRIDE;
-    process.env.OPENCLAW_CLI_NAME_OVERRIDE = "seniormantis";
+    process.env.OPENCLAW_CLI_NAME_OVERRIDE = "holyops";
     try {
       expect(() => assertSeniorMantisAllowedGatewayChannel("telegram", "--channel")).toThrow(
         /Senior Mantis supports/,

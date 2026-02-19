@@ -2,7 +2,7 @@
   "name": "@seniormantis/desktop-electron",
   "version": "0.0.1",
   "private": true,
-  "description": "Senior Mantis desktop shell (Electron)",
+  "description": "HolyOps desktop shell (Electron)",
   "main": "main.mjs",
   "type": "module",
   "scripts": {

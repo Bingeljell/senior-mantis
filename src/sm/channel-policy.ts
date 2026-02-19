@@ -1,4 +1,4 @@
-import { SENIOR_MANTIS_CLI_NAME } from "./env.js";
+import { HOLYOPS_COMPAT_CLI_NAMES } from "../cli/cli-name.js";
 
 export const SENIOR_MANTIS_ALLOWED_GATEWAY_CHANNELS = ["whatsapp", "webchat"] as const;
 export const SENIOR_MANTIS_ALLOWED_DELIVERABLE_CHANNELS = ["whatsapp"] as const;
@@ -6,8 +6,10 @@ export const SENIOR_MANTIS_ALLOWED_ONBOARDING_CHANNELS = ["whatsapp"] as const;
 
 export function isSeniorMantisCli(env: NodeJS.ProcessEnv = process.env): boolean {
   const cliName = env.OPENCLAW_CLI_NAME_OVERRIDE?.trim().toLowerCase();
-  return cliName === SENIOR_MANTIS_CLI_NAME;
+  return (HOLYOPS_COMPAT_CLI_NAMES as readonly string[]).includes(cliName ?? "");
 }
+
+export const isHolyOpsCli = isSeniorMantisCli;
 
 export function isSeniorMantisAllowedGatewayChannel(raw: string): boolean {
   return (SENIOR_MANTIS_ALLOWED_GATEWAY_CHANNELS as readonly string[]).includes(raw);

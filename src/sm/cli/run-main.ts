@@ -11,6 +11,8 @@ import { applySeniorMantisDefaults } from "../env.js";
 import { applySeniorMantisRuntimeGuardrails } from "../runtime-guardrails.js";
 import { buildSeniorMantisProgram } from "./program/build-program.js";
 
+const CLI_LOG_PREFIX = "[holyops]";
+
 function rewriteUpdateFlagArgv(argv: string[]): string[] {
   const index = argv.indexOf("--update");
   if (index === -1) {
@@ -42,7 +44,7 @@ export async function runSeniorMantisCli(argv: string[] = process.argv): Promise
   // Global error handlers to prevent silent crashes from unhandled rejections/exceptions.
   installUnhandledRejectionHandler();
   process.on("uncaughtException", (error) => {
-    console.error("[seniormantis] Uncaught exception:", formatUncaughtError(error));
+    console.error(`${CLI_LOG_PREFIX} Uncaught exception:`, formatUncaughtError(error));
     process.exit(1);
   });
 

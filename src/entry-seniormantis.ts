@@ -9,10 +9,17 @@ import { attachChildProcessBridge } from "./process/child-process-bridge.js";
 import { runSeniorMantisCli } from "./sm/cli/run-main.js";
 import { applySeniorMantisDefaults } from "./sm/env.js";
 
-process.title = "seniormantis";
+const resolveCliLogLabel = () => {
+  const raw = process.env.OPENCLAW_CLI_NAME_OVERRIDE?.trim();
+  return raw || "holyops";
+};
+
+process.title = resolveCliLogLabel();
 installProcessWarningFilter();
 normalizeEnv();
 applySeniorMantisDefaults();
+
+const CLI_LOG_LABEL = resolveCliLogLabel();
 
 if (process.argv.includes("--no-color")) {
   process.env.NO_COLOR = "1";
@@ -70,7 +77,7 @@ function ensureExperimentalWarningSuppressed(): boolean {
 
   child.once("error", (error) => {
     console.error(
-      "[seniormantis] Failed to respawn CLI:",
+      `[${CLI_LOG_LABEL}] Failed to respawn CLI:`,
       error instanceof Error ? (error.stack ?? error.message) : error,
     );
     process.exit(1);
@@ -84,7 +91,7 @@ process.argv = normalizeWindowsArgv(process.argv);
 if (!ensureExperimentalWarningSuppressed()) {
   void runSeniorMantisCli(process.argv).catch((error) => {
     console.error(
-      "[seniormantis] Failed to start CLI:",
+      `[${CLI_LOG_LABEL}] Failed to start CLI:`,
       error instanceof Error ? (error.stack ?? error.message) : error,
     );
     process.exitCode = 1;

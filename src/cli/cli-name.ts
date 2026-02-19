@@ -1,10 +1,12 @@
 import path from "node:path";
 
 export const DEFAULT_CLI_NAME = "openclaw";
+export const HOLYOPS_CLI_NAME = "holyops";
 export const SENIOR_MANTIS_CLI_NAME = "seniormantis";
+export const HOLYOPS_COMPAT_CLI_NAMES = [HOLYOPS_CLI_NAME, SENIOR_MANTIS_CLI_NAME] as const;
 
-const KNOWN_CLI_NAMES = new Set([DEFAULT_CLI_NAME, SENIOR_MANTIS_CLI_NAME]);
-const CLI_PREFIX_RE = /^(?:((?:pnpm|npm|bunx|npx)\s+))?(openclaw|seniormantis)\b/;
+const KNOWN_CLI_NAMES = new Set([DEFAULT_CLI_NAME, ...HOLYOPS_COMPAT_CLI_NAMES]);
+const CLI_PREFIX_RE = /^(?:((?:pnpm|npm|bunx|npx)\s+))?(openclaw|holyops|seniormantis)\b/;
 
 export function resolveCliName(argv: string[] = process.argv): string {
   const override = process.env.OPENCLAW_CLI_NAME_OVERRIDE?.trim();

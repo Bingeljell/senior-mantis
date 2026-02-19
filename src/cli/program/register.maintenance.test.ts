@@ -34,14 +34,14 @@ describe("registerMaintenanceCommands", () => {
   it("maps --no-open to dashboardCommand noOpen=true", async () => {
     const program = new Command();
     registerMaintenanceCommands(program);
-    await program.parseAsync(["node", "seniormantis", "dashboard", "--no-open"]);
+    await program.parseAsync(["node", "holyops", "dashboard", "--no-open"]);
     expect(dashboardCommand).toHaveBeenCalledWith(expect.anything(), { noOpen: true });
   });
 
   it("defaults dashboardCommand noOpen=false", async () => {
     const program = new Command();
     registerMaintenanceCommands(program);
-    await program.parseAsync(["node", "seniormantis", "dashboard"]);
+    await program.parseAsync(["node", "holyops", "dashboard"]);
     expect(dashboardCommand).toHaveBeenCalledWith(expect.anything(), { noOpen: false });
   });
 });

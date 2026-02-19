@@ -38,12 +38,12 @@ export function registerSeniorMantisStatusHealthSessionsCommands(program: Comman
       "after",
       () =>
         `\n${theme.heading("Examples:")}\n${formatHelpExamples([
-          ["seniormantis status", "Show health + session summary."],
-          ["seniormantis status --all", "Full diagnosis (read-only)."],
-          ["seniormantis status --json", "Machine-readable output."],
-          ["seniormantis status --usage", "Show model provider usage/quota snapshots."],
-          ["seniormantis status --deep", "Run deeper WhatsApp probes."],
-          ["seniormantis status --deep --timeout 5000", "Tighten probe timeout."],
+          ["holyops status", "Show health + session summary."],
+          ["holyops status --all", "Full diagnosis (read-only)."],
+          ["holyops status --json", "Machine-readable output."],
+          ["holyops status --usage", "Show model provider usage/quota snapshots."],
+          ["holyops status --deep", "Run deeper WhatsApp probes."],
+          ["holyops status --deep --timeout 5000", "Tighten probe timeout."],
         ])}`,
     )
     .addHelpText("after", () => `\n${theme.muted("Docs:")} docs/sm/STATUS.md\n`)
@@ -107,10 +107,10 @@ export function registerSeniorMantisStatusHealthSessionsCommands(program: Comman
       "after",
       () =>
         `\n${theme.heading("Examples:")}\n${formatHelpExamples([
-          ["seniormantis sessions", "List all sessions."],
-          ["seniormantis sessions --active 120", "Only last 2 hours."],
-          ["seniormantis sessions --json", "Machine-readable output."],
-          ["seniormantis sessions --store ./tmp/sessions.json", "Use a specific session store."],
+          ["holyops sessions", "List all sessions."],
+          ["holyops sessions --active 120", "Only last 2 hours."],
+          ["holyops sessions --json", "Machine-readable output."],
+          ["holyops sessions --store ./tmp/sessions.json", "Use a specific session store."],
         ])}\n\n${theme.muted(
           "Shows token usage per session when the agent reports it; set agents.defaults.contextTokens to cap the window and show %.",
         )}`,

@@ -1,7 +1,7 @@
 import { resolveCommitHash } from "../infra/git-commit.js";
 import { visibleWidth } from "../terminal/ansi.js";
 import { isRich, theme } from "../terminal/theme.js";
-import { SENIOR_MANTIS_CLI_NAME, resolveCliName } from "./cli-name.js";
+import { HOLYOPS_CLI_NAME, SENIOR_MANTIS_CLI_NAME, resolveCliName } from "./cli-name.js";
 import { pickTagline, type TaglineOptions } from "./tagline.js";
 
 type BannerOptions = TaglineOptions & {
@@ -42,13 +42,17 @@ type CliBrand = {
   tagline: string;
 };
 
+function isHolyOpsCliName(name: string): boolean {
+  return name === HOLYOPS_CLI_NAME || name === SENIOR_MANTIS_CLI_NAME;
+}
+
 function resolveCliBrand(argv: string[]): CliBrand {
-  if (resolveCliName(argv) === SENIOR_MANTIS_CLI_NAME) {
+  if (isHolyOpsCliName(resolveCliName(argv))) {
     return {
-      title: "🪲 Senior Mantis",
-      prefix: "🪲 ",
-      label: "SENIOR MANTIS",
-      tagline: "Desktop-first assistant with WhatsApp and local web UI.",
+      title: "⚡ HolyOps",
+      prefix: "⚡ ",
+      label: "HOLYOPS",
+      tagline: "Personal creator ops with WhatsApp and local desktop control.",
     };
   }
   return {
@@ -101,20 +105,20 @@ const LOBSTER_ASCII = [
   " ",
 ];
 
-const SENIOR_MANTIS_ASCII = [
+const HOLYOPS_ASCII = [
   "▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄",
   "██░▄▄▄░██░▄▄░██░▄▄▄██░▀██░██░▄▄▀██░████░▄▄▀██░███░██",
   "██░███░██░▀▀░██░▄▄▄██░█░█░██░█████░████░▀▀░██░█░█░██",
   "██░▀▀▀░██░█████░▀▀▀██░██▄░██░▀▀▄██░▀▀░█░██░██▄▀▄▀▄██",
   "▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀",
-  "               🪲 SENIOR MANTIS 🪲               ",
+  "                  ⚡ HOLYOPS ⚡                  ",
   " ",
 ];
 
 export function formatCliBannerArt(options: BannerOptions = {}): string {
   const argv = options.argv ?? process.argv;
   const brand = resolveCliBrand(argv);
-  const source = brand.label === "SENIOR MANTIS" ? SENIOR_MANTIS_ASCII : LOBSTER_ASCII;
+  const source = brand.label === "HOLYOPS" ? HOLYOPS_ASCII : LOBSTER_ASCII;
   const rich = options.richTty ?? isRich();
   if (!rich) {
     return source.join("\n");
@@ -137,9 +141,9 @@ export function formatCliBannerArt(options: BannerOptions = {}): string {
     if (line.includes(brand.label)) {
       return (
         theme.muted("              ") +
-        (brand.label === "SENIOR MANTIS" ? theme.accent("🪲") : theme.accent("🦞")) +
+        (brand.label === "HOLYOPS" ? theme.accent("⚡") : theme.accent("🦞")) +
         theme.info(` ${brand.label} `) +
-        (brand.label === "SENIOR MANTIS" ? theme.accent("🪲") : theme.accent("🦞"))
+        (brand.label === "HOLYOPS" ? theme.accent("⚡") : theme.accent("🦞"))
       );
     }
     return splitGraphemes(line).map(colorChar).join("");

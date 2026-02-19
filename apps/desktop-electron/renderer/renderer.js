@@ -42,7 +42,11 @@ function maybeSetupHint(result) {
     return null;
   }
   const details = `${result?.stderr ?? ""}\n${result?.stdout ?? ""}`.toLowerCase();
-  if (details.includes("missing config") || details.includes("run `seniormantis setup`")) {
+  if (
+    details.includes("missing config") ||
+    details.includes("run `holyops setup`") ||
+    details.includes("run `seniormantis setup`")
+  ) {
     return "Setup is required before first gateway start. Click 'Run Setup'.";
   }
   return null;

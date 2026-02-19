@@ -6,12 +6,14 @@
   "license": "MIT",
   "author": "",
   "bin": {
+    "holyops": "holyops.mjs",
     "openclaw": "openclaw.mjs",
     "seniormantis": "seniormantis.mjs"
   },
   "files": [
     "CHANGELOG.md",
     "LICENSE",
+    "holyops.mjs",
     "openclaw.mjs",
     "seniormantis.mjs",
     "README-header.png",

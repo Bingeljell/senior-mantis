@@ -40,7 +40,7 @@ function setRequiredOverride(path: string, value: unknown): void {
   const result = setConfigOverride(path, value);
   if (!result.ok) {
     throw new Error(
-      `[seniormantis] Failed to apply runtime guardrail override for "${path}": ${result.error ?? "unknown error"}`,
+      `[holyops] Failed to apply runtime guardrail override for "${path}": ${result.error ?? "unknown error"}`,
     );
   }
 }

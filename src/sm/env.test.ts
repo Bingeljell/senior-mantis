@@ -2,8 +2,8 @@ import path from "node:path";
 import { describe, expect, it } from "vitest";
 import {
   applySeniorMantisDefaults,
+  HOLYOPS_CLI_NAME,
   SENIOR_MANTIS_CONFIG_FILENAME,
-  SENIOR_MANTIS_CLI_NAME,
   SENIOR_MANTIS_STATE_DIRNAME,
 } from "./env.js";
 
@@ -19,7 +19,7 @@ describe("applySeniorMantisDefaults", () => {
     expect(env.OPENCLAW_CONFIG_PATH).toBe(
       path.join("/tmp/home-user", SENIOR_MANTIS_STATE_DIRNAME, SENIOR_MANTIS_CONFIG_FILENAME),
     );
-    expect(env.OPENCLAW_CLI_NAME_OVERRIDE).toBe(SENIOR_MANTIS_CLI_NAME);
+    expect(env.OPENCLAW_CLI_NAME_OVERRIDE).toBe(HOLYOPS_CLI_NAME);
   });
 
   it("does not overwrite explicit OpenClaw env overrides", () => {
