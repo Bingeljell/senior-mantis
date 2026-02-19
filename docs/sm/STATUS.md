@@ -60,6 +60,21 @@ Last updated: 2026-02-19
 - Pruned extension/plugin tool surface in HolyOps mode:
   - `createOpenClawTools` now skips plugin tool resolution in HolyOps mode while retaining OpenClaw behavior in OpenClaw mode.
   - files: `src/agents/openclaw-tools.ts`, `src/agents/openclaw-tools.holyops-plugin-prune.test.ts`
+- Added HolyOps-aware Control UI branding seam:
+  - gateway-served Control UI HTML now injects CLI command + product brand:
+    - `src/gateway/control-ui.ts`
+  - new UI helper for command/product rendering:
+    - `ui/src/ui/brand.ts`
+  - updated Control UI surfaces:
+    - `ui/src/ui/app-render.ts` (topbar brand + config path subtitle)
+    - `ui/src/ui/views/overview.ts` (auth recovery commands)
+    - `ui/src/ui/views/debug.ts` (security audit command hint)
+  - tests:
+    - `src/gateway/control-ui.test.ts`
+- Updated onboarding finalization copy to follow active HolyOps/OpenClaw branding:
+  - `src/wizard/onboarding.finalize.ts` now uses active brand wording for dashboard control copy and local "What now" guidance in HolyOps mode.
+  - tests:
+    - `src/wizard/onboarding.test.ts`
 - Added explicit migration tracker:
   - `docs/sm/HOLYOPS_MIGRATION_NOTES.md`
   - keeps `~/.seniormantis` path for now, tracks deferred move to `~/.holyops`.
@@ -208,6 +223,8 @@ Last updated: 2026-02-19
   - pass (12 tests)
 - `pnpm exec vitest -c vitest.e2e.config.ts run src/gateway/server.channels.e2e.test.ts`
   - pass (4 tests)
+- `pnpm exec vitest run src/gateway/control-ui.test.ts src/wizard/onboarding.test.ts`
+  - pass (8 tests)
 - `node seniormantis.mjs status --json`
   - pass
 - `node seniormantis.mjs gateway --help`
@@ -222,6 +239,8 @@ Last updated: 2026-02-19
   - non-zero when gateway is not running (`gateway closed`), expected in this state.
 - `node seniormantis.mjs gateway run --bind loopback --port 18789 --force`
   - exits with missing-config guidance when setup is incomplete, expected on fresh local state.
+- `pnpm exec vitest run ui/src/ui/app-gateway.node.test.ts ui/src/ui/navigation.test.ts`
+  - exits with `No test files found` because root Vitest include is `src/**/*.test.ts`; `ui/src/**` tests are excluded from this runner.
 
 ## Notes
 

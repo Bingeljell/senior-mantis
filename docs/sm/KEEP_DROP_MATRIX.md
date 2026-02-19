@@ -67,6 +67,10 @@ Legend (HolyOps pivot):
   - rationale: prune extension/plugin tool surface in HolyOps mode by skipping plugin tool resolution while preserving OpenClaw-mode behavior.
 - 2026-02-19: `apps/desktop-electron/main.mjs`, `apps/desktop-electron/renderer/index.html`, `apps/desktop-electron/renderer/renderer.js`
   - rationale: expand desktop quick actions to research/writer workflows so visible product capability shifts beyond legacy OpenClaw defaults.
+- 2026-02-19: `src/gateway/control-ui.ts`, `ui/src/ui/brand.ts`, `ui/src/ui/app-render.ts`, `ui/src/ui/views/overview.ts`, `ui/src/ui/views/debug.ts`
+  - rationale: route Control UI command hints and topbar branding through active HolyOps/OpenClaw mode so web auth guidance no longer hardcodes `openclaw` in HolyOps flows.
+- 2026-02-19: `src/wizard/onboarding.finalize.ts`
+  - rationale: ensure onboarding completion/token guidance uses active product brand and points HolyOps mode to local `docs/sm/HANDOFF.md` for next steps.
 
 ## Deletion log (completed)
 

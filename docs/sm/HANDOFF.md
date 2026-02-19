@@ -49,6 +49,13 @@ Direction is now personal-first `HolyOps` (creator workflow cockpit) while prese
 - Plugin/extension tool surface pruned in HolyOps mode:
   - `src/agents/openclaw-tools.ts` now skips `resolvePluginTools(...)` when HolyOps mode is active
   - keeps OpenClaw-mode plugin behavior unchanged outside HolyOps mode
+- Control UI brand/command seam shipped for HolyOps mode:
+  - gateway HTML injection now provides CLI command + product brand (`src/gateway/control-ui.ts`)
+  - web UI now renders HolyOps-aware command hints and topbar brand (`ui/src/ui/brand.ts`, `ui/src/ui/views/overview.ts`, `ui/src/ui/views/debug.ts`, `ui/src/ui/app-render.ts`)
+  - regression test: `src/gateway/control-ui.test.ts`
+- Onboarding finalization copy now follows active brand:
+  - HolyOps mode now shows HolyOps control wording and local "What now" guidance (`docs/sm/HANDOFF.md`) in final onboarding notes/outro.
+  - files: `src/wizard/onboarding.finalize.ts`, `src/wizard/onboarding.test.ts`
 - Migration tracking doc:
   - `docs/sm/HOLYOPS_MIGRATION_NOTES.md`
 - HolyOps workflow adapter implementation:
