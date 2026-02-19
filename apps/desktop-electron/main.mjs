@@ -151,6 +151,52 @@ function buildQuickActionPlan(actionId, payload) {
     };
   }
 
+  if (actionId === "research_scan") {
+    const topic = readStringFromPayload(payload, "topic") || "creator tooling trends";
+    const maxResults = readStringFromPayload(payload, "maxResults") || "5";
+    return {
+      ok: true,
+      actionLabel: "Run quick action: research scan",
+      cliArgs: [
+        "workflow",
+        "--adapter",
+        "research-agent",
+        "--action",
+        "scan_topic",
+        "--arg",
+        `topic=${topic}`,
+        "--arg",
+        `maxResults=${maxResults}`,
+        "--json",
+      ],
+    };
+  }
+
+  if (actionId === "writer_draft") {
+    const topic = readStringFromPayload(payload, "topic") || "weekly build log";
+    const tone = readStringFromPayload(payload, "tone") || "clear";
+    const maxWords = readStringFromPayload(payload, "maxWords") || "500";
+    return {
+      ok: true,
+      actionLabel: "Run quick action: writer draft",
+      cliArgs: [
+        "workflow",
+        "--adapter",
+        "writer-agent",
+        "--action",
+        "draft_post",
+        "--arg",
+        `topic=${topic}`,
+        "--arg",
+        `tone=${tone}`,
+        "--arg",
+        `maxWords=${maxWords}`,
+        "--confirm",
+        "--json",
+      ],
+    };
+  }
+
   return {
     ok: false,
     actionLabel: "",

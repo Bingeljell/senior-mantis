@@ -10,6 +10,8 @@ const els = {
   refreshFrame: document.getElementById("refreshFrame"),
   runVideoCompress: document.getElementById("runVideoCompress"),
   runBusinessProposal: document.getElementById("runBusinessProposal"),
+  runResearchScan: document.getElementById("runResearchScan"),
+  runWriterDraft: document.getElementById("runWriterDraft"),
   gatewayStatus: document.getElementById("gatewayStatus"),
   healthOutput: document.getElementById("healthOutput"),
   sessionsOutput: document.getElementById("sessionsOutput"),
@@ -22,6 +24,11 @@ const els = {
   businessProjectId: document.getElementById("businessProjectId"),
   businessTemplate: document.getElementById("businessTemplate"),
   businessBrief: document.getElementById("businessBrief"),
+  researchTopic: document.getElementById("researchTopic"),
+  researchMaxResults: document.getElementById("researchMaxResults"),
+  writerTopic: document.getElementById("writerTopic"),
+  writerTone: document.getElementById("writerTone"),
+  writerMaxWords: document.getElementById("writerMaxWords"),
 };
 
 function logActivity(message) {
@@ -190,6 +197,34 @@ els.runBusinessProposal.addEventListener("click", async () => {
       brief,
     },
     "Business proposal quick action",
+  );
+});
+
+els.runResearchScan.addEventListener("click", async () => {
+  const topic = getFieldValue(els.researchTopic);
+  const maxResults = getFieldValue(els.researchMaxResults);
+  await runQuickAction(
+    "research_scan",
+    {
+      topic,
+      maxResults,
+    },
+    "Research scan quick action",
+  );
+});
+
+els.runWriterDraft.addEventListener("click", async () => {
+  const topic = getFieldValue(els.writerTopic);
+  const tone = getFieldValue(els.writerTone);
+  const maxWords = getFieldValue(els.writerMaxWords);
+  await runQuickAction(
+    "writer_draft",
+    {
+      topic,
+      tone,
+      maxWords,
+    },
+    "Writer draft quick action",
   );
 });
 

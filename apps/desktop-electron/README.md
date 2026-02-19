@@ -8,7 +8,7 @@ Minimal desktop shell for local HolyOps workflows on macOS.
 - Opens setup in a terminal window after explicit confirmation.
 - Opens interactive onboarding in a terminal window after explicit confirmation.
 - Shows status/health/sessions snapshots.
-- Includes quick actions that run direct HolyOps workflow adapter commands (`video-agent`, `business-agent`).
+- Includes quick actions that run direct HolyOps workflow adapter commands (`video-agent`, `business-agent`, `research-agent`, `writer-agent`).
 - Embeds local web UI in-app (`http://127.0.0.1:18789` by default, or configured `gateway.controlUi.basePath`).
 - Surfaces first-run setup hints when status checks detect missing config.
 
