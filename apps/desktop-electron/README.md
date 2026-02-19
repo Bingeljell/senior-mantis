@@ -7,6 +7,7 @@ Minimal desktop shell for local HolyOps workflows on macOS.
 - Starts/stops a local gateway process (`bind=loopback`, port `18789`) after explicit confirmation.
 - Opens setup in a terminal window after explicit confirmation.
 - Opens interactive onboarding in a terminal window after explicit confirmation.
+- Runs desktop diagnostics from the app (`Run Diagnostics`) using `scripts/smoke-desktop-local.sh`.
 - Shows status/health/sessions snapshots.
 - Includes quick actions that run direct HolyOps workflow adapter commands (`video-agent`, `business-agent`, `research-agent`, `writer-agent`).
 - Embeds local web UI in-app (`http://127.0.0.1:18789` by default, or configured `gateway.controlUi.basePath`).
@@ -40,16 +41,24 @@ Run this before `pnpm desktop:dev` to verify desktop dependencies + HolyOps CLI 
 scripts/smoke-desktop-local.sh
 ```
 
+- Default behavior is read-only and exits with an actionable error if setup/config is missing.
+- To allow setup from this script when config is missing, use:
+
+```bash
+scripts/smoke-desktop-local.sh --with-setup
+```
+
 ## Fast local test flow
 
 1. Start the desktop app with `pnpm desktop:dev`.
 2. Click `Run Setup` and complete setup in Terminal (first run).
-3. Click `Start Gateway` and accept confirmation.
-4. Confirm gateway status shows `Running`.
-5. Click `Run Onboarding` and accept confirmation.
-6. Complete onboarding in Terminal and verify WhatsApp connection.
-7. Return to desktop app and click `Refresh` on Status/Health/Sessions.
-8. If the embedded Web UI says `unauthorized`, run:
+3. Click `Run Diagnostics` and confirm diagnostics output is successful.
+4. Click `Start Gateway` and accept confirmation.
+5. Confirm gateway status shows `Running`.
+6. Click `Run Onboarding` and accept confirmation.
+7. Complete onboarding in Terminal and verify WhatsApp connection.
+8. Return to desktop app and click `Refresh` on Status/Health/Sessions.
+9. If the embedded Web UI says `unauthorized`, run:
    - `node holyops.mjs dashboard --no-open`
    - copy the `#token=...` URL and use it once in browser/dashboard settings
    - then reload the embedded Web UI.

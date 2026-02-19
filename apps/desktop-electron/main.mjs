@@ -10,6 +10,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const repoRoot = path.resolve(__dirname, "..", "..");
 const seniorMantisEntry = path.join(repoRoot, "holyops.mjs");
+const desktopSmokeScript = path.join(repoRoot, "scripts", "smoke-desktop-local.sh");
 const globalCliCommand = process.env.SM_CLI_COMMAND?.trim() || "holyops";
 const repoNodeCommand =
   process.env.SM_NODE_COMMAND?.trim() || (process.versions?.electron ? "node" : process.execPath);
@@ -427,6 +428,51 @@ function runCommand(command, args) {
   });
 }
 
+function runDesktopDiagnostics() {
+  if (!fs.existsSync(desktopSmokeScript)) {
+    return Promise.resolve({
+      ok: false,
+      code: 127,
+      stdout: "",
+      stderr: `Missing diagnostics script: ${desktopSmokeScript}`,
+      command: desktopSmokeScript,
+    });
+  }
+  return new Promise((resolve) => {
+    const child = spawn("bash", [desktopSmokeScript], {
+      cwd: repoRoot,
+      env: resolveCliEnv(),
+      stdio: ["ignore", "pipe", "pipe"],
+    });
+    let stdout = "";
+    let stderr = "";
+    child.stdout?.on("data", (chunk) => {
+      stdout += chunk.toString();
+    });
+    child.stderr?.on("data", (chunk) => {
+      stderr += chunk.toString();
+    });
+    child.once("error", (error) => {
+      resolve({
+        ok: false,
+        code: -1,
+        stdout: stdout.trim(),
+        stderr: `${stderr}\n${String(error)}`.trim(),
+        command: `bash ${desktopSmokeScript}`,
+      });
+    });
+    child.once("close", (code) => {
+      resolve({
+        ok: code === 0,
+        code: code ?? -1,
+        stdout: stdout.trim(),
+        stderr: stderr.trim(),
+        command: `bash ${desktopSmokeScript}`,
+      });
+    });
+  });
+}
+
 async function startGateway() {
   if (gatewayProcess && gatewayProcess.exitCode == null) {
     return {
@@ -646,6 +692,10 @@ ipcMain.handle("sm:run-quick-action", async (_event, input) => {
     };
   }
   return runQuickAction(actionId, payload);
+});
+
+ipcMain.handle("sm:run-diagnostics", async () => {
+  return runDesktopDiagnostics();
 });
 
 void app

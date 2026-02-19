@@ -1,5 +1,6 @@
 const els = {
   runSetup: document.getElementById("runSetup"),
+  runDiagnostics: document.getElementById("runDiagnostics"),
   startGateway: document.getElementById("startGateway"),
   stopGateway: document.getElementById("stopGateway"),
   openOnboarding: document.getElementById("openOnboarding"),
@@ -16,6 +17,7 @@ const els = {
   healthOutput: document.getElementById("healthOutput"),
   sessionsOutput: document.getElementById("sessionsOutput"),
   statusOutput: document.getElementById("statusOutput"),
+  diagnosticsOutput: document.getElementById("diagnosticsOutput"),
   activityLog: document.getElementById("activityLog"),
   webUiFrame: document.getElementById("webUiFrame"),
   quickActionOutput: document.getElementById("quickActionOutput"),
@@ -133,6 +135,17 @@ els.startGateway.addEventListener("click", async () => {
 els.runSetup.addEventListener("click", async () => {
   const result = await window.smDesktop.runSetup();
   logActivity(result.message ?? "Setup action completed.");
+});
+
+els.runDiagnostics.addEventListener("click", async () => {
+  els.diagnosticsOutput.textContent = "Running diagnostics...";
+  const result = await window.smDesktop.runDiagnostics();
+  els.diagnosticsOutput.textContent = pretty(result);
+  if (result?.ok) {
+    logActivity("Desktop diagnostics passed.");
+  } else {
+    logActivity(`Desktop diagnostics failed (code: ${result?.code ?? "unknown"}).`);
+  }
 });
 
 els.stopGateway.addEventListener("click", async () => {
