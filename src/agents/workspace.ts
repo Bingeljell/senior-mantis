@@ -4,6 +4,7 @@ import path from "node:path";
 import { resolveRequiredHomeDir } from "../infra/home-dir.js";
 import { runCommandWithTimeout } from "../process/exec.js";
 import { isCronSessionKey, isSubagentSessionKey } from "../routing/session-key.js";
+import { isHolyOpsCli } from "../sm/channel-policy.js";
 import { resolveUserPath } from "../utils.js";
 import { resolveWorkspaceTemplateDir } from "./workspace-templates.js";
 
@@ -12,11 +13,12 @@ export function resolveDefaultAgentWorkspaceDir(
   homedir: () => string = os.homedir,
 ): string {
   const home = resolveRequiredHomeDir(env, homedir);
+  const stateRoot = isHolyOpsCli(env) ? ".holyops" : ".openclaw";
   const profile = env.OPENCLAW_PROFILE?.trim();
   if (profile && profile.toLowerCase() !== "default") {
-    return path.join(home, ".openclaw", `workspace-${profile}`);
+    return path.join(home, stateRoot, `workspace-${profile}`);
   }
-  return path.join(home, ".openclaw", "workspace");
+  return path.join(home, stateRoot, "workspace");
 }
 
 export const DEFAULT_AGENT_WORKSPACE_DIR = resolveDefaultAgentWorkspaceDir();
@@ -29,7 +31,8 @@ export const DEFAULT_HEARTBEAT_FILENAME = "HEARTBEAT.md";
 export const DEFAULT_BOOTSTRAP_FILENAME = "BOOTSTRAP.md";
 export const DEFAULT_MEMORY_FILENAME = "MEMORY.md";
 export const DEFAULT_MEMORY_ALT_FILENAME = "memory.md";
-const WORKSPACE_STATE_DIRNAME = ".openclaw";
+const HOLYOPS_WORKSPACE_STATE_DIRNAME = ".holyops";
+const LEGACY_WORKSPACE_STATE_DIRNAME = ".openclaw";
 const WORKSPACE_STATE_FILENAME = "workspace-state.json";
 const WORKSPACE_STATE_VERSION = 1;
 
@@ -140,8 +143,15 @@ async function fileExists(filePath: string): Promise<boolean> {
   }
 }
 
-function resolveWorkspaceStatePath(dir: string): string {
-  return path.join(dir, WORKSPACE_STATE_DIRNAME, WORKSPACE_STATE_FILENAME);
+function resolveWorkspaceStatePath(dir: string, env: NodeJS.ProcessEnv = process.env): string {
+  const stateDirName = isHolyOpsCli(env)
+    ? HOLYOPS_WORKSPACE_STATE_DIRNAME
+    : LEGACY_WORKSPACE_STATE_DIRNAME;
+  return path.join(dir, stateDirName, WORKSPACE_STATE_FILENAME);
+}
+
+function resolveLegacyWorkspaceStatePath(dir: string): string {
+  return path.join(dir, LEGACY_WORKSPACE_STATE_DIRNAME, WORKSPACE_STATE_FILENAME);
 }
 
 function parseWorkspaceOnboardingState(raw: string): WorkspaceOnboardingState | null {
@@ -165,7 +175,10 @@ function parseWorkspaceOnboardingState(raw: string): WorkspaceOnboardingState | 
   }
 }
 
-async function readWorkspaceOnboardingState(statePath: string): Promise<WorkspaceOnboardingState> {
+async function readWorkspaceOnboardingState(
+  statePath: string,
+  fallbackStatePath?: string,
+): Promise<WorkspaceOnboardingState> {
   try {
     const raw = await fs.readFile(statePath, "utf-8");
     return (
@@ -177,6 +190,9 @@ async function readWorkspaceOnboardingState(statePath: string): Promise<Workspac
     const anyErr = err as { code?: string };
     if (anyErr.code !== "ENOENT") {
       throw err;
+    }
+    if (fallbackStatePath && fallbackStatePath !== statePath) {
+      return readWorkspaceOnboardingState(fallbackStatePath);
     }
     return {
       version: WORKSPACE_STATE_VERSION,
@@ -272,6 +288,7 @@ export async function ensureAgentWorkspace(params?: {
   const heartbeatPath = path.join(dir, DEFAULT_HEARTBEAT_FILENAME);
   const bootstrapPath = path.join(dir, DEFAULT_BOOTSTRAP_FILENAME);
   const statePath = resolveWorkspaceStatePath(dir);
+  const legacyStatePath = resolveLegacyWorkspaceStatePath(dir);
 
   const isBrandNewWorkspace = await (async () => {
     const paths = [agentsPath, soulPath, toolsPath, identityPath, userPath, heartbeatPath];
@@ -301,7 +318,10 @@ export async function ensureAgentWorkspace(params?: {
   await writeFileIfMissing(userPath, userTemplate);
   await writeFileIfMissing(heartbeatPath, heartbeatTemplate);
 
-  let state = await readWorkspaceOnboardingState(statePath);
+  let state = await readWorkspaceOnboardingState(
+    statePath,
+    legacyStatePath !== statePath ? legacyStatePath : undefined,
+  );
   let stateDirty = false;
   const markState = (next: Partial<WorkspaceOnboardingState>) => {
     state = { ...state, ...next };

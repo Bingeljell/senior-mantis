@@ -24,6 +24,16 @@ describe("resolveDefaultAgentWorkspaceDir", () => {
 
     expect(dir).toBe(path.join(path.resolve("/srv/openclaw-home"), ".openclaw", "workspace"));
   });
+
+  it("uses HolyOps workspace root in HolyOps mode", () => {
+    const dir = resolveDefaultAgentWorkspaceDir({
+      OPENCLAW_HOME: "/srv/openclaw-home",
+      OPENCLAW_CLI_NAME_OVERRIDE: "holyops",
+      HOME: "/home/other",
+    } as NodeJS.ProcessEnv);
+
+    expect(dir).toBe(path.join(path.resolve("/srv/openclaw-home"), ".holyops", "workspace"));
+  });
 });
 
 const WORKSPACE_STATE_PATH_SEGMENTS = [".openclaw", "workspace-state.json"] as const;

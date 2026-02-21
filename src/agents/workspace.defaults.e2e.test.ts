@@ -16,4 +16,14 @@ describe("DEFAULT_AGENT_WORKSPACE_DIR", () => {
       path.join(path.resolve(home), ".openclaw", "workspace"),
     );
   });
+
+  it("uses .holyops workspace root when HolyOps mode is active", () => {
+    const home = path.join(path.sep, "srv", "holyops-home");
+    vi.stubEnv("OPENCLAW_HOME", home);
+    vi.stubEnv("OPENCLAW_CLI_NAME_OVERRIDE", "holyops");
+
+    expect(resolveDefaultAgentWorkspaceDir()).toBe(
+      path.join(path.resolve(home), ".holyops", "workspace"),
+    );
+  });
 });
