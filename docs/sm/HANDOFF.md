@@ -16,6 +16,10 @@ Primary vision doc: `docs/sm/VISION.md`
 - Channel plugin catalog returns no entries in HolyOps mode, disabling plugin-install onboarding surface for v1.
 - Core channel registry now enforces HolyOps channel policy (`listChatChannels` + `normalizeChatChannelId`).
 - Plugin loader now blocks non-channel plugins in HolyOps mode.
+- Desktop smoke script now validates Electron package wiring via `pnpm list electron` (no Electron binary launch in smoke checks).
+- Control UI brand helper now defaults to HolyOps command/config path when injection is missing.
+- Onboarding wizard header now switches mascot/brand line by active mode (HolyOps vs OpenClaw) instead of hardcoded OpenClaw.
+- Setup command help text now resolves HolyOps default config/workspace paths when HolyOps mode is active.
 - Updated desktop runbook docs to match this reduced v1 surface.
 
 Files changed in this cleanup pass:
@@ -25,6 +29,12 @@ Files changed in this cleanup pass:
 - `apps/desktop-electron/renderer/styles.css`
 - `apps/desktop-electron/preload.cjs`
 - `apps/desktop-electron/main.mjs`
+- `scripts/smoke-desktop-local.sh`
+- `ui/src/ui/brand.ts`
+- `ui/src/ui/brand.node.test.ts`
+- `src/commands/onboard-helpers.ts`
+- `src/commands/onboard-helpers.e2e.test.ts`
+- `src/cli/program/register.setup.ts`
 - `src/sm/cli/program/build-program.ts`
 - `src/sm/cli/program/build-program.test.ts`
 - `src/agents/openclaw-tools.ts`

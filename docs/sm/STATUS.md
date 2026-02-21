@@ -26,6 +26,14 @@ Last updated: 2026-02-21
   - `src/sm/cli/program/build-program.test.ts`
 - Updated desktop runbook docs to match browser-only Local Web UI:
   - `apps/desktop-electron/README.md`
+- Made HolyOps fallback branding the default in Control UI helper layer:
+  - `ui/src/ui/brand.ts`
+  - `ui/src/ui/brand.node.test.ts`
+- Made onboarding wizard header brand-aware (HolyOps vs OpenClaw) instead of hardcoded OpenClaw:
+  - `src/commands/onboard-helpers.ts`
+  - `src/commands/onboard-helpers.e2e.test.ts`
+- Updated setup command help copy to show HolyOps default config/workspace paths in HolyOps mode:
+  - `src/cli/program/register.setup.ts`
 
 Behavior impact:
 
@@ -350,7 +358,7 @@ Behavior impact:
 - `pnpm check`
   - pass
 - `scripts/smoke-desktop-local.sh`
-  - blocked at `pnpm --dir apps/desktop-electron exec electron --version` with `Electron ... exited with signal SIGABRT`
+  - pass (uses `pnpm --dir apps/desktop-electron list electron --depth 0` to avoid GUI crash popups from `electron --version`)
 - `pnpm build`
   - pass
 - `pnpm check`
@@ -380,6 +388,10 @@ Behavior impact:
   - pass (8 tests)
 - `pnpm --dir ui exec vitest run --config vitest.node.config.ts src/ui/brand.node.test.ts src/ui/app-gateway.node.test.ts`
   - pass (5 tests)
+- `pnpm --dir ui exec vitest run --config vitest.node.config.ts src/ui/brand.node.test.ts`
+  - pass (2 tests)
+- `pnpm exec vitest run --config vitest.e2e.config.ts src/commands/onboard-helpers.e2e.test.ts`
+  - pass (16 tests)
 - `node seniormantis.mjs status --json`
   - pass
 - `node seniormantis.mjs gateway --help`
@@ -399,7 +411,7 @@ Behavior impact:
 
 ## Notes
 
-- `ERR_CONNECTION_REFUSED` for `http://127.0.0.1:18789/ui` is expected until a local gateway is actually running.
+- `ERR_CONNECTION_REFUSED` for `http://127.0.0.1:18789/` is expected until a local gateway is actually running.
 - `docs/zh-CN/**` remains unchanged by policy (generated content).
 
 ## Fork CI/CD mode (temporary)

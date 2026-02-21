@@ -117,6 +117,14 @@ Legend (HolyOps pivot):
   - rationale: enforce HolyOps channel policy at core channel registry normalization/list boundaries for defense in depth.
 - 2026-02-21: `src/plugins/loader.ts`, `src/plugins/loader.test.ts`
   - rationale: block non-channel plugins in HolyOps mode so plugin runtime stays focused on v1 channel scope.
+- 2026-02-21: `scripts/smoke-desktop-local.sh`
+  - rationale: avoid launching Electron during smoke checks (`electron --version`) and validate dependency wiring via `pnpm list electron` instead.
+- 2026-02-21: `ui/src/ui/brand.ts`, `ui/src/ui/brand.node.test.ts`
+  - rationale: set HolyOps as default fallback command/config identity in Control UI helper layer so disconnected/auth hints do not regress to OpenClaw copy when runtime injection is absent.
+- 2026-02-21: `src/commands/onboard-helpers.ts`, `src/commands/onboard-helpers.e2e.test.ts`
+  - rationale: remove hardcoded OpenClaw wizard header branding and make onboarding header mode-aware for HolyOps visibility.
+- 2026-02-21: `src/cli/program/register.setup.ts`
+  - rationale: make setup command help text mode-aware so HolyOps CLI output defaults to `~/.holyops/holyops.json` and `~/.holyops/workspace`.
 
 ## Deletion log (completed)
 
