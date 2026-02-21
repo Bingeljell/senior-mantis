@@ -55,10 +55,12 @@ Behavior impact:
   - `src/wizard/onboarding.finalize.ts`
   - `apps/desktop-electron/README.md`
   - `src/agents/workspace.ts`, `src/agents/workspace.e2e.test.ts`, `src/agents/workspace.defaults.e2e.test.ts`
+  - `src/commands/setup.ts`, `src/commands/setup.e2e.test.ts`, `src/cli/program/register.setup.ts`
 
 Additional behavior impact:
 
 - In HolyOps mode, default workspace path now resolves to `~/.holyops/workspace` (instead of `~/.openclaw/workspace`).
+- In HolyOps mode, `setup` now auto-migrates `agents.defaults.workspace` from legacy default `~/.openclaw/workspace` to `~/.holyops/workspace` when no explicit `--workspace` override is provided.
 - Workspace onboarding state now writes HolyOps-mode metadata under `.holyops/workspace-state.json` and still reads legacy `.openclaw/workspace-state.json` when present.
 - Channel plugin catalog now returns no entries in HolyOps mode (`src/channels/plugins/catalog.ts`), removing extension onboarding/install surface from v1 mode.
 - Core channel registry helpers now apply HolyOps channel policy:
@@ -392,6 +394,8 @@ Behavior impact:
   - pass (2 tests)
 - `pnpm exec vitest run --config vitest.e2e.config.ts src/commands/onboard-helpers.e2e.test.ts`
   - pass (16 tests)
+- `pnpm exec vitest run --config vitest.e2e.config.ts src/commands/setup.e2e.test.ts src/agents/workspace.defaults.e2e.test.ts`
+  - pass (5 tests)
 - `node seniormantis.mjs status --json`
   - pass
 - `node seniormantis.mjs gateway --help`

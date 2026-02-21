@@ -20,6 +20,7 @@ Primary vision doc: `docs/sm/VISION.md`
 - Control UI brand helper now defaults to HolyOps command/config path when injection is missing.
 - Onboarding wizard header now switches mascot/brand line by active mode (HolyOps vs OpenClaw) instead of hardcoded OpenClaw.
 - Setup command help text now resolves HolyOps default config/workspace paths when HolyOps mode is active.
+- Setup command now rewrites legacy default workspace (`~/.openclaw/workspace`) to HolyOps default (`~/.holyops/workspace`) when running in HolyOps mode without explicit `--workspace`.
 - Updated desktop runbook docs to match this reduced v1 surface.
 
 Files changed in this cleanup pass:
@@ -35,6 +36,10 @@ Files changed in this cleanup pass:
 - `src/commands/onboard-helpers.ts`
 - `src/commands/onboard-helpers.e2e.test.ts`
 - `src/cli/program/register.setup.ts`
+- `src/commands/setup.ts`
+- `src/commands/setup.e2e.test.ts`
+- `src/agents/workspace.ts`
+- `src/agents/workspace.defaults.e2e.test.ts`
 - `src/sm/cli/program/build-program.ts`
 - `src/sm/cli/program/build-program.test.ts`
 - `src/agents/openclaw-tools.ts`

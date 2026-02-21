@@ -125,6 +125,8 @@ Legend (HolyOps pivot):
   - rationale: remove hardcoded OpenClaw wizard header branding and make onboarding header mode-aware for HolyOps visibility.
 - 2026-02-21: `src/cli/program/register.setup.ts`
   - rationale: make setup command help text mode-aware so HolyOps CLI output defaults to `~/.holyops/holyops.json` and `~/.holyops/workspace`.
+- 2026-02-21: `src/commands/setup.ts`, `src/commands/setup.e2e.test.ts`, `src/agents/workspace.ts`, `src/agents/workspace.defaults.e2e.test.ts`
+  - rationale: migrate legacy default workspace config (`~/.openclaw/workspace`) to HolyOps default (`~/.holyops/workspace`) during setup in HolyOps mode while preserving explicit `--workspace` overrides.
 
 ## Deletion log (completed)
 
