@@ -241,6 +241,35 @@ describe("loadOpenClawPlugins", () => {
     expect(registry.channels.some((entry) => entry.plugin.id === "whatsapp")).toBe(true);
   });
 
+  it("skips non-channel plugins in Senior Mantis mode", () => {
+    process.env.OPENCLAW_CLI_NAME_OVERRIDE = "seniormantis";
+    process.env.OPENCLAW_BUNDLED_PLUGINS_DIR = "/nonexistent/bundled/plugins";
+    const plugin = writePlugin({
+      id: "memory-core",
+      body: `export default { id: "memory-core", register(api) {
+  api.registerGatewayMethod("memory-core.ping", ({ respond }) => respond(true, { ok: true }));
+} };`,
+    });
+
+    const registry = loadOpenClawPlugins({
+      cache: false,
+      config: {
+        plugins: {
+          load: { paths: [plugin.file] },
+          allow: ["memory-core"],
+          entries: {
+            "memory-core": { enabled: true },
+          },
+        },
+      },
+    });
+
+    const memory = registry.plugins.find((entry) => entry.id === "memory-core");
+    expect(memory?.status).toBe("disabled");
+    expect(memory?.error).toContain("non-channel plugin");
+    expect(registry.gatewayHandlers["memory-core.ping"]).toBeUndefined();
+  });
+
   it("enables bundled memory plugin when selected by slot", () => {
     const bundledDir = makeTempDir();
     writePlugin({

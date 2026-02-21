@@ -101,7 +101,10 @@ function resolveSeniorMantisChannelGate(params: { pluginId: string; channels: st
     return { allowed: true };
   }
   if (params.channels.length === 0) {
-    return { allowed: true };
+    return {
+      allowed: false,
+      reason: "blocked by Senior Mantis plugin policy (non-channel plugin)",
+    };
   }
   const disallowed = params.channels.find(
     (channel) => !isSeniorMantisAllowedGatewayChannel(channel),
