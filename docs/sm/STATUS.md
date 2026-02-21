@@ -53,6 +53,9 @@ Additional behavior impact:
 - In HolyOps mode, default workspace path now resolves to `~/.holyops/workspace` (instead of `~/.openclaw/workspace`).
 - Workspace onboarding state now writes HolyOps-mode metadata under `.holyops/workspace-state.json` and still reads legacy `.openclaw/workspace-state.json` when present.
 - Channel plugin catalog now returns no entries in HolyOps mode (`src/channels/plugins/catalog.ts`), removing extension onboarding/install surface from v1 mode.
+- Core channel registry helpers now apply HolyOps channel policy:
+  - `src/channels/registry.ts` filters `listChatChannels()` to v1-allowed core channels in HolyOps mode.
+  - `src/channels/registry.ts` rejects non-v1 channel ids in `normalizeChatChannelId()` while HolyOps mode is active.
 
 ## Workflow/adapter removal pass (2026-02-21)
 

@@ -14,6 +14,7 @@ Primary vision doc: `docs/sm/VISION.md`
 - HolyOps mode default workspace path now resolves to `~/.holyops/workspace` (legacy workspace-state marker is still read for compatibility).
 - Removed dormant workflow adapter stack from active runtime and code (video/business/research/writer tools + adapter registry + workflow command implementation/tests).
 - Channel plugin catalog returns no entries in HolyOps mode, disabling plugin-install onboarding surface for v1.
+- Core channel registry now enforces HolyOps channel policy (`listChatChannels` + `normalizeChatChannelId`).
 - Updated desktop runbook docs to match this reduced v1 surface.
 
 Files changed in this cleanup pass:

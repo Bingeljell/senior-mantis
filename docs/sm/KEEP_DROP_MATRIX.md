@@ -113,6 +113,8 @@ Legend (HolyOps pivot):
   - rationale: remove HolyOps workflow adapter-tool injection from active runtime path to reduce v1 surface area.
 - 2026-02-21: `src/channels/plugins/catalog.ts`, `src/channels/plugins/catalog.test.ts`
   - rationale: return empty channel-plugin catalog in HolyOps mode to remove extension onboarding/install surface from v1 path.
+- 2026-02-21: `src/channels/registry.ts`, `src/channels/registry.test.ts`
+  - rationale: enforce HolyOps channel policy at core channel registry normalization/list boundaries for defense in depth.
 
 ## Deletion log (completed)
 
