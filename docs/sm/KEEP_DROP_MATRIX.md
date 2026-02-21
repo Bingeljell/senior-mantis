@@ -24,6 +24,7 @@ Legend (HolyOps pivot):
 | Internal `openclaw` identifiers        | package names, internal script ids, env key prefixes                                                            | Defer                       | migrate after v1 parity to avoid high-risk cross-cutting breaks                                                                                                                    |
 | Multi-channel CLI                      | `src/cli/channels-cli.ts` and non-v1 sub-CLIs                                                                   | Defer                       | remove after Senior Mantis onboarding is stable                                                                                                                                    |
 | Senior Mantis gateway command surface  | `src/sm/cli/program/register-gateway.ts`                                                                        | Keep (minimal)              | keep only `gateway run` + `gateway status` in SM runner; exclude non-v1 gateway subcommands                                                                                        |
+| HolyOps workflow command surface       | `src/sm/cli/program/register-workflow.ts` + registration in `src/sm/cli/program/build-program.ts`               | Defer                       | keep implementation available for future agent wiring, but keep it de-registered from HolyOps v1 CLI while core prototype is being stabilized                                      |
 | Onboarding channel chooser             | `src/commands/onboard-channels.ts`, `src/wizard/onboarding.ts`                                                  | Keep                        | Senior Mantis runtime now filters onboarding to WhatsApp-only, disables plugin-catalog install paths, and sanitizes onboarding defaults/overrides to prevent non-v1 channel bypass |
 | Plugin channels                        | `extensions/**`                                                                                                 | Drop                        | not needed in v1 (staged: non-v1 channel plugins runtime-disabled in Senior Mantis guardrails)                                                                                     |
 | Mobile apps                            | `apps/ios/**`, `apps/android/**`                                                                                | Drop                        | out of scope v1                                                                                                                                                                    |
@@ -95,6 +96,14 @@ Legend (HolyOps pivot):
   - rationale: enforce read-only default for smoke checks (no implicit setup side effects) and require explicit `--with-setup` opt-in when setup bootstrap is desired.
 - 2026-02-19: `ui/src/ui/navigation.ts`, `ui/src/ui/views/overview.ts`
   - rationale: reduce high-visibility OpenClaw naming in HolyOps mode and align visible runtime labels/placeholders to neutral or HolyOps-aware wording.
+- 2026-02-21: `apps/desktop-electron/renderer/index.html`, `apps/desktop-electron/renderer/renderer.js`, `apps/desktop-electron/renderer/styles.css`
+  - rationale: remove embedded Control UI iframe path and run browser-only dashboard mode to avoid frame-policy breakages (`X-Frame-Options`/CSP frame-ancestors).
+- 2026-02-21: `apps/desktop-electron/preload.cjs`, `apps/desktop-electron/main.mjs`
+  - rationale: remove desktop quick-action execution surface (`sm:run-quick-action`) during staged v1 prune.
+- 2026-02-21: `src/sm/cli/program/build-program.ts`, `src/sm/cli/program/build-program.test.ts`
+  - rationale: de-register `workflow` from HolyOps v1 CLI command surface until cleanup/migration pass is complete.
+- 2026-02-21: `apps/desktop-electron/README.md`
+  - rationale: align desktop docs with browser-only dashboard path and removed quick-action surface.
 
 ## Deletion log (completed)
 

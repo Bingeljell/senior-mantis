@@ -1,7 +1,7 @@
 # Senior Mantis Status
 
 Status: active staged-prune implementation
-Last updated: 2026-02-19
+Last updated: 2026-02-21
 
 ## Source of truth
 
@@ -11,6 +11,27 @@ Last updated: 2026-02-19
 - `docs/sm/KEEP_DROP_MATRIX.md`
 - `docs/sm/BOOTSTRAP_NEW_REPO.md`
 - `docs/sm/HOLYOPS_MIGRATION_NOTES.md`
+
+## Phase 2 cleanup pass (2026-02-21)
+
+- Removed desktop in-app iframe surface and switched to browser-only dashboard flow:
+  - `apps/desktop-electron/renderer/index.html`
+  - `apps/desktop-electron/renderer/renderer.js`
+  - `apps/desktop-electron/renderer/styles.css`
+- Removed desktop quick-action UI + IPC execution surface:
+  - `apps/desktop-electron/preload.cjs`
+  - `apps/desktop-electron/main.mjs`
+- Pruned `workflow` from HolyOps v1 CLI registration:
+  - `src/sm/cli/program/build-program.ts`
+  - `src/sm/cli/program/build-program.test.ts`
+- Updated desktop runbook docs to match browser-only Local Web UI:
+  - `apps/desktop-electron/README.md`
+
+Behavior impact:
+
+- Desktop app no longer attempts to embed Control UI; this avoids frame-policy crashes/blank state caused by gateway anti-framing headers.
+- Desktop app no longer exposes quick-action buttons for workflow adapters during cleanup phase.
+- HolyOps v1 top-level CLI no longer advertises/registers `workflow`; command surface stays focused on setup/onboarding/gateway/status/session flows.
 
 ## HolyOps pivot updates (2026-02-19)
 
@@ -32,11 +53,11 @@ Last updated: 2026-02-19
   - research adapter: `src/sm/adapters/research-cli-adapter.ts`
   - writer adapter: `src/sm/adapters/writer-cli-adapter.ts`
   - agent tools + registration: `src/agents/tools/holyops-video-tool.ts`, `src/agents/tools/holyops-business-tool.ts`, `src/agents/tools/holyops-research-tool.ts`, `src/agents/tools/holyops-writer-tool.ts`, `src/agents/openclaw-tools.ts` (HolyOps-mode only)
-- Added direct workflow command for deterministic adapter execution (non-LLM path):
+- Added direct workflow command for deterministic adapter execution (non-LLM path) (now de-registered from HolyOps v1 CLI surface in 2026-02-21 cleanup pass):
   - command surface + validation: `src/sm/cli/program/register-workflow.ts`
   - command registration: `src/sm/cli/program/build-program.ts`
   - parser/confirmation tests: `src/sm/cli/program/register-workflow.test.ts`, `src/sm/cli/program/build-program.test.ts`
-- Added desktop quick actions that route into direct workflow command paths:
+- Added desktop quick actions that route into direct workflow command paths (removed from desktop UI/IPC surface in 2026-02-21 cleanup pass):
   - desktop IPC + runner: `apps/desktop-electron/main.mjs`, `apps/desktop-electron/preload.cjs`
   - desktop UI controls: `apps/desktop-electron/renderer/index.html`, `apps/desktop-electron/renderer/renderer.js`, `apps/desktop-electron/renderer/styles.css`
   - current quick actions:

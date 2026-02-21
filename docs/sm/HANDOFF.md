@@ -2,9 +2,33 @@
 
 Status: active implementation baseline
 Owner: Senior Mantis product fork
-Last updated: 2026-02-19
+Last updated: 2026-02-21
 
 Primary vision doc: `docs/sm/VISION.md`
+
+## Phase 2 cleanup update (2026-02-21)
+
+- Desktop now runs in browser-dashboard mode only (no embedded iframe panel in Electron UI).
+- Desktop quick-action surface was removed from UI + IPC + runtime handler.
+- HolyOps v1 CLI surface no longer registers `workflow`.
+- Updated desktop runbook docs to match this reduced v1 surface.
+
+Files changed in this cleanup pass:
+
+- `apps/desktop-electron/renderer/index.html`
+- `apps/desktop-electron/renderer/renderer.js`
+- `apps/desktop-electron/renderer/styles.css`
+- `apps/desktop-electron/preload.cjs`
+- `apps/desktop-electron/main.mjs`
+- `src/sm/cli/program/build-program.ts`
+- `src/sm/cli/program/build-program.test.ts`
+- `apps/desktop-electron/README.md`
+
+Rationale:
+
+- keep v1 stable/local-first while pruning non-essential feature surfaces
+- avoid frame-policy breakage from gateway anti-framing headers
+- reduce launch/test complexity before deeper HolyOps rename + path migration
 
 ## Goal
 
@@ -31,12 +55,12 @@ Direction is now personal-first `HolyOps` (creator workflow cockpit) while prese
   - `business-agent` adapter/tool
   - `research-agent` adapter/tool
   - `writer-agent` adapter/tool
-- Desktop quick-actions shipped for first adapters:
+- Desktop quick-actions shipped for first adapters (later removed from desktop shell in 2026-02-21 cleanup pass):
   - `Run Video Compress` (routes through direct `workflow` command to `video-agent`)
   - `Run Business Proposal` (routes through direct `workflow` command to `business-agent`)
   - `Run Research Scan` (routes through direct `workflow` command to `research-agent`)
   - `Run Writer Draft` (routes through direct `workflow` command to `writer-agent`)
-- Direct non-LLM workflow command shipped:
+- Direct non-LLM workflow command shipped (later de-registered from HolyOps v1 CLI surface in 2026-02-21 cleanup pass):
   - `holyops workflow --adapter ... --action ... --arg key=value --confirm --json`
   - file: `src/sm/cli/program/register-workflow.ts`
 - Adapter hardening shipped:
@@ -245,11 +269,9 @@ Gateway subcommands intentionally exposed in Senior Mantis runner:
 
 ## Immediate next tasks
 
-1. Complete phase-2 hard prune of non-v1 channel wiring beyond guardrails (runtime loaders, command surfaces, docs).
-2. Replace remaining HolyOps-mode OpenClaw user-facing copy in shared commands/docs where feasible without risky internal rewrites.
-3. Add desktop packaging/distribution flow for `apps/desktop-electron` (dev -> signed release pipeline later).
-4. Add lightweight quick-action history in desktop UI (last run, args, result status).
-5. Add workflow presets/templates for common local tasks (video clip pack, proposal draft, analytics pulse, research sweep).
+1. Migrate HolyOps defaults from `~/.seniormantis` to `~/.holyops` with compatibility reads for existing local state.
+2. Continue pruning non-v1 channel/runtime surfaces (remove dormant extension/plugin/channel paths where unused in HolyOps mode).
+3. Run desktop-first manual smoke loop (`setup -> gateway -> dashboard -> onboarding`) and fix remaining UI/launch instability.
 
 ## Brand migration track (OpenClaw -> HolyOps)
 
