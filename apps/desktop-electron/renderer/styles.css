@@ -108,15 +108,8 @@ button.mini {
   grid-template-columns: 1.15fr 1fr 1fr;
 }
 
-.quick-row {
-  display: grid;
-  gap: 12px;
-  grid-template-columns: 1fr;
-}
-
 .layout {
-  grid-template-columns: 1.8fr 1fr;
-  min-height: 60vh;
+  grid-template-columns: 1fr 1fr;
 }
 
 .card {
@@ -139,45 +132,6 @@ button.mini {
   font-size: 0.85rem;
 }
 
-.quick-grid {
-  display: grid;
-  gap: 12px;
-  grid-template-columns: 1fr 1fr;
-}
-
-.quick-item {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  padding: 10px;
-  border: 1px solid rgba(127, 209, 176, 0.14);
-  border-radius: 10px;
-  background: rgba(6, 18, 14, 0.55);
-}
-
-.quick-item input {
-  border: 1px solid rgba(127, 209, 176, 0.22);
-  background: rgba(5, 16, 12, 0.84);
-  color: var(--text);
-  border-radius: 8px;
-  padding: 8px 10px;
-  font: inherit;
-  font-size: 0.82rem;
-}
-
-.card.full {
-  display: flex;
-  flex-direction: column;
-}
-
-#webUiFrame {
-  width: 100%;
-  min-height: 58vh;
-  border: 1px solid rgba(127, 209, 176, 0.18);
-  border-radius: 12px;
-  background: #0a1611;
-}
-
 pre {
   margin: 8px 0 0;
   border-radius: 10px;
@@ -195,8 +149,7 @@ pre {
 
 @media (max-width: 1100px) {
   .status-row,
-  .layout,
-  .quick-grid {
+  .layout {
     grid-template-columns: 1fr;
   }
 }

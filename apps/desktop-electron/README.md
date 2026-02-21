@@ -9,8 +9,7 @@ Minimal desktop shell for local HolyOps workflows on macOS.
 - Opens interactive onboarding in a terminal window after explicit confirmation.
 - Runs desktop diagnostics from the app (`Run Diagnostics`) using `scripts/smoke-desktop-local.sh`.
 - Shows status/health/sessions snapshots.
-- Includes quick actions that run direct HolyOps workflow adapter commands (`video-agent`, `business-agent`, `research-agent`, `writer-agent`).
-- Embeds local web UI in-app (`http://127.0.0.1:18789` by default, or configured `gateway.controlUi.basePath`).
+- Uses browser-only dashboard opening (`Open Browser Dashboard`) for the local web UI.
 - Surfaces first-run setup hints when status checks detect missing config.
 
 ## Prerequisites
@@ -58,17 +57,16 @@ scripts/smoke-desktop-local.sh --with-setup
 6. Click `Run Onboarding` and accept confirmation.
 7. Complete onboarding in Terminal and verify WhatsApp connection.
 8. Return to desktop app and click `Refresh` on Status/Health/Sessions.
-9. If the embedded Web UI says `unauthorized`, run:
+9. If browser dashboard says `unauthorized`, run:
    - `node holyops.mjs dashboard --no-open`
-   - copy the `#token=...` URL and use it once in browser/dashboard settings
-   - then reload the embedded Web UI.
+   - copy the `#token=...` URL and reconnect in dashboard settings.
 
 ## Expected desktop states
 
 - `Gateway` card should show `Running (desktop-managed) ...` after successful start.
 - `Health` should return JSON output (not gateway closed/connection errors).
 - `Sessions` should return JSON output with at least default/main keys after setup.
-- Embedded `Local Web UI` should load and connect without auth errors once token is configured.
+- `Local Web UI` URL card should show a reachable dashboard URL, and browser dashboard should connect once token is configured.
 
 ## CLI resolution behavior
 
@@ -95,12 +93,11 @@ SM_GATEWAY_TOKEN=replace-with-token pnpm desktop:dev
 
 - This is an MVP shell, not a packaged release.
 - Onboarding launches in your system terminal for interactive prompts.
-- Quick actions require model/auth setup and adapter env vars (`HOLYOPS_VIDEO_CLI_BIN`, `HOLYOPS_BUSINESS_CLI_BIN`).
 - If gateway start fails with `ENOENT`, install or point `SM_CLI_COMMAND` to a valid `holyops` binary.
 - If setup/onboarding opens a terminal and reports an unexpected runtime command, set `SM_NODE_COMMAND` to your Node binary path.
 - If status/health commands fail with missing `dist/entry-seniormantis`, run `pnpm build`.
 - If status/health or gateway launch reports missing config, run `holyops setup` (or click `Run Setup` in the desktop app).
-- If the embedded UI is blank or 404s, verify local gateway is running and check `gateway.controlUi.basePath` (or set `SM_GATEWAY_UI_PATH`).
-- If the embedded UI shows `disconnected (1008): unauthorized`, generate/read the gateway token and reconnect:
+- If browser dashboard is blank or 404s, verify local gateway is running and check `gateway.controlUi.basePath` (or set `SM_GATEWAY_UI_PATH`).
+- If dashboard shows `disconnected (1008): unauthorized`, generate/read the gateway token and reconnect:
   - `node holyops.mjs dashboard --no-open`
   - `node holyops.mjs doctor --generate-gateway-token`

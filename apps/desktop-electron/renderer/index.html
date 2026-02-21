@@ -47,63 +47,13 @@
         </article>
       </section>
 
-      <section class="quick-row">
-        <article class="card">
-          <h2>Quick Actions</h2>
-          <p class="quick-hint">
-            Runs direct HolyOps workflow adapter commands for video and business actions.
-          </p>
-          <div class="quick-grid">
-            <div class="quick-item">
-              <h3>Video Compress</h3>
-              <input id="videoInputPath" type="text" placeholder="Input path (default ~/Videos/input.mp4)" />
-              <input
-                id="videoOutputPath"
-                type="text"
-                placeholder="Output path (default ~/Videos/input-compressed.mp4)"
-              />
-              <button id="runVideoCompress" class="secondary">Run Video Compress</button>
-            </div>
-            <div class="quick-item">
-              <h3>Business Proposal</h3>
-              <input id="businessProjectId" type="text" placeholder="Project id (default default)" />
-              <input
-                id="businessTemplate"
-                type="text"
-                placeholder="Template (default default)"
-              />
-              <input
-                id="businessBrief"
-                type="text"
-                placeholder="Brief (default: concise proposal with scope/timeline/pricing)"
-              />
-              <button id="runBusinessProposal" class="secondary">Run Business Proposal</button>
-            </div>
-            <div class="quick-item">
-              <h3>Research Scan</h3>
-              <input id="researchTopic" type="text" placeholder="Topic (default creator tooling trends)" />
-              <input id="researchMaxResults" type="text" placeholder="Max results (default 5)" />
-              <button id="runResearchScan" class="secondary">Run Research Scan</button>
-            </div>
-            <div class="quick-item">
-              <h3>Writer Draft</h3>
-              <input id="writerTopic" type="text" placeholder="Topic (default weekly build log)" />
-              <input id="writerTone" type="text" placeholder="Tone (default clear)" />
-              <input id="writerMaxWords" type="text" placeholder="Max words (default 500)" />
-              <button id="runWriterDraft" class="secondary">Run Writer Draft</button>
-            </div>
-          </div>
-          <pre id="quickActionOutput">No quick action run yet.</pre>
-        </article>
-      </section>
-
       <section class="layout">
-        <article class="card full">
-          <div class="card-header">
-            <h2>Local Web UI</h2>
-            <button id="refreshFrame" class="mini">Reload</button>
-          </div>
-          <iframe id="webUiFrame" title="HolyOps Web UI"></iframe>
+        <article class="card">
+          <h2>Local Web UI</h2>
+          <p class="quick-hint">
+            Browser-only mode: use <strong>Open Browser Dashboard</strong> to control HolyOps.
+          </p>
+          <pre id="uiUrlOutput"></pre>
         </article>
         <article class="card side">
           <div class="card-header">
