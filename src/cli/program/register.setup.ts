@@ -2,15 +2,20 @@ import type { Command } from "commander";
 import { onboardCommand } from "../../commands/onboard.js";
 import { setupCommand } from "../../commands/setup.js";
 import { defaultRuntime } from "../../runtime.js";
+import { resolveProductBrand } from "../../sm/brand.js";
 import { formatDocsLink } from "../../terminal/links.js";
 import { theme } from "../../terminal/theme.js";
 import { runCommandWithRuntime } from "../cli-utils.js";
 import { hasExplicitOptions } from "../command-options.js";
 
 export function registerSetupCommand(program: Command) {
+  const holyOpsMode = resolveProductBrand() === "HolyOps";
+  const defaultConfigPath = holyOpsMode ? "~/.holyops/holyops.json" : "~/.openclaw/openclaw.json";
+  const defaultWorkspacePath = holyOpsMode ? "~/.holyops/workspace" : "~/.openclaw/workspace";
+
   program
     .command("setup")
-    .description("Initialize ~/.openclaw/openclaw.json and the agent workspace")
+    .description(`Initialize ${defaultConfigPath} and the agent workspace`)
     .addHelpText(
       "after",
       () =>
@@ -18,7 +23,7 @@ export function registerSetupCommand(program: Command) {
     )
     .option(
       "--workspace <dir>",
-      "Agent workspace directory (default: ~/.openclaw/workspace; stored as agents.defaults.workspace)",
+      `Agent workspace directory (default: ${defaultWorkspacePath}; stored as agents.defaults.workspace)`,
     )
     .option("--wizard", "Run the interactive onboarding wizard", false)
     .option("--non-interactive", "Run the wizard without prompts", false)

@@ -1,7 +1,9 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
+import type { RuntimeEnv } from "../runtime.js";
 import {
   normalizeGatewayTokenInput,
   openUrl,
+  printWizardHeader,
   resolveBrowserOpenCommand,
   resolveControlUiLinks,
   validateGatewayPasswordInput,
@@ -149,5 +151,24 @@ describe("validateGatewayPasswordInput", () => {
 
   it("accepts a normal password", () => {
     expect(validateGatewayPasswordInput(" secret ")).toBeUndefined();
+  });
+});
+
+describe("printWizardHeader", () => {
+  it("uses HolyOps branding in HolyOps mode", () => {
+    vi.stubEnv("OPENCLAW_CLI_NAME_OVERRIDE", "holyops");
+    const log = vi.fn();
+    printWizardHeader({ log } as unknown as RuntimeEnv);
+    const output = log.mock.calls[0]?.[0] as string | undefined;
+    expect(output).toContain("HOLYOPS");
+    expect(output).not.toContain("OPENCLAW");
+  });
+
+  it("uses OpenClaw branding outside HolyOps mode", () => {
+    vi.stubEnv("OPENCLAW_CLI_NAME_OVERRIDE", "openclaw");
+    const log = vi.fn();
+    printWizardHeader({ log } as unknown as RuntimeEnv);
+    const output = log.mock.calls[0]?.[0] as string | undefined;
+    expect(output).toContain("OPENCLAW");
   });
 });

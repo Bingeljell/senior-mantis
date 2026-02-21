@@ -1,4 +1,4 @@
-const DEFAULT_CLI_COMMAND = "openclaw";
+const DEFAULT_CLI_COMMAND = "holyops";
 const HOLYOPS_COMPAT_CLI_NAMES = new Set(["holyops", "seniormantis"]);
 const CLI_PREFIX_RE = /^(?:((?:pnpm|npm|bunx|npx|node)\s+))?openclaw\b/i;
 const UI_DOCS_HOME = "https://docs.openclaw.ai";
@@ -53,7 +53,7 @@ export function formatCliCommandForUi(command: string): string {
 
 export function resolveConfigPathForUi(): string {
   return resolveProductBrand() === "HolyOps"
-    ? "~/.seniormantis/seniormantis.json"
+    ? "~/.holyops/holyops.json"
     : "~/.openclaw/openclaw.json";
 }
 

@@ -16,6 +16,7 @@ import { isSafeExecutableValue } from "../infra/exec-safety.js";
 import { pickPrimaryTailnetIPv4 } from "../infra/tailnet.js";
 import { isWSL } from "../infra/wsl.js";
 import { runCommandWithTimeout } from "../process/exec.js";
+import { resolveProductBrand } from "../sm/brand.js";
 import { stylePromptTitle } from "../terminal/prompt-style.js";
 import {
   CONFIG_DIR,
@@ -97,13 +98,18 @@ export function validateGatewayPasswordInput(value: unknown): string | undefined
 }
 
 export function printWizardHeader(runtime: RuntimeEnv) {
+  const brand = resolveProductBrand();
+  const mascotLine =
+    brand === "HolyOps"
+      ? "                    🪲 HOLYOPS 🪲                     "
+      : "                  🦞 OPENCLAW 🦞                    ";
   const header = [
     "▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄",
     "██░▄▄▄░██░▄▄░██░▄▄▄██░▀██░██░▄▄▀██░████░▄▄▀██░███░██",
     "██░███░██░▀▀░██░▄▄▄██░█░█░██░█████░████░▀▀░██░█░█░██",
     "██░▀▀▀░██░█████░▀▀▀██░██▄░██░▀▀▄██░▀▀░█░██░██▄▀▄▀▄██",
     "▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀",
-    "                  🦞 OPENCLAW 🦞                    ",
+    mascotLine,
     " ",
   ].join("\n");
   runtime.log(header);

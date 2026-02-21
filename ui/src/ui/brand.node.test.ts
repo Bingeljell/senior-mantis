@@ -19,15 +19,15 @@ describe("ui brand helpers", () => {
     delete (globalThis as unknown as { window?: Record<string, unknown> }).window;
   });
 
-  it("uses OpenClaw defaults when no injection exists", () => {
-    expect(resolveProductBrand()).toBe("OpenClaw");
-    expect(resolveProductSlugForUi()).toBe("openclaw");
-    expect(resolveConfigPathForUi()).toBe("~/.openclaw/openclaw.json");
+  it("uses HolyOps defaults when no injection exists", () => {
+    expect(resolveProductBrand()).toBe("HolyOps");
+    expect(resolveProductSlugForUi()).toBe("holyops");
+    expect(resolveConfigPathForUi()).toBe("~/.holyops/holyops.json");
     const docs = resolveUiDocsLinks();
-    expect(docs.home.href).toBe("https://docs.openclaw.ai");
-    expect(docs.controlUiAuth.href).toBe("https://docs.openclaw.ai/web/dashboard");
+    expect(docs.home.href).toBeNull();
+    expect(docs.controlUiAuth.href).toBeNull();
     expect(formatCliCommandForUi("openclaw dashboard --no-open")).toBe(
-      "openclaw dashboard --no-open",
+      "holyops dashboard --no-open",
     );
   });
 
@@ -35,7 +35,7 @@ describe("ui brand helpers", () => {
     setInjectedUiEnv({ cli: "holyops", brand: "HolyOps" });
     expect(resolveProductBrand()).toBe("HolyOps");
     expect(resolveProductSlugForUi()).toBe("holyops");
-    expect(resolveConfigPathForUi()).toBe("~/.seniormantis/seniormantis.json");
+    expect(resolveConfigPathForUi()).toBe("~/.holyops/holyops.json");
     const docs = resolveUiDocsLinks();
     expect(docs.home.href).toBeNull();
     expect(docs.home.label).toContain("docs/sm/HANDOFF.md");
