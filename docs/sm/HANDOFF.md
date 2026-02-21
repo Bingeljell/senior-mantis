@@ -12,6 +12,7 @@ Primary vision doc: `docs/sm/VISION.md`
 - Desktop quick-action surface was removed from UI + IPC + runtime handler.
 - HolyOps v1 CLI surface no longer registers `workflow`.
 - HolyOps mode default workspace path now resolves to `~/.holyops/workspace` (legacy workspace-state marker is still read for compatibility).
+- Removed dormant workflow adapter stack from active runtime and code (video/business/research/writer tools + adapter registry + workflow command implementation/tests).
 - Updated desktop runbook docs to match this reduced v1 surface.
 
 Files changed in this cleanup pass:
@@ -23,6 +24,23 @@ Files changed in this cleanup pass:
 - `apps/desktop-electron/main.mjs`
 - `src/sm/cli/program/build-program.ts`
 - `src/sm/cli/program/build-program.test.ts`
+- `src/agents/openclaw-tools.ts`
+- `src/agents/tools/holyops-business-tool.ts` (deleted)
+- `src/agents/tools/holyops-research-tool.ts` (deleted)
+- `src/agents/tools/holyops-video-tool.ts` (deleted)
+- `src/agents/tools/holyops-writer-tool.ts` (deleted)
+- `src/agents/openclaw-tools.holyops.test.ts` (deleted)
+- `src/sm/cli/program/register-workflow.ts` (deleted)
+- `src/sm/cli/program/register-workflow.test.ts` (deleted)
+- `src/sm/adapters/types.ts` (deleted)
+- `src/sm/adapters/runner.ts` (deleted)
+- `src/sm/adapters/registry.ts` (deleted)
+- `src/sm/adapters/registry.test.ts` (deleted)
+- `src/sm/adapters/helpers.ts` (deleted)
+- `src/sm/adapters/video-cli-adapter.ts` (deleted)
+- `src/sm/adapters/business-cli-adapter.ts` (deleted)
+- `src/sm/adapters/research-cli-adapter.ts` (deleted)
+- `src/sm/adapters/writer-cli-adapter.ts` (deleted)
 - `apps/desktop-electron/README.md`
 
 Rationale:
@@ -51,19 +69,7 @@ Direction is now personal-first `HolyOps` (creator workflow cockpit) while prese
   - desktop-first local control flow
   - WhatsApp interaction path
   - local web UI
-- First specialist workflow adapters shipped:
-  - `video-agent` adapter/tool
-  - `business-agent` adapter/tool
-  - `research-agent` adapter/tool
-  - `writer-agent` adapter/tool
-- Desktop quick-actions shipped for first adapters (later removed from desktop shell in 2026-02-21 cleanup pass):
-  - `Run Video Compress` (routes through direct `workflow` command to `video-agent`)
-  - `Run Business Proposal` (routes through direct `workflow` command to `business-agent`)
-  - `Run Research Scan` (routes through direct `workflow` command to `research-agent`)
-  - `Run Writer Draft` (routes through direct `workflow` command to `writer-agent`)
-- Direct non-LLM workflow command shipped (later de-registered from HolyOps v1 CLI surface in 2026-02-21 cleanup pass):
-  - `holyops workflow --adapter ... --action ... --arg key=value --confirm --json`
-  - file: `src/sm/cli/program/register-workflow.ts`
+- Historical note: workflow adapters/quick-actions were prototyped during 2026-02-19 and removed in 2026-02-21 cleanup to keep v1 surface minimal.
 - Adapter hardening shipped:
   - per-action validation for video workflows (`outputPath`, clip timing, music path)
   - business artifact enrichment (`proposal_id`, URL extraction)
@@ -121,14 +127,6 @@ Direction is now personal-first `HolyOps` (creator workflow cockpit) while prese
   - `ui/src/ui/views/overview.ts` token field placeholder now uses generic copy.
 - Migration tracking doc:
   - `docs/sm/HOLYOPS_MIGRATION_NOTES.md`
-- HolyOps workflow adapter implementation:
-  - adapter contract + registry: `src/sm/adapters/types.ts`, `src/sm/adapters/registry.ts`
-  - command runner: `src/sm/adapters/runner.ts`
-  - video adapter: `src/sm/adapters/video-cli-adapter.ts`
-  - business adapter: `src/sm/adapters/business-cli-adapter.ts`
-  - research adapter: `src/sm/adapters/research-cli-adapter.ts`
-  - writer adapter: `src/sm/adapters/writer-cli-adapter.ts`
-  - agent tool wiring: `src/agents/tools/holyops-video-tool.ts`, `src/agents/tools/holyops-business-tool.ts`, `src/agents/tools/holyops-research-tool.ts`, `src/agents/tools/holyops-writer-tool.ts`, `src/agents/openclaw-tools.ts`
 
 ## Implemented in this baseline
 

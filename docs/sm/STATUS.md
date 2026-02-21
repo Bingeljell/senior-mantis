@@ -53,6 +53,33 @@ Additional behavior impact:
 - In HolyOps mode, default workspace path now resolves to `~/.holyops/workspace` (instead of `~/.openclaw/workspace`).
 - Workspace onboarding state now writes HolyOps-mode metadata under `.holyops/workspace-state.json` and still reads legacy `.openclaw/workspace-state.json` when present.
 
+## Workflow/adapter removal pass (2026-02-21)
+
+- Removed dormant HolyOps workflow adapter runtime surface from current v1 path:
+  - deleted `src/sm/cli/program/register-workflow.ts`
+  - deleted `src/sm/cli/program/register-workflow.test.ts`
+  - deleted `src/sm/adapters/business-cli-adapter.ts`
+  - deleted `src/sm/adapters/helpers.ts`
+  - deleted `src/sm/adapters/research-cli-adapter.ts`
+  - deleted `src/sm/adapters/runner.ts`
+  - deleted `src/sm/adapters/registry.ts`
+  - deleted `src/sm/adapters/registry.test.ts`
+  - deleted `src/sm/adapters/types.ts`
+  - deleted `src/sm/adapters/video-cli-adapter.ts`
+  - deleted `src/sm/adapters/writer-cli-adapter.ts`
+  - deleted `src/agents/tools/holyops-business-tool.ts`
+  - deleted `src/agents/tools/holyops-research-tool.ts`
+  - deleted `src/agents/tools/holyops-video-tool.ts`
+  - deleted `src/agents/tools/holyops-writer-tool.ts`
+  - deleted `src/agents/openclaw-tools.holyops.test.ts`
+- Updated runtime tool wiring:
+  - `src/agents/openclaw-tools.ts` no longer injects HolyOps workflow adapter tools.
+
+Behavior impact:
+
+- HolyOps v1 runtime no longer exposes video/business/research/writer adapter tools.
+- Adapter stack is removed until a dedicated post-cleanup integration phase.
+
 ## HolyOps pivot updates (2026-02-19)
 
 - Added `holyops` CLI alias while preserving `seniormantis` compatibility:
@@ -66,17 +93,7 @@ Additional behavior impact:
   - banner branding: `src/cli/banner.ts`
   - SM/HolyOps CLI help text and examples: `src/sm/cli/program/build-program.ts`, `src/sm/cli/program/register-status-health-sessions.ts`, `src/sm/cli/program/register-gateway.ts`
   - desktop shell labels and default CLI command: `apps/desktop-electron/main.mjs`, `apps/desktop-electron/renderer/index.html`
-- Implemented first HolyOps workflow adapter contract + tools:
-  - adapter types/runner/registry: `src/sm/adapters/types.ts`, `src/sm/adapters/runner.ts`, `src/sm/adapters/registry.ts`
-  - video adapter: `src/sm/adapters/video-cli-adapter.ts`
-  - business adapter: `src/sm/adapters/business-cli-adapter.ts`
-  - research adapter: `src/sm/adapters/research-cli-adapter.ts`
-  - writer adapter: `src/sm/adapters/writer-cli-adapter.ts`
-  - agent tools + registration: `src/agents/tools/holyops-video-tool.ts`, `src/agents/tools/holyops-business-tool.ts`, `src/agents/tools/holyops-research-tool.ts`, `src/agents/tools/holyops-writer-tool.ts`, `src/agents/openclaw-tools.ts` (HolyOps-mode only)
-- Added direct workflow command for deterministic adapter execution (non-LLM path) (now de-registered from HolyOps v1 CLI surface in 2026-02-21 cleanup pass):
-  - command surface + validation: `src/sm/cli/program/register-workflow.ts`
-  - command registration: `src/sm/cli/program/build-program.ts`
-  - parser/confirmation tests: `src/sm/cli/program/register-workflow.test.ts`, `src/sm/cli/program/build-program.test.ts`
+- Historical note: HolyOps workflow adapters and direct `workflow` command were prototyped during 2026-02-19 and fully removed from runtime/code in 2026-02-21 cleanup pass.
 - Added desktop quick actions that route into direct workflow command paths (removed from desktop UI/IPC surface in 2026-02-21 cleanup pass):
   - desktop IPC + runner: `apps/desktop-electron/main.mjs`, `apps/desktop-electron/preload.cjs`
   - desktop UI controls: `apps/desktop-electron/renderer/index.html`, `apps/desktop-electron/renderer/renderer.js`, `apps/desktop-electron/renderer/styles.css`

@@ -24,7 +24,8 @@ Legend (HolyOps pivot):
 | Internal `openclaw` identifiers        | package names, internal script ids, env key prefixes                                                            | Defer                       | migrate after v1 parity to avoid high-risk cross-cutting breaks                                                                                                                    |
 | Multi-channel CLI                      | `src/cli/channels-cli.ts` and non-v1 sub-CLIs                                                                   | Defer                       | remove after Senior Mantis onboarding is stable                                                                                                                                    |
 | Senior Mantis gateway command surface  | `src/sm/cli/program/register-gateway.ts`                                                                        | Keep (minimal)              | keep only `gateway run` + `gateway status` in SM runner; exclude non-v1 gateway subcommands                                                                                        |
-| HolyOps workflow command surface       | `src/sm/cli/program/register-workflow.ts` + registration in `src/sm/cli/program/build-program.ts`               | Defer                       | keep implementation available for future agent wiring, but keep it de-registered from HolyOps v1 CLI while core prototype is being stabilized                                      |
+| HolyOps workflow command surface       | `src/sm/cli/program/register-workflow.ts` + registration in `src/sm/cli/program/build-program.ts`               | Drop (removed)              | removed in 2026-02-21 staged cleanup to keep the current v1 command surface minimal and reduce non-essential maintenance                                                           |
+| HolyOps adapter/tool stack             | `src/sm/adapters/*`, `src/agents/tools/holyops-*.ts`                                                            | Drop (removed)              | removed in 2026-02-21 staged cleanup; planned to reintroduce only after core prototype stabilizes                                                                                  |
 | Onboarding channel chooser             | `src/commands/onboard-channels.ts`, `src/wizard/onboarding.ts`                                                  | Keep                        | Senior Mantis runtime now filters onboarding to WhatsApp-only, disables plugin-catalog install paths, and sanitizes onboarding defaults/overrides to prevent non-v1 channel bypass |
 | Plugin channels                        | `extensions/**`                                                                                                 | Drop                        | not needed in v1 (staged: non-v1 channel plugins runtime-disabled in Senior Mantis guardrails)                                                                                     |
 | Mobile apps                            | `apps/ios/**`, `apps/android/**`                                                                                | Drop                        | out of scope v1                                                                                                                                                                    |
@@ -108,6 +109,8 @@ Legend (HolyOps pivot):
   - rationale: move HolyOps default state/config path to `~/.holyops/holyops.json` while preserving compatibility reads from legacy `~/.seniormantis/seniormantis.json`.
 - 2026-02-21: `src/agents/workspace.ts`, `src/agents/workspace.e2e.test.ts`, `src/agents/workspace.defaults.e2e.test.ts`
   - rationale: move HolyOps-mode default workspace root to `~/.holyops/workspace` while preserving legacy workspace-state marker read compatibility.
+- 2026-02-21: `src/agents/openclaw-tools.ts`
+  - rationale: remove HolyOps workflow adapter-tool injection from active runtime path to reduce v1 surface area.
 
 ## Deletion log (completed)
 
@@ -117,3 +120,17 @@ Legend (HolyOps pivot):
   - rationale: cloud deployment artifact not needed for local-first v1 runtime.
 - 2026-02-16: removed `fly.private.toml`
   - rationale: cloud deployment artifact not needed for local-first v1 runtime.
+- 2026-02-21: removed `src/sm/cli/program/register-workflow.ts`
+  - rationale: de-scoped workflow command from current v1 CLI cleanup phase.
+- 2026-02-21: removed `src/sm/cli/program/register-workflow.test.ts`
+  - rationale: command test removed with workflow command deletion.
+- 2026-02-21: removed `src/sm/adapters/types.ts`, `src/sm/adapters/runner.ts`, `src/sm/adapters/registry.ts`, `src/sm/adapters/helpers.ts`
+  - rationale: remove dormant adapter framework and helper code no longer wired to v1 runtime.
+- 2026-02-21: removed `src/sm/adapters/video-cli-adapter.ts`, `src/sm/adapters/business-cli-adapter.ts`, `src/sm/adapters/research-cli-adapter.ts`, `src/sm/adapters/writer-cli-adapter.ts`
+  - rationale: remove adapter implementations until post-cleanup integration phase.
+- 2026-02-21: removed `src/sm/adapters/registry.test.ts`
+  - rationale: adapter tests removed with adapter runtime deletion.
+- 2026-02-21: removed `src/agents/tools/holyops-video-tool.ts`, `src/agents/tools/holyops-business-tool.ts`, `src/agents/tools/holyops-research-tool.ts`, `src/agents/tools/holyops-writer-tool.ts`
+  - rationale: remove non-v1 HolyOps tool surface from active agent runtime.
+- 2026-02-21: removed `src/agents/openclaw-tools.holyops.test.ts`
+  - rationale: HolyOps tool registration test removed with tool surface deletion.
