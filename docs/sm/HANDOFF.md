@@ -21,6 +21,7 @@ Primary vision doc: `docs/sm/VISION.md`
 - Onboarding wizard header now switches mascot/brand line by active mode (HolyOps vs OpenClaw) instead of hardcoded OpenClaw.
 - Setup command help text now resolves HolyOps default config/workspace paths when HolyOps mode is active.
 - Setup command now rewrites legacy default workspace (`~/.openclaw/workspace`) to HolyOps default (`~/.holyops/workspace`) when running in HolyOps mode without explicit `--workspace`.
+- Desktop smoke script now reports legacy default workspace detection from status output and prints the exact migration command (`node holyops.mjs setup`).
 - Updated desktop runbook docs to match this reduced v1 surface.
 
 Files changed in this cleanup pass:

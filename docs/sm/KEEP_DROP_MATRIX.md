@@ -127,6 +127,8 @@ Legend (HolyOps pivot):
   - rationale: make setup command help text mode-aware so HolyOps CLI output defaults to `~/.holyops/holyops.json` and `~/.holyops/workspace`.
 - 2026-02-21: `src/commands/setup.ts`, `src/commands/setup.e2e.test.ts`, `src/agents/workspace.ts`, `src/agents/workspace.defaults.e2e.test.ts`
   - rationale: migrate legacy default workspace config (`~/.openclaw/workspace`) to HolyOps default (`~/.holyops/workspace`) during setup in HolyOps mode while preserving explicit `--workspace` overrides.
+- 2026-02-21: `scripts/smoke-desktop-local.sh`
+  - rationale: detect legacy default workspace in `holyops status --json` output and print explicit migration guidance for local testing loops.
 
 ## Deletion log (completed)
 

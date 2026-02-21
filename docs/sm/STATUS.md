@@ -34,6 +34,8 @@ Last updated: 2026-02-21
   - `src/commands/onboard-helpers.e2e.test.ts`
 - Updated setup command help copy to show HolyOps default config/workspace paths in HolyOps mode:
   - `src/cli/program/register.setup.ts`
+- Desktop smoke script now detects legacy default workspace in status JSON and prints explicit migration guidance:
+  - `scripts/smoke-desktop-local.sh`
 
 Behavior impact:
 
