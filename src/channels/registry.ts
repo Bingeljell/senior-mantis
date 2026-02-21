@@ -1,6 +1,7 @@
 import type { ChannelMeta } from "./plugins/types.js";
 import type { ChannelId } from "./plugins/types.js";
 import { requireActivePluginRegistry } from "../plugins/runtime.js";
+import { isSeniorMantisAllowedGatewayChannel, isSeniorMantisCli } from "../sm/channel-policy.js";
 
 // Channel docking: add new core channels here (order + meta + aliases), then
 // register the plugin in its extension entrypoint and keep protocol IDs in sync.
@@ -124,7 +125,11 @@ const normalizeChannelKey = (raw?: string | null): string | undefined => {
 };
 
 export function listChatChannels(): ChatChannelMeta[] {
-  return CHAT_CHANNEL_ORDER.map((id) => CHAT_CHANNEL_META[id]);
+  const channels = CHAT_CHANNEL_ORDER.map((id) => CHAT_CHANNEL_META[id]);
+  if (!isSeniorMantisCli()) {
+    return channels;
+  }
+  return channels.filter((channel) => isSeniorMantisAllowedGatewayChannel(channel.id));
 }
 
 export function listChatChannelAliases(): string[] {
@@ -141,7 +146,13 @@ export function normalizeChatChannelId(raw?: string | null): ChatChannelId | nul
     return null;
   }
   const resolved = CHAT_CHANNEL_ALIASES[normalized] ?? normalized;
-  return CHAT_CHANNEL_ORDER.includes(resolved) ? resolved : null;
+  if (!CHAT_CHANNEL_ORDER.includes(resolved)) {
+    return null;
+  }
+  if (isSeniorMantisCli() && !isSeniorMantisAllowedGatewayChannel(resolved)) {
+    return null;
+  }
+  return resolved;
 }
 
 // Channel docking: prefer this helper in shared code. Importing from

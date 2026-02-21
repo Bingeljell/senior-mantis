@@ -6,6 +6,36 @@ import {
 } from "./registry.js";
 
 describe("channel registry", () => {
+  it("limits normalized channel ids in holyops mode", () => {
+    const previous = process.env.OPENCLAW_CLI_NAME_OVERRIDE;
+    process.env.OPENCLAW_CLI_NAME_OVERRIDE = "holyops";
+    try {
+      expect(normalizeChatChannelId("whatsapp")).toBe("whatsapp");
+      expect(normalizeChatChannelId("telegram")).toBeNull();
+    } finally {
+      if (previous === undefined) {
+        delete process.env.OPENCLAW_CLI_NAME_OVERRIDE;
+      } else {
+        process.env.OPENCLAW_CLI_NAME_OVERRIDE = previous;
+      }
+    }
+  });
+
+  it("returns only v1 core channels in holyops mode", () => {
+    const previous = process.env.OPENCLAW_CLI_NAME_OVERRIDE;
+    process.env.OPENCLAW_CLI_NAME_OVERRIDE = "holyops";
+    try {
+      const channels = listChatChannels();
+      expect(channels.map((channel) => channel.id)).toEqual(["whatsapp"]);
+    } finally {
+      if (previous === undefined) {
+        delete process.env.OPENCLAW_CLI_NAME_OVERRIDE;
+      } else {
+        process.env.OPENCLAW_CLI_NAME_OVERRIDE = previous;
+      }
+    }
+  });
+
   it("normalizes aliases", () => {
     expect(normalizeChatChannelId("imsg")).toBe("imessage");
     expect(normalizeChatChannelId("gchat")).toBe("googlechat");
