@@ -16,8 +16,12 @@ const repoNodeCommand =
   process.env.SM_NODE_COMMAND?.trim() || (process.versions?.electron ? "node" : process.execPath);
 const defaultGatewayHost = process.env.SM_GATEWAY_HOST ?? "127.0.0.1";
 const defaultGatewayPort = process.env.SM_GATEWAY_PORT ?? "18789";
-const seniorMantisStateDir = process.env.SM_STATE_DIR?.trim() || path.join(os.homedir(), ".seniormantis");
-const seniorMantisConfigPath = resolveGatewayConfigPath();
+const HOLYOPS_STATE_DIRNAME = ".holyops";
+const HOLYOPS_CONFIG_FILENAME = "holyops.json";
+const LEGACY_SM_STATE_DIRNAME = ".seniormantis";
+const LEGACY_SM_CONFIG_FILENAME = "seniormantis.json";
+const holyOpsStateDir = resolveStateDir();
+const holyOpsConfigPath = resolveGatewayConfigPath();
 
 function normalizeUiPath(rawPath) {
   if (typeof rawPath !== "string") {
@@ -31,20 +35,45 @@ function normalizeUiPath(rawPath) {
   return withLeadingSlash.endsWith("/") ? withLeadingSlash.slice(0, -1) : withLeadingSlash;
 }
 
+function resolveStateDir() {
+  const explicit = process.env.SM_STATE_DIR?.trim();
+  if (explicit) {
+    return explicit;
+  }
+  const home = os.homedir();
+  const holyopsStateDir = path.join(home, HOLYOPS_STATE_DIRNAME);
+  const legacyStateDir = path.join(home, LEGACY_SM_STATE_DIRNAME);
+  if (fs.existsSync(holyopsStateDir)) {
+    return holyopsStateDir;
+  }
+  if (fs.existsSync(path.join(legacyStateDir, LEGACY_SM_CONFIG_FILENAME))) {
+    return legacyStateDir;
+  }
+  return holyopsStateDir;
+}
+
 function resolveGatewayConfigPath() {
   const explicit = process.env.SM_CONFIG_PATH?.trim();
   if (explicit) {
     return explicit;
   }
-  return path.join(seniorMantisStateDir, "seniormantis.json");
+  const holyopsConfigPath = path.join(holyOpsStateDir, HOLYOPS_CONFIG_FILENAME);
+  const legacyConfigPath = path.join(holyOpsStateDir, LEGACY_SM_CONFIG_FILENAME);
+  if (fs.existsSync(holyopsConfigPath)) {
+    return holyopsConfigPath;
+  }
+  if (fs.existsSync(legacyConfigPath)) {
+    return legacyConfigPath;
+  }
+  return holyopsConfigPath;
 }
 
 function readGatewayConfig() {
-  if (!fs.existsSync(seniorMantisConfigPath)) {
+  if (!fs.existsSync(holyOpsConfigPath)) {
     return null;
   }
   try {
-    return JSON5.parse(fs.readFileSync(seniorMantisConfigPath, "utf8"));
+    return JSON5.parse(fs.readFileSync(holyOpsConfigPath, "utf8"));
   } catch {
     return null;
   }
@@ -110,8 +139,8 @@ function resolveCliEnv(baseEnv = process.env) {
   // pnpm desktop launches can leak npm_config_prefix and trigger nvm startup warnings in spawned shells.
   delete env.npm_config_prefix;
   // Force HolyOps-local state/config so desktop workflows do not accidentally bind to legacy OpenClaw paths.
-  env.OPENCLAW_STATE_DIR = seniorMantisStateDir;
-  env.OPENCLAW_CONFIG_PATH = seniorMantisConfigPath;
+  env.OPENCLAW_STATE_DIR = holyOpsStateDir;
+  env.OPENCLAW_CONFIG_PATH = holyOpsConfigPath;
   env.OPENCLAW_CLI_NAME_OVERRIDE = "holyops";
   return env;
 }
@@ -450,7 +479,7 @@ ipcMain.handle("sm:get-config", async () => {
     cliMode: invocation.mode,
     globalCliCommand,
     cliCommand: invocation.command,
-    configPath: seniorMantisConfigPath,
+    configPath: holyOpsConfigPath,
   };
 });
 

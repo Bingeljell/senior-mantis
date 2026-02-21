@@ -53,7 +53,7 @@ export async function finalizeOnboardingWizard(
   const productBrand = resolveProductBrand();
   const docsLinks = resolveBrandDocsLinks();
   const configPathHint = holyOpsMode
-    ? "~/.seniormantis/seniormantis.json"
+    ? "~/.holyops/holyops.json (legacy fallback: ~/.seniormantis/seniormantis.json)"
     : "~/.openclaw/openclaw.json";
   const controlUiStorageKey = "openclaw.control.settings.v1";
   const controlUiStorageLabel = holyOpsMode

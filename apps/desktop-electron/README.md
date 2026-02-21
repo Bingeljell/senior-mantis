@@ -72,7 +72,7 @@ scripts/smoke-desktop-local.sh --with-setup
 
 - Preferred mode: repo CLI (`node holyops.mjs ...`) when repo runtime deps and dist entry are present.
 - Fallback mode: global `holyops` command if repo mode fails with module-resolution errors.
-- Desktop launcher always sets `OPENCLAW_STATE_DIR` + `OPENCLAW_CONFIG_PATH` to HolyOps compatibility paths by default (`~/.seniormantis`, `~/.seniormantis/seniormantis.json`) to avoid accidental OpenClaw config reuse.
+- Desktop launcher defaults to HolyOps paths (`~/.holyops`, `~/.holyops/holyops.json`) and falls back to legacy Senior Mantis config when present (`~/.seniormantis/seniormantis.json`).
 - Override global command path with `SM_CLI_COMMAND` (binary path).
 - Override repo Node runtime command with `SM_NODE_COMMAND` (default auto-detects `node` under Electron).
 - Override state/config paths with `SM_STATE_DIR` and `SM_CONFIG_PATH`.
@@ -83,8 +83,8 @@ scripts/smoke-desktop-local.sh --with-setup
 SM_CLI_COMMAND=/usr/local/bin/holyops pnpm desktop:dev
 # optional:
 SM_NODE_COMMAND=/opt/homebrew/bin/node pnpm desktop:dev
-SM_STATE_DIR=$HOME/.seniormantis pnpm desktop:dev
-SM_CONFIG_PATH=$HOME/.seniormantis/seniormantis.json pnpm desktop:dev
+SM_STATE_DIR=$HOME/.holyops pnpm desktop:dev
+SM_CONFIG_PATH=$HOME/.holyops/holyops.json pnpm desktop:dev
 SM_GATEWAY_UI_PATH=/ui pnpm desktop:dev
 SM_GATEWAY_TOKEN=replace-with-token pnpm desktop:dev
 ```

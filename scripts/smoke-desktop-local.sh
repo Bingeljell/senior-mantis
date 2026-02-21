@@ -6,7 +6,18 @@ set -euo pipefail
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "${ROOT_DIR}"
 
-CONFIG_PATH="${SM_CONFIG_PATH:-${HOME}/.seniormantis/seniormantis.json}"
+HOLYOPS_CONFIG_PATH="${HOME}/.holyops/holyops.json"
+LEGACY_CONFIG_PATH="${HOME}/.seniormantis/seniormantis.json"
+CONFIG_PATH="${SM_CONFIG_PATH:-}"
+if [[ -z "${CONFIG_PATH}" ]]; then
+  if [[ -f "${HOLYOPS_CONFIG_PATH}" ]]; then
+    CONFIG_PATH="${HOLYOPS_CONFIG_PATH}"
+  elif [[ -f "${LEGACY_CONFIG_PATH}" ]]; then
+    CONFIG_PATH="${LEGACY_CONFIG_PATH}"
+  else
+    CONFIG_PATH="${HOLYOPS_CONFIG_PATH}"
+  fi
+fi
 ALLOW_SETUP=0
 
 for arg in "$@"; do
