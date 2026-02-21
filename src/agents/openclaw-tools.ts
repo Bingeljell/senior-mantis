@@ -10,10 +10,6 @@ import { createBrowserTool } from "./tools/browser-tool.js";
 import { createCanvasTool } from "./tools/canvas-tool.js";
 import { createCronTool } from "./tools/cron-tool.js";
 import { createGatewayTool } from "./tools/gateway-tool.js";
-import { createHolyOpsBusinessTool } from "./tools/holyops-business-tool.js";
-import { createHolyOpsResearchTool } from "./tools/holyops-research-tool.js";
-import { createHolyOpsVideoTool } from "./tools/holyops-video-tool.js";
-import { createHolyOpsWriterTool } from "./tools/holyops-writer-tool.js";
 import { createImageTool } from "./tools/image-tool.js";
 import { createMessageTool } from "./tools/message-tool.js";
 import { createNodesTool } from "./tools/nodes-tool.js";
@@ -103,14 +99,6 @@ export function createOpenClawTools(options?: {
         sandboxRoot: options?.sandboxRoot,
         requireExplicitTarget: options?.requireExplicitMessageTarget,
       });
-  const holyOpsTools = holyOpsMode
-    ? [
-        createHolyOpsVideoTool(),
-        createHolyOpsBusinessTool(),
-        createHolyOpsResearchTool(),
-        createHolyOpsWriterTool(),
-      ]
-    : [];
   const tools: AnyAgentTool[] = [
     createBrowserTool({
       sandboxBridgeUrl: options?.sandboxBrowserBridgeUrl,
@@ -172,7 +160,6 @@ export function createOpenClawTools(options?: {
     ...(webSearchTool ? [webSearchTool] : []),
     ...(webFetchTool ? [webFetchTool] : []),
     ...(imageTool ? [imageTool] : []),
-    ...holyOpsTools,
   ];
 
   const pluginTools = holyOpsMode
