@@ -11,6 +11,7 @@ Primary vision doc: `docs/sm/VISION.md`
 - Desktop now runs in browser-dashboard mode only (no embedded iframe panel in Electron UI).
 - Desktop quick-action surface was removed from UI + IPC + runtime handler.
 - HolyOps v1 CLI surface no longer registers `workflow`.
+- HolyOps mode default workspace path now resolves to `~/.holyops/workspace` (legacy workspace-state marker is still read for compatibility).
 - Updated desktop runbook docs to match this reduced v1 surface.
 
 Files changed in this cleanup pass:

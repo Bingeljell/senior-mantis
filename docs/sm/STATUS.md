@@ -46,6 +46,12 @@ Behavior impact:
   - `scripts/smoke-desktop-local.sh`
   - `src/wizard/onboarding.finalize.ts`
   - `apps/desktop-electron/README.md`
+  - `src/agents/workspace.ts`, `src/agents/workspace.e2e.test.ts`, `src/agents/workspace.defaults.e2e.test.ts`
+
+Additional behavior impact:
+
+- In HolyOps mode, default workspace path now resolves to `~/.holyops/workspace` (instead of `~/.openclaw/workspace`).
+- Workspace onboarding state now writes HolyOps-mode metadata under `.holyops/workspace-state.json` and still reads legacy `.openclaw/workspace-state.json` when present.
 
 ## HolyOps pivot updates (2026-02-19)
 

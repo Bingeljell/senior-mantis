@@ -106,6 +106,8 @@ Legend (HolyOps pivot):
   - rationale: align desktop docs with browser-only dashboard path and removed quick-action surface.
 - 2026-02-21: `src/sm/env.ts`, `src/sm/env.test.ts`, `apps/desktop-electron/main.mjs`, `scripts/smoke-desktop-local.sh`, `src/wizard/onboarding.finalize.ts`
   - rationale: move HolyOps default state/config path to `~/.holyops/holyops.json` while preserving compatibility reads from legacy `~/.seniormantis/seniormantis.json`.
+- 2026-02-21: `src/agents/workspace.ts`, `src/agents/workspace.e2e.test.ts`, `src/agents/workspace.defaults.e2e.test.ts`
+  - rationale: move HolyOps-mode default workspace root to `~/.holyops/workspace` while preserving legacy workspace-state marker read compatibility.
 
 ## Deletion log (completed)
 
