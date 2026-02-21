@@ -16,7 +16,6 @@ describe("buildSeniorMantisProgram", () => {
     expect(commandNames).toContain("dashboard");
     expect(commandNames).toContain("message");
     expect(commandNames).toContain("agent");
-    expect(commandNames).toContain("workflow");
     expect(commandNames).toContain("status");
     expect(commandNames).toContain("gateway");
   });
@@ -25,6 +24,7 @@ describe("buildSeniorMantisProgram", () => {
     const program = buildSeniorMantisProgram();
     const commandNames = program.commands.map((command) => command.name());
 
+    expect(commandNames).not.toContain("workflow");
     expect(commandNames).not.toContain("channels");
     expect(commandNames).not.toContain("plugins");
     expect(commandNames).not.toContain("pairing");
