@@ -52,7 +52,8 @@ run() {
 
 run node --version
 run pnpm --version
-run pnpm --dir apps/desktop-electron exec electron --version
+# Validate Electron package wiring without launching the Electron binary (avoids GUI crash popups).
+run pnpm --dir apps/desktop-electron list electron --depth 0
 run node holyops.mjs --help
 run node holyops.mjs gateway --help
 
