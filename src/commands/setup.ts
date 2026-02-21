@@ -1,12 +1,18 @@
 import JSON5 from "json5";
 import fs from "node:fs/promises";
 import type { RuntimeEnv } from "../runtime.js";
-import { DEFAULT_AGENT_WORKSPACE_DIR, ensureAgentWorkspace } from "../agents/workspace.js";
+import {
+  ensureAgentWorkspace,
+  resolveDefaultAgentWorkspaceDir,
+  resolveLegacyDefaultAgentWorkspaceDir,
+} from "../agents/workspace.js";
 import { type OpenClawConfig, createConfigIO, writeConfigFile } from "../config/config.js";
 import { formatConfigPath, logConfigUpdated } from "../config/logging.js";
 import { resolveSessionTranscriptsDir } from "../config/sessions.js";
 import { defaultRuntime } from "../runtime.js";
+import { isHolyOpsCli } from "../sm/channel-policy.js";
 import { shortenHomePath } from "../utils.js";
+import { resolveUserPath } from "../utils.js";
 
 async function readConfigFileRaw(configPath: string): Promise<{
   exists: boolean;
@@ -38,8 +44,19 @@ export async function setupCommand(
   const existingRaw = await readConfigFileRaw(configPath);
   const cfg = existingRaw.parsed;
   const defaults = cfg.agents?.defaults ?? {};
+  const defaultWorkspace = resolveDefaultAgentWorkspaceDir();
+  const legacyDefaultWorkspace = resolveLegacyDefaultAgentWorkspaceDir();
+  const migrateLegacyDefaultWorkspace =
+    !desiredWorkspace &&
+    isHolyOpsCli() &&
+    typeof defaults.workspace === "string" &&
+    defaults.workspace.trim().length > 0 &&
+    resolveUserPath(defaults.workspace) === resolveUserPath(legacyDefaultWorkspace);
 
-  const workspace = desiredWorkspace ?? defaults.workspace ?? DEFAULT_AGENT_WORKSPACE_DIR;
+  const workspace =
+    desiredWorkspace ??
+    (migrateLegacyDefaultWorkspace ? defaultWorkspace : defaults.workspace) ??
+    defaultWorkspace;
 
   const next: OpenClawConfig = {
     ...cfg,
@@ -58,6 +75,11 @@ export async function setupCommand(
       runtime.log(`Wrote ${formatConfigPath(configPath)}`);
     } else {
       logConfigUpdated(runtime, { path: configPath, suffix: "(set agents.defaults.workspace)" });
+      if (migrateLegacyDefaultWorkspace) {
+        runtime.log(
+          `Workspace default migrated to ${shortenHomePath(workspace)} (HolyOps default).`,
+        );
+      }
     }
   } else {
     runtime.log(`Config OK: ${formatConfigPath(configPath)}`);

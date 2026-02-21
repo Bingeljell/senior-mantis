@@ -1,6 +1,9 @@
 import path from "node:path";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { resolveDefaultAgentWorkspaceDir } from "./workspace.js";
+import {
+  resolveDefaultAgentWorkspaceDir,
+  resolveLegacyDefaultAgentWorkspaceDir,
+} from "./workspace.js";
 
 afterEach(() => {
   vi.unstubAllEnvs();
@@ -24,6 +27,16 @@ describe("DEFAULT_AGENT_WORKSPACE_DIR", () => {
 
     expect(resolveDefaultAgentWorkspaceDir()).toBe(
       path.join(path.resolve(home), ".holyops", "workspace"),
+    );
+  });
+
+  it("resolves legacy workspace path under .openclaw", () => {
+    const home = path.join(path.sep, "srv", "holyops-home");
+    vi.stubEnv("OPENCLAW_HOME", home);
+    vi.stubEnv("OPENCLAW_PROFILE", "default");
+
+    expect(resolveLegacyDefaultAgentWorkspaceDir()).toBe(
+      path.join(path.resolve(home), ".openclaw", "workspace"),
     );
   });
 });

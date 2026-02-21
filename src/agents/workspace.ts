@@ -21,6 +21,18 @@ export function resolveDefaultAgentWorkspaceDir(
   return path.join(home, stateRoot, "workspace");
 }
 
+export function resolveLegacyDefaultAgentWorkspaceDir(
+  env: NodeJS.ProcessEnv = process.env,
+  homedir: () => string = os.homedir,
+): string {
+  const home = resolveRequiredHomeDir(env, homedir);
+  const profile = env.OPENCLAW_PROFILE?.trim();
+  if (profile && profile.toLowerCase() !== "default") {
+    return path.join(home, ".openclaw", `workspace-${profile}`);
+  }
+  return path.join(home, ".openclaw", "workspace");
+}
+
 export const DEFAULT_AGENT_WORKSPACE_DIR = resolveDefaultAgentWorkspaceDir();
 export const DEFAULT_AGENTS_FILENAME = "AGENTS.md";
 export const DEFAULT_SOUL_FILENAME = "SOUL.md";
