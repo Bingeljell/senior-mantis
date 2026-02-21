@@ -67,6 +67,30 @@ if [[ ! -f "${CONFIG_PATH}" ]]; then
   fi
 fi
 
-run node holyops.mjs status --json
+log "node holyops.mjs status --json"
+STATUS_JSON="$(node holyops.mjs status --json)"
+printf "%s\n" "${STATUS_JSON}"
+
+WORKSPACE_DIR="$(printf "%s" "${STATUS_JSON}" | node -e '
+let raw = "";
+process.stdin.setEncoding("utf8");
+process.stdin.on("data", (chunk) => {
+  raw += chunk;
+});
+process.stdin.on("end", () => {
+  try {
+    const parsed = JSON.parse(raw);
+    const workspace = parsed?.agents?.agents?.[0]?.workspaceDir;
+    process.stdout.write(typeof workspace === "string" ? workspace : "");
+  } catch {
+    process.stdout.write("");
+  }
+});
+')"
+LEGACY_WORKSPACE_PATH="${HOME}/.openclaw/workspace"
+if [[ "${WORKSPACE_DIR}" == "${LEGACY_WORKSPACE_PATH}" ]]; then
+  log "Legacy workspace default detected at ${LEGACY_WORKSPACE_PATH}."
+  log "Run node holyops.mjs setup to migrate default workspace to ~/.holyops/workspace."
+fi
 
 log "Desktop smoke checks passed."
