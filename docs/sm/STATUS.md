@@ -52,6 +52,7 @@ Additional behavior impact:
 
 - In HolyOps mode, default workspace path now resolves to `~/.holyops/workspace` (instead of `~/.openclaw/workspace`).
 - Workspace onboarding state now writes HolyOps-mode metadata under `.holyops/workspace-state.json` and still reads legacy `.openclaw/workspace-state.json` when present.
+- Channel plugin catalog now returns no entries in HolyOps mode (`src/channels/plugins/catalog.ts`), removing extension onboarding/install surface from v1 mode.
 
 ## Workflow/adapter removal pass (2026-02-21)
 

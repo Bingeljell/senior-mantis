@@ -13,6 +13,7 @@ Primary vision doc: `docs/sm/VISION.md`
 - HolyOps v1 CLI surface no longer registers `workflow`.
 - HolyOps mode default workspace path now resolves to `~/.holyops/workspace` (legacy workspace-state marker is still read for compatibility).
 - Removed dormant workflow adapter stack from active runtime and code (video/business/research/writer tools + adapter registry + workflow command implementation/tests).
+- Channel plugin catalog returns no entries in HolyOps mode, disabling plugin-install onboarding surface for v1.
 - Updated desktop runbook docs to match this reduced v1 surface.
 
 Files changed in this cleanup pass:

@@ -111,6 +111,8 @@ Legend (HolyOps pivot):
   - rationale: move HolyOps-mode default workspace root to `~/.holyops/workspace` while preserving legacy workspace-state marker read compatibility.
 - 2026-02-21: `src/agents/openclaw-tools.ts`
   - rationale: remove HolyOps workflow adapter-tool injection from active runtime path to reduce v1 surface area.
+- 2026-02-21: `src/channels/plugins/catalog.ts`, `src/channels/plugins/catalog.test.ts`
+  - rationale: return empty channel-plugin catalog in HolyOps mode to remove extension onboarding/install surface from v1 path.
 
 ## Deletion log (completed)
 
