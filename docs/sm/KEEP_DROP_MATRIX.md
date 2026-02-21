@@ -115,6 +115,8 @@ Legend (HolyOps pivot):
   - rationale: return empty channel-plugin catalog in HolyOps mode to remove extension onboarding/install surface from v1 path.
 - 2026-02-21: `src/channels/registry.ts`, `src/channels/registry.test.ts`
   - rationale: enforce HolyOps channel policy at core channel registry normalization/list boundaries for defense in depth.
+- 2026-02-21: `src/plugins/loader.ts`, `src/plugins/loader.test.ts`
+  - rationale: block non-channel plugins in HolyOps mode so plugin runtime stays focused on v1 channel scope.
 
 ## Deletion log (completed)
 

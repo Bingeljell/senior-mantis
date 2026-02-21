@@ -56,6 +56,9 @@ Additional behavior impact:
 - Core channel registry helpers now apply HolyOps channel policy:
   - `src/channels/registry.ts` filters `listChatChannels()` to v1-allowed core channels in HolyOps mode.
   - `src/channels/registry.ts` rejects non-v1 channel ids in `normalizeChatChannelId()` while HolyOps mode is active.
+- Plugin loader now blocks non-channel plugins in HolyOps mode:
+  - `src/plugins/loader.ts` treats non-channel plugins as disallowed under Senior Mantis/HolyOps policy.
+  - `src/plugins/loader.test.ts` covers HolyOps-mode non-channel plugin blocking.
 
 ## Workflow/adapter removal pass (2026-02-21)
 
