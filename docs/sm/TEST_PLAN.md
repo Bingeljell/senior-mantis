@@ -18,7 +18,7 @@
 - launches locally
 - explicit confirmation appears before gateway start/stop and onboarding launch
 - status/health/sessions snapshots render
-- local web UI embeds and reloads
+- browser dashboard opens and connects
 - activity log shows resolved CLI mode/command
 - gateway start returns actionable error if CLI binary is missing
 
@@ -43,7 +43,7 @@
 
 1. Senior Mantis runner does not expose `channels` command in help.
 2. Non-v1 command families are absent from default workflows.
-3. State/config writes go under `~/.seniormantis` when no explicit override is set.
+3. State/config defaults resolve to `~/.holyops/holyops.json` when no explicit override is set, with legacy fallback reads from `~/.seniormantis/seniormantis.json`.
 4. In Senior Mantis mode, disallowed channel plugins do not load at plugin-loader boundary.
 
 ## Suggested command suite

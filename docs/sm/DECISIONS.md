@@ -76,3 +76,8 @@ Reason: defense in depth; remove non-v1 channel load paths instead of relying on
 
 Decision: desktop Electron shell should resolve CLI invocation dynamically (repo CLI first, global `seniormantis` fallback), and report explicit process-launch errors.
 Reason: keep local developer testing unblocked when repo dependencies are temporarily missing, while preserving a deterministic default path.
+
+### D-016: HolyOps default path migration with legacy compatibility
+
+Decision: switch HolyOps default state/config paths to `~/.holyops/holyops.json`, while retaining compatibility reads from `~/.seniormantis/seniormantis.json` when HolyOps config is absent.
+Reason: make HolyOps identity concrete now without breaking existing local installs during staged cleanup.

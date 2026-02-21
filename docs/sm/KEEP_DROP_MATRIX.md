@@ -104,6 +104,8 @@ Legend (HolyOps pivot):
   - rationale: de-register `workflow` from HolyOps v1 CLI command surface until cleanup/migration pass is complete.
 - 2026-02-21: `apps/desktop-electron/README.md`
   - rationale: align desktop docs with browser-only dashboard path and removed quick-action surface.
+- 2026-02-21: `src/sm/env.ts`, `src/sm/env.test.ts`, `apps/desktop-electron/main.mjs`, `scripts/smoke-desktop-local.sh`, `src/wizard/onboarding.finalize.ts`
+  - rationale: move HolyOps default state/config path to `~/.holyops/holyops.json` while preserving compatibility reads from legacy `~/.seniormantis/seniormantis.json`.
 
 ## Deletion log (completed)
 

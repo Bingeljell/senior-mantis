@@ -1,6 +1,6 @@
 # HolyOps Migration Notes
 
-Last updated: 2026-02-19
+Last updated: 2026-02-21
 
 ## Current state
 
@@ -8,9 +8,11 @@ Last updated: 2026-02-19
 - CLI compatibility is dual-mode:
   - primary: `holyops`
   - compatibility alias: `seniormantis`
-- Runtime/state path remains unchanged for now:
-  - state: `~/.seniormantis`
-  - config: `~/.seniormantis/seniormantis.json`
+- HolyOps defaults now target:
+  - state: `~/.holyops`
+  - config: `~/.holyops/holyops.json`
+- Legacy compatibility read path remains active:
+  - `~/.seniormantis/seniormantis.json` is still detected and used when no HolyOps config exists.
 
 ## Why this is staged
 
@@ -20,7 +22,7 @@ Last updated: 2026-02-19
 ## Deferred cleanup items (tracked)
 
 1. Remove `seniormantis` command alias after HolyOps rollout window closes.
-2. Add explicit migrator from `~/.seniormantis` to `~/.holyops`.
+2. Add explicit one-time migrator from `~/.seniormantis` to `~/.holyops` (copy + verify + backup, operator-confirmed).
 3. Rename internal identifiers/file paths that still mention Senior Mantis.
 4. Replace `docs/sm/*` path naming once repo split timing is locked.
 

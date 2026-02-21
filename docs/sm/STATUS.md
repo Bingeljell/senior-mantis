@@ -33,6 +33,20 @@ Behavior impact:
 - Desktop app no longer exposes quick-action buttons for workflow adapters during cleanup phase.
 - HolyOps v1 top-level CLI no longer advertises/registers `workflow`; command surface stays focused on setup/onboarding/gateway/status/session flows.
 
+## HolyOps path migration pass (2026-02-21)
+
+- HolyOps default state/config paths now target:
+  - `~/.holyops`
+  - `~/.holyops/holyops.json`
+- Legacy compatibility read path remains active:
+  - if `~/.seniormantis/seniormantis.json` exists and HolyOps config is absent, defaults fall back to legacy config.
+- Updated path resolution and docs:
+  - `src/sm/env.ts`, `src/sm/env.test.ts`
+  - `apps/desktop-electron/main.mjs`
+  - `scripts/smoke-desktop-local.sh`
+  - `src/wizard/onboarding.finalize.ts`
+  - `apps/desktop-electron/README.md`
+
 ## HolyOps pivot updates (2026-02-19)
 
 - Added `holyops` CLI alias while preserving `seniormantis` compatibility:
@@ -113,7 +127,7 @@ Behavior impact:
     - `ui/src/ui/brand.node.test.ts`
 - Added explicit migration tracker:
   - `docs/sm/HOLYOPS_MIGRATION_NOTES.md`
-  - keeps `~/.seniormantis` path for now, tracks deferred move to `~/.holyops`.
+  - tracks default-path migration (`~/.holyops`) and legacy compatibility behavior.
 
 ## Reality check (implemented)
 
@@ -250,7 +264,7 @@ Behavior impact:
   - root cause: desktop-launched CLI could drift into legacy OpenClaw state/config/auth context.
   - symptom: embedded UI showed `disconnected (1008): unauthorized` while desktop reported gateway running.
   - fix in `apps/desktop-electron/main.mjs` + `apps/desktop-electron/renderer/renderer.js`:
-    - force desktop CLI env defaults to Senior Mantis paths (`OPENCLAW_STATE_DIR=~/.seniormantis`, `OPENCLAW_CONFIG_PATH=~/.seniormantis/seniormantis.json`) unless explicitly overridden with `SM_STATE_DIR`/`SM_CONFIG_PATH`
+    - default desktop CLI env to HolyOps paths (`OPENCLAW_STATE_DIR=~/.holyops`, `OPENCLAW_CONFIG_PATH=~/.holyops/holyops.json`) with legacy config fallback, unless explicitly overridden with `SM_STATE_DIR`/`SM_CONFIG_PATH`
     - resolve `gateway.auth.token` from Senior Mantis config and append `#token=...` for embedded/opened dashboard URL
     - re-resolve dashboard URL/token dynamically after gateway start so first-run auto-token generation does not require desktop app restart
     - token resolution now also honors `OPENCLAW_GATEWAY_TOKEN` env when present (common legacy local setup)

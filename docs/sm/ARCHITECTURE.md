@@ -25,7 +25,7 @@ WhatsApp channel      Pi runtime + tools
 2. Product defaults
 
 - `src/sm/env.ts`
-- Sets isolated state/config defaults under `~/.seniormantis`.
+- Sets isolated state/config defaults under `~/.holyops` with legacy fallback reads.
 
 3. CLI runner
 
@@ -65,9 +65,10 @@ WhatsApp channel      Pi runtime + tools
 
 ## State model
 
-1. State root: `~/.seniormantis` (default).
-2. Config file: `~/.seniormantis/seniormantis.json`.
-3. Sessions/transcripts still use existing gateway/session internals.
+1. State root: `~/.holyops` (default).
+2. Config file: `~/.holyops/holyops.json`.
+3. Legacy fallback read: `~/.seniormantis/seniormantis.json` when HolyOps config is absent.
+4. Sessions/transcripts still use existing gateway/session internals.
 
 ## Security defaults (target)
 

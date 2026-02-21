@@ -45,7 +45,7 @@ Ship a senior-friendly assistant app based on OpenClaw with a narrow v1:
 Direction is now personal-first `HolyOps` (creator workflow cockpit) while preserving safe staged cleanup.
 
 - Primary UX command is now `holyops`; `seniormantis` remains as a compatibility alias.
-- Runtime/state path remains `~/.seniormantis` for now (migration deferred, explicitly tracked).
+- Runtime/state defaults now target `~/.holyops` with legacy fallback to `~/.seniormantis/seniormantis.json` when present.
 - Surface focus remains:
   - desktop-first local control flow
   - WhatsApp interaction path
@@ -134,8 +134,9 @@ Direction is now personal-first `HolyOps` (creator workflow cockpit) while prese
 - Added `seniormantis` binary entry and `holyops` primary alias (`package.json`, `seniormantis.mjs`, `holyops.mjs`).
 - Added dedicated entrypoint `src/entry-seniormantis.ts`.
 - Added Senior Mantis environment defaults in `src/sm/env.ts`:
-  - state path defaults to `~/.seniormantis`
-  - config path defaults to `~/.seniormantis/seniormantis.json`
+  - state path defaults to `~/.holyops`
+  - config path defaults to `~/.holyops/holyops.json`
+  - compatibility reads legacy `~/.seniormantis/seniormantis.json` when no HolyOps config exists
   - CLI name override defaults to `holyops` (with `seniormantis` compatibility)
 - Added reduced CLI program at `src/sm/cli/program/build-program.ts`.
 - Added Senior Mantis-only gateway CLI registration at `src/sm/cli/program/register-gateway.ts`:
@@ -190,8 +191,8 @@ Direction is now personal-first `HolyOps` (creator workflow cockpit) while prese
   - desktop shell now resolves UI path from config (or `SM_GATEWAY_UI_PATH`) before loading iframe URL
   - file: `apps/desktop-electron/main.mjs`
 - Fixed desktop auth/config drift with legacy OpenClaw installs:
-  - desktop launcher now forces CLI state/config env to Senior Mantis paths by default (`~/.seniormantis`)
-  - embedded dashboard/open-in-browser URLs include `#token=...` when `gateway.auth.token` exists in Senior Mantis config (or via `SM_GATEWAY_TOKEN`)
+  - desktop launcher now defaults CLI state/config env to HolyOps paths (`~/.holyops/holyops.json`) with legacy config fallback
+  - embedded dashboard/open-in-browser URLs include `#token=...` when `gateway.auth.token` exists in HolyOps config (legacy-compatible, or via `SM_GATEWAY_TOKEN`)
   - dashboard URL/token are resolved dynamically after gateway start to pick up first-run auto-generated tokens without restarting desktop
   - token resolution also reads `OPENCLAW_GATEWAY_TOKEN` env for legacy local setups
   - dashboard URL uses trailing slash for non-root base paths to avoid auth fragment loss on redirect edge cases
@@ -269,7 +270,7 @@ Gateway subcommands intentionally exposed in Senior Mantis runner:
 
 ## Immediate next tasks
 
-1. Migrate HolyOps defaults from `~/.seniormantis` to `~/.holyops` with compatibility reads for existing local state.
+1. Add explicit one-time state migrator (`~/.seniormantis` -> `~/.holyops`) with backup + confirmation.
 2. Continue pruning non-v1 channel/runtime surfaces (remove dormant extension/plugin/channel paths where unused in HolyOps mode).
 3. Run desktop-first manual smoke loop (`setup -> gateway -> dashboard -> onboarding`) and fix remaining UI/launch instability.
 
