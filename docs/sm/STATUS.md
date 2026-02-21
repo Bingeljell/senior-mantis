@@ -102,11 +102,6 @@ Behavior impact:
     - `business_proposal`
     - `research_scan`
     - `writer_draft`
-- Hardened adapter ergonomics for v1 reliability:
-  - stricter action validation (`outputPath`, `clip` args, `musicPath`) in `src/sm/adapters/video-cli-adapter.ts`
-  - richer business artifacts (`proposal_id` + URL inference) in `src/sm/adapters/business-cli-adapter.ts`
-  - retryability heuristics for transient command failures in both adapters
-  - expanded adapter tests in `src/sm/adapters/registry.test.ts`
 - Added HolyOps-mode runtime branding pass for high-visibility output:
   - dynamic product label helper: `src/sm/brand.ts`
   - updated runtime output copy:
@@ -341,6 +336,14 @@ Behavior impact:
 
 ## Validation (this environment)
 
+- `pnpm exec vitest run src/agents/openclaw-tools.holyops-plugin-prune.test.ts src/sm/cli/program/build-program.test.ts`
+  - pass (6 tests)
+- `pnpm exec vitest run --config vitest.e2e.config.ts src/agents/workspace.e2e.test.ts src/agents/workspace.defaults.e2e.test.ts`
+  - pass (11 tests)
+- `pnpm check`
+  - pass
+- `scripts/smoke-desktop-local.sh`
+  - blocked at `pnpm --dir apps/desktop-electron exec electron --version` with `Electron ... exited with signal SIGABRT`
 - `pnpm build`
   - pass
 - `pnpm check`
@@ -359,10 +362,7 @@ Behavior impact:
   - pass (9 tests)
 - `pnpm exec vitest run src/sm/cli/program/build-program.test.ts src/sm/cli/program/build-program.dashboard.test.ts`
   - pass (6 tests)
-- `pnpm exec vitest run src/sm/adapters/registry.test.ts src/agents/openclaw-tools.holyops.test.ts src/cli/cli-name.test.ts src/sm/channel-policy.test.ts`
-  - pass (14 tests)
-- `pnpm exec vitest run src/sm/brand.test.ts src/sm/cli/program/register-workflow.test.ts src/sm/adapters/registry.test.ts src/agents/openclaw-tools.holyops.test.ts src/agents/openclaw-tools.holyops-plugin-prune.test.ts`
-  - pass (21 tests)
+- Historical: adapter/workflow test runs from 2026-02-19 were removed after 2026-02-21 adapter stack deletion.
 - `pnpm exec vitest -c vitest.e2e.config.ts run src/commands/dashboard.e2e.test.ts src/commands/status.e2e.test.ts`
   - pass (12 tests)
 - `pnpm exec vitest -c vitest.e2e.config.ts run src/gateway/server.channels.e2e.test.ts`
