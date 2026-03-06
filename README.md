@@ -1,3 +1,5 @@
+# This is meant to be a warning repo of what happens when you vibe-code outside your league: https://x.com/Bingeljell/status/2029502589222424637?s=20 read here to find out more.
+
 # 🦞 OpenClaw — Personal AI Assistant
 
 <p align="center">
